@@ -9,10 +9,21 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo-google-fonts/merriweather": "^0.2.3",
+    "@expo-google-fonts/noto-sans-jp": "^0.2.3",
+    "@expo-google-fonts/roboto": "^0.2.3",
+    "@expo/metro-runtime": "~3.2.1",
+    "@react-native-community/checkbox": "^0.5.17",
     "expo": "~51.0.26",
+    "expo-blur": "^13.0.2",
+    "expo-checkbox": "^3.0.0",
+    "expo-linear-gradient": "^13.0.2",
+    "expo-splash-screen": "^0.27.5",
     "expo-status-bar": "~1.12.1",
     "react": "18.2.0",
+    "react-dom": "18.2.0",
     "react-native": "0.74.5",
+    "react-native-web": "~0.19.10",
     "twrnc": "^4.5.0"
   },
   "devDependencies": {
