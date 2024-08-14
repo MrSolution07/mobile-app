@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import {StyleSheet,SafeAreaView,View,Image,Text,TouchableOpacity,TextInput,} from 'react-native';
+import { StyleSheet, SafeAreaView, View, Image, Text, TouchableOpacity, TextInput,Pressable } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { BlurView } from 'expo-blur';
+import tw from 'twrnc';
 
-export default function SignUpScreen() {
+export default function RegistrationScreen() {
   const [form, setForm] = useState({
     name: '',
     surname: '',
@@ -13,24 +15,28 @@ export default function SignUpScreen() {
   });
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: 'whitesmoke' }}>
+    <SafeAreaView style={[tw`flex-1`, styles.safeArea]}>
+      <Image 
+        source={{ uri: 'https://i.pinimg.com/564x/fe/01/5d/fe015d82aec5279fe7b9abceb3ee813a.jpg' }}
+        style={tw`absolute w-full h-full`}
+        resizeMode='cover'
+      />
+      <BlurView
+        style={tw`absolute inset-0`}
+        intensity={100}
+        tint="light"
+      />
       <View style={styles.container}>
         <KeyboardAwareScrollView>
           <View style={styles.header}>
             <Image
               resizeMode="contain"
               style={styles.headerImg}
-              source={{
-                uri: 'logo.png',
-              }} />
-
+              source={{ uri: 'logo.png' }} />
             <Text style={styles.title}>
               Sign up to <Text style={{ color: '#075eec' }}>MajorInvest</Text>
             </Text>
-
-            <Text style={styles.subtitle}>
-              Create a new account
-            </Text>
+            <Text style={styles.subtitle}>Create a new account</Text>
           </View>
 
           <View style={styles.form}>
@@ -123,22 +129,30 @@ export default function SignUpScreen() {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.formLink}>Already have an account? Sign in</Text>
+            <Text style={styles.formLink}>
+              Already have an account? {''}
+              <Pressable>
+                <Text style={styles.signInText}>Sign in</Text>
+              </Pressable>
+            </Text>
+
           </View>
         </KeyboardAwareScrollView>
-
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    position: 'relative',
+  },
   container: {
-    paddingVertical: 24,
-    paddingHorizontal: 0,
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
+    flex: 1,
+    margin: 24,
+    padding: 24,
+    backgroundColor: 'rgba(245, 245, 245, 0.9)', // Reduced opacity
+    borderRadius: 8,
   },
   title: {
     fontSize: 31,
@@ -164,10 +178,7 @@ const styles = StyleSheet.create({
   },
   form: {
     marginBottom: 24,
-    paddingHorizontal: 24,
     flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
   },
   formAction: {
     marginTop: 4,
@@ -178,6 +189,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#075eec',
     textAlign: 'center',
+  },
+  signInText: {
+    textDecorationLine: 'underline',
   },
   input: {
     marginBottom: 16,
