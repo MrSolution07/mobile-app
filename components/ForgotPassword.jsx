@@ -28,12 +28,15 @@ const ForgotPassword = () => {
                 Reset Password
               </Text>
             </Pressable>
-            <Text style={[tw`text-center mt-5`, styles.formLink]}>
-              Don't have an account? {''}
-              <Pressable>
-                <Text style={[tw`underline`, styles.signUptext]}>Sign Up</Text>
-              </Pressable>
+
+            <View style={tw`flex-row justify-center mt-5 gap-x-px`}>
+            <Text style={styles.formLink}>Don't have an account?{''}
             </Text>
+            <Pressable>
+              <Text style={[tw`underline`, styles.signUptext]}>Sign Up</Text>
+            </Pressable>
+          </View>
+
           </View>
         </View>
       </View>
@@ -63,12 +66,12 @@ const styles = StyleSheet.create({
   },
   signUptext: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '500',
     color: '#075eec',
   },
   formLink: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '500',
     color: '#075eec',
   },
 });

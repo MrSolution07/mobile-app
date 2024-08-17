@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { StyleSheet, SafeAreaView, View, Image, Text, TouchableOpacity, TextInput,Pressable } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Image, Text, TouchableOpacity, TextInput, Pressable, StatusBar } from 'react-native';
+import CheckBox from 'expo-checkbox';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
+import Feather from '@expo/vector-icons/Feather';
 
 export default function RegistrationScreen() {
   const [form, setForm] = useState({
@@ -14,28 +16,39 @@ export default function RegistrationScreen() {
     confirmPassword: '',
   });
 
+  const [showPassword, setShowPassword] = useState(true);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(true);
+  const [isChecked, setIsChecked] = useState(false);
+
+
+  const togglePassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
   return (
     <SafeAreaView style={[tw`flex-1`, styles.safeArea]}>
+      <StatusBar barStyle="dark-content" translucent />
       <Image 
-        source={{ uri: 'https://i.pinimg.com/564x/fe/01/5d/fe015d82aec5279fe7b9abceb3ee813a.jpg' }}
+        source={{ uri: 'https://i.pinimg.com/originals/6b/f8/48/6bf848ae5afdb77782a1ff14067b194a.jpg' }}
         style={tw`absolute w-full h-full`}
         resizeMode='cover'
       />
       <BlurView
         style={tw`absolute inset-0`}
-        intensity={100}
-        tint="light"
+        intensity={1}
+        tint="dark"
       />
       <View style={styles.container}>
-        <KeyboardAwareScrollView>
+        <KeyboardAwareScrollView showsVerticalScrollIndicator={false} bounces={false}>
           <View style={styles.header}>
-            <Image
-              resizeMode="contain"
-              style={styles.headerImg}
-              source={{ uri: 'logo.png' }} />
-            <Text style={styles.title}>
-              Sign up to <Text style={{ color: '#075eec' }}>MajorInvest</Text>
-            </Text>
+            <View style={styles.titleContainer}>
+              <Text style={styles.title}>Sign up to </Text>
+              <Text style={styles.companyName}>MajorInvest</Text>
+            </View>
             <Text style={styles.subtitle}>Create a new account</Text>
           </View>
 
@@ -95,29 +108,64 @@ export default function RegistrationScreen() {
 
             <View style={styles.input}>
               <Text style={styles.inputLabel}>Password</Text>
-              <TextInput
-                autoCorrect={false}
-                clearButtonMode="while-editing"
-                onChangeText={password => setForm({ ...form, password })}
-                placeholder="********"
-                placeholderTextColor="#6b7280"
-                style={styles.inputControl}
-                secureTextEntry={true}
-                value={form.password} />
+              <View style={tw`relative`}>
+                <TextInput
+                  autoCorrect={false}
+                  clearButtonMode="while-editing"
+                  onChangeText={password => setForm({ ...form, password })}
+                  placeholder="********"
+                  placeholderTextColor="#6b7280"
+                  style={styles.inputControl}
+                  secureTextEntry={showPassword}
+                  value={form.password} />
+                <Pressable
+                  onPress={togglePassword}
+                  style={tw`absolute right-3 top-2/6 transform -translate-y-1/2`}
+                >
+                  {showPassword ? (
+                    <Feather name="eye" size={20} color="black" />
+                  ) : (
+                    <Feather name="eye-off" size={20} color="black" />
+                  )}
+                </Pressable>
+              </View>
             </View>
 
             <View style={styles.input}>
               <Text style={styles.inputLabel}>Confirm Password</Text>
-              <TextInput
-                autoCorrect={false}
-                clearButtonMode="while-editing"
-                onChangeText={confirmPassword => setForm({ ...form, confirmPassword })}
-                placeholder="********"
-                placeholderTextColor="#6b7280"
-                style={styles.inputControl}
-                secureTextEntry={true}
-                value={form.confirmPassword} />
+              <View style={tw`relative`}>
+                <TextInput
+                  autoCorrect={false}
+                  clearButtonMode="while-editing"
+                  onChangeText={confirmPassword => setForm({ ...form, confirmPassword })}
+                  placeholder="********"
+                  placeholderTextColor="#6b7280"
+                  style={styles.inputControl}
+                  secureTextEntry={showConfirmPassword}
+                  value={form.confirmPassword} />
+                <Pressable
+                  onPress={toggleConfirmPassword}
+                  style={tw`absolute right-3 top-2/6 transform -translate-y-1/2`}
+                >
+                  {showConfirmPassword ? (
+                    <Feather name="eye" size={20} color="black" />
+                  ) : (
+                    <Feather name="eye-off" size={20} color="black" />
+                  )}
+                </Pressable>
+              </View>
             </View>
+            
+            <View style={tw`flex-row items-center ml-1 mb-5`}>
+              <CheckBox
+                value={isChecked}
+                onValueChange={setIsChecked}
+                style={tw`mr-2 rounded-md border-black`}
+                tintColors={{ true: 'black', false: 'gray' }}
+              />
+              <Text style={styles.checktext}>I have read the <Text style={styles.terms}>Terms and Conditions </Text></Text>
+            </View>
+            
 
             <View style={styles.formAction}>
               <TouchableOpacity
@@ -128,14 +176,13 @@ export default function RegistrationScreen() {
                 </View>
               </TouchableOpacity>
             </View>
-
-            <Text style={styles.formLink}>
-              Already have an account? {''}
+            
+            <View style={tw`flex-row justify-center mt-5`}> 
+              <Text style={styles.formLink}>Already have an account? {''}</Text>
               <Pressable>
-                <Text style={styles.signInText}>Sign in</Text>
+                <Text style={[styles.formLink, tw`underline`]}>Sign in</Text>
               </Pressable>
-            </Text>
-
+            </View>
           </View>
         </KeyboardAwareScrollView>
       </View>
@@ -149,36 +196,40 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    margin: 24,
+    // margin: 24,
     padding: 24,
-    backgroundColor: 'rgba(245, 245, 245, 0.9)', // Reduced opacity
+    backgroundColor: 'rgba(245, 245, 245, 0.85)', 
     borderRadius: 8,
+    ...StyleSheet.absoluteFillObject
   },
   title: {
-    fontSize: 31,
+    fontSize: 26,
     fontWeight: '700',
     color: '#1D2A32',
-    marginBottom: 6,
   },
   subtitle: {
     fontSize: 15,
     fontWeight: '500',
     color: '#929292',
+    textAlign: 'center',
   },
-  header: {
+  companyName: {
+    fontSize: 26,
+    marginBottom: 0,
+    color: '#075eec',
+  },
+  titleContainer: {
+    flexDirection: 'row', 
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 36,
+    marginBottom: 8,
   },
-  headerImg: {
-    width: 80,
-    height: 80,
-    alignSelf: 'center',
-    marginBottom: 36,
+  header: {
+    marginVertical: 60,
   },
   form: {
-    marginBottom: 24,
-    flexGrow: 1,
+    // marginBottom: 24,
+    // flexGrow: 1,
   },
   formAction: {
     marginTop: 4,
@@ -188,10 +239,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#075eec',
-    textAlign: 'center',
-  },
-  signInText: {
-    textDecorationLine: 'underline',
   },
   input: {
     marginBottom: 16,
@@ -231,5 +278,13 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     fontWeight: '600',
     color: '#fff',
+  },
+  checktext:{
+      fontSize:16,
+  },
+  terms:{
+    textDecorationLine:'underline',
+    color:'#075eec',
+
   },
 });

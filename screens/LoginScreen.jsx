@@ -1,30 +1,39 @@
 import React, { useState } from 'react';
-import { TextInput, SafeAreaView, View, Text, Pressable, StatusBar, Image, StyleSheet } from 'react-native';
+import { TextInput, SafeAreaView, View, Text, Pressable, StatusBar, Image, StyleSheet, ScrollView } from 'react-native';
 import { BlurView } from 'expo-blur';
 import CheckBox from 'expo-checkbox';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import tw from 'twrnc';
-// import ForgotPassword from './components/ForgotPassword.jsx'
+import Feather from '@expo/vector-icons/Feather';
 
 const LoginScreen = () => {
   const [isChecked, setIsChecked] = useState(false);
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(true);
+
+  const togglePassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   return (
-    <SafeAreaView style={[tw`flex-1`]}>
-      <StatusBar barStyle="light-content" />
-      <Image 
-        source={{ uri: 'https://i.pinimg.com/564x/fe/01/5d/fe015d82aec5279fe7b9abceb3ee813a.jpg' }}
-        style={tw`absolute w-full h-full`}
+    <View style={tw`flex-1`}>
+      <ScrollView showsVerticalScrollIndicator={false} bounces={false} horizontal showsHorizontalScrollIndicator={false}>
+      <StatusBar barStyle="dark-content" translucent />
+
+      <Image
+        source={{ uri: 'https://i.pinimg.com/originals/6b/f8/48/6bf848ae5afdb77782a1ff14067b194a.jpg' }}
+        style={[tw`absolute w-full h-full`, styles.img]}
         resizeMode='cover'
       />
+
       <BlurView
         style={tw`absolute inset-0`}
-        intensity={100}  
-        tint="light"
+        intensity={1}
+        tint="dark"
       />
 
-      <View style={tw`flex-1 justify-center items-center p-8`}>
-        <View style={[tw`w-full p-8`, styles.contentContainer]}>
+      <SafeAreaView style={tw`flex-1`}>
+        <View style={styles.contentContainer}>
           <Text style={[tw`text-3xl font-bold text-left mb-12`, styles.header]}>Sign in to your account</Text>
 
           <TextInput
@@ -33,53 +42,72 @@ const LoginScreen = () => {
             style={[tw`rounded-md bg-white text-black h-12 w-full mb-5 p-3`, styles.textInput]}
           />
 
-          <TextInput
-            placeholder='Enter your password'
-            placeholderTextColor='gray'
-            secureTextEntry
-            style={[tw`rounded-md bg-white text-black h-12 w-full mb-5 p-3`, styles.textInput]}
-          />
+          <View style={tw`relative w-full mb-5`}>
+            <TextInput
+              placeholder='Enter your password'
+              placeholderTextColor='gray'
+              secureTextEntry={showPassword}
+              autoCorrect={false}
+              value={password}
+              autoCapitalize="none"
+              onChangeText={(text) => setPassword(text)}
+              style={[tw`rounded-md bg-white text-black h-12 p-3`, styles.textInput]}
+            />
+            <Pressable
+              onPress={togglePassword}
+              style={tw`absolute right-3 top-2/6 transform -translate-y-1/2 `}
+            >
+              {showPassword ? (
+                <Feather name="eye" size={20} color="black" />
+              ) : (
+                <Feather name="eye-off" size={20} color="black" />
+              )}
+            </Pressable>
+          </View>
 
-          
           <View style={tw`flex-row justify-between items-center mb-5`}>
-            <View style={tw`flex-row items-center`}>
+            <View style={tw`flex-row items-center ml-1`}>
               <CheckBox
                 value={isChecked}
                 onValueChange={setIsChecked}
-                style={tw`mr-2 rounded-md border-black`} 
-                tintColors={{ true: 'black', false: 'gray' }} 
+                style={tw`mr-2 rounded-md border-black`}
+                tintColors={{ true: 'black', false: 'gray' }}
               />
-              <Text style={tw`text-black font-small`}>Remember Me</Text>
+              <Text style={tw`text-black`}>Remember Me</Text>
             </View>
 
-            <Pressable>
-            <Text style={tw`text-black underline`}>Forgot Password?</Text>
+            <Pressable style={tw`ml-10`}>
+              <Text style={tw`text-black underline`}>Forgot Password?</Text>
             </Pressable>
-            
           </View>
 
-          <Pressable style={[tw` w-full h-12 justify-center mb-2 rounded-lg`,styles.loginbtn]} android_ripple={{ color: 'lightgray' }}>
+
+          <Pressable style={[tw`w-full h-12 justify-center mb-2 rounded-lg`, styles.loginBtn]} android_ripple={{ color: 'lightgray' }}>
             <Text style={tw`text-white text-center text-lg font-medium`}>Login</Text>
           </Pressable>
 
-          <Pressable style={tw`bg-gray-200 w-full h-12 flex-row justify-center items-center mb-2 rounded-lg`}>
+          <Pressable style={tw`bg-indigo-50 w-full h-12 flex-row justify-center items-center mb-2 rounded-lg`}>
             <FontAwesome name="google" size={20} color="black" style={tw`mr-3`} />
             <Text style={tw`text-black text-center`}>Login with Google</Text>
           </Pressable>
 
-          <Pressable style={tw`bg-gray-200 w-full h-12 flex-row justify-center items-center rounded-lg`}>
+          <Pressable style={tw`bg-indigo-50 w-full h-12 flex-row justify-center items-center rounded-lg`}>
             <FontAwesome name="facebook" size={20} color="black" style={tw`mr-2`} />
             <Text style={tw`text-black text-center`}>Login with Facebook</Text>
           </Pressable>
 
-          <Text style={[tw`text-center mt-5`,styles.text]}>Don't have an account? {''} 
-           <Pressable >
-            <Text style={[tw`underline`,styles.text]}>Sign Up</Text>
-          </Pressable> 
-          </Text>
+          <View style={tw`flex-row justify-center mt-5`}>
+            <Text style={styles.text}>Don't have an account?{''}
+            </Text>
+            <Pressable>
+              <Text style={[tw`underline`, styles.text]}>Sign Up</Text>
+            </Pressable>
+          </View>
         </View>
-      </View>
-    </SafeAreaView>
+        
+      </SafeAreaView>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -88,20 +116,27 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto_400Regular',
   },
   header: {
-    color: '#1D2A32',
+    color: '#333',
   },
   contentContainer: {
-    backgroundColor: 'rgba(245, 245, 245, 0.9)',  
-    borderRadius: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+    ...StyleSheet.absoluteFillObject,
   },
-  loginbtn:{
+  loginBtn: {
     backgroundColor: '#075eec',
   },
-  text:{
+  text: {
     fontSize: 16,
     fontWeight: '600',
     color: '#075eec',
-  }
+  },
+  img: {
+    // ...StyleSheet.absoluteFillObject,
+  },
 });
 
 export default LoginScreen;
