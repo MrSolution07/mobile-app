@@ -17,7 +17,6 @@ const LoginScreen = () => {
 
   return (
     <View style={tw`flex-1`}>
-      <ScrollView showsVerticalScrollIndicator={false} bounces={false} horizontal showsHorizontalScrollIndicator={false}>
       <StatusBar barStyle="dark-content" translucent />
 
       <Image
@@ -55,7 +54,7 @@ const LoginScreen = () => {
             />
             <Pressable
               onPress={togglePassword}
-              style={tw`absolute right-3 top-2/6 transform -translate-y-1/2 `}
+              style={tw`absolute right-3 top-2/6 `}
             >
               {showPassword ? (
                 <Feather name="eye" size={20} color="black" />
@@ -106,7 +105,6 @@ const LoginScreen = () => {
         </View>
         
       </SafeAreaView>
-      </ScrollView>
     </View>
   );
 };
