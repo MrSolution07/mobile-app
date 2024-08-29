@@ -1,12 +1,14 @@
 import React from 'react';
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import tw from 'twrnc'; // this is a how you import tailwindcss in react native
 import LoginScreen from './screens/LoginScreen';
 import RegistrationScreen from './screens/RegistrationScreen.jsx';
 import { useCustomFonts } from './assets/fonts/fonts.js'; 
 import * as SplashScreen from 'expo-splash-screen';
-// import ForgotPassword from './components/ForgotPassword.jsx';
+import ForgotPassword from './components/ForgotPassword.jsx';
+import AppNavigator from './screens/Navigator/AppNavigator.js'; 
+import { NavigationContainer } from '@react-navigation/native';
+
 
 
 
@@ -25,17 +27,7 @@ export default function App() {
   }
   return (
 
-    <LoginScreen/>
-    // <ForgotPassword/>
-    // <RegistrationScreen/>
-    // <View style={[styles.container, tw`bg-blue-600`]}>
-    //   <Text style={[styles.headerText, tw`text-white`]}>
-    //     Welcome to React Native!
-    //   </Text>
-    //   <Text style={[styles.bodyText, tw`text-gray-200`]}>
-    //     This is a sample application using Tailwind.
-    //   </Text>
-    // </View>
+      <AppNavigator />
   );
 }
 

@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
-import { TextInput, SafeAreaView, View, Text, Pressable, StatusBar, Image, StyleSheet, ScrollView } from 'react-native';
+import React, { useContext } from 'react';
+import { TextInput, SafeAreaView, View, Text, Pressable, StatusBar, Image, StyleSheet } from 'react-native';
 import { BlurView } from 'expo-blur';
 import CheckBox from 'expo-checkbox';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import tw from 'twrnc';
 import Feather from '@expo/vector-icons/Feather';
+import DataContext from '../screens/Context/Context'; // Adjust path if needed
 
-const LoginScreen = () => {
-  const [isChecked, setIsChecked] = useState(false);
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(true);
+const LoginScreen = ({ navigation }) => {
+  const {
+    isChecked, setIsChecked,
+    password, setPassword,
+    showPassword, setShowPassword
+  } = useContext(DataContext);
 
   const togglePassword = () => {
     setShowPassword(!showPassword);
@@ -49,7 +52,7 @@ const LoginScreen = () => {
               autoCorrect={false}
               value={password}
               autoCapitalize="none"
-              onChangeText={(text) => setPassword(text)}
+              onChangeText={setPassword}
               style={[tw`rounded-md bg-white text-black h-12 p-3`, styles.textInput]}
             />
             <Pressable
@@ -75,13 +78,16 @@ const LoginScreen = () => {
               <Text style={tw`text-black`}>Remember Me</Text>
             </View>
 
-            <Pressable style={tw`ml-10`}>
+            <Pressable style={tw`ml-10`} onPress={() => navigation.navigate('ForgotPassword')}>
               <Text style={tw`text-black underline`}>Forgot Password?</Text>
             </Pressable>
           </View>
 
-
-          <Pressable style={[tw`w-full h-12 justify-center mb-2 rounded-lg`, styles.loginBtn]} android_ripple={{ color: 'lightgray' }}>
+          <Pressable
+            style={[tw`w-full h-12 justify-center mb-2 rounded-lg`, styles.loginBtn]}
+            android_ripple={{ color: 'lightgray' }}
+            onPress={() => navigation.navigate('Tabs')}
+          >
             <Text style={tw`text-white text-center text-lg font-medium`}>Login</Text>
           </Pressable>
 
@@ -96,14 +102,12 @@ const LoginScreen = () => {
           </Pressable>
 
           <View style={tw`flex-row justify-center mt-5`}>
-            <Text style={styles.text}>Don't have an account?{''}
-            </Text>
-            <Pressable>
+            <Text style={styles.text}>Don't have an account?{''}</Text>
+            <Pressable onPress={() => navigation.navigate('Registration')}>
               <Text style={[tw`underline`, styles.text]}>Sign Up</Text>
             </Pressable>
           </View>
         </View>
-        
       </SafeAreaView>
     </View>
   );
