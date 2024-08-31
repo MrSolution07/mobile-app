@@ -1,29 +1,25 @@
-import React, { useState } from 'react';
+import React, { useContext,useState } from 'react';
 import { StyleSheet, SafeAreaView, View, Image, Text, TouchableOpacity, TextInput, Pressable, StatusBar } from 'react-native';
 import CheckBox from 'expo-checkbox';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
 import Feather from '@expo/vector-icons/Feather';
+import DataContext from './Context/Context'; // Import the context
 
-export default function RegistrationScreen() {
-  const [form, setForm] = useState({
-    name: '',
-    surname: '',
-    email: '',
-    cellNumber: '',
-    password: '',
-    confirmPassword: '',
-  });
+export default function RegistrationScreen({navigation}) {
+  const {
+    name, setName,
+    email, setEmail,
+    password, setPassword,
+    phoneNo, setPhoneNo,
+    isChecked, setIsChecked,
+    showPassword, setShowPassword
+  } = useContext(DataContext); 
 
-  const [showPassword, setShowPassword] = useState(true);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(true);
-  const [isChecked, setIsChecked] = useState(false);
-
-
-  const togglePassword = () => {
-    setShowPassword(!showPassword);
-  };
+  const [surname, setSurname] = useState(''); 
+  const [confirmPassword, setConfirmPassword] = useState(''); 
+  const [showConfirmPassword, setShowConfirmPassword] = useState(true); 
 
   const toggleConfirmPassword = () => {
     setShowConfirmPassword(!showConfirmPassword);
@@ -32,7 +28,7 @@ export default function RegistrationScreen() {
   return (
     <SafeAreaView style={[tw`flex-1`, styles.safeArea]}>
       <StatusBar barStyle="dark-content" translucent />
-      <Image 
+      <Image
         source={{ uri: 'https://i.pinimg.com/originals/6b/f8/48/6bf848ae5afdb77782a1ff14067b194a.jpg' }}
         style={tw`absolute w-full h-full`}
         resizeMode='cover'
@@ -59,11 +55,11 @@ export default function RegistrationScreen() {
                 autoCapitalize="words"
                 autoCorrect={false}
                 clearButtonMode="while-editing"
-                onChangeText={name => setForm({ ...form, name })}
+                onChangeText={setName}
                 placeholder="Your Name"
                 placeholderTextColor="#6b7280"
                 style={styles.inputControl}
-                value={form.name} />
+                value={name} />
             </View>
 
             <View style={styles.input}>
@@ -72,11 +68,11 @@ export default function RegistrationScreen() {
                 autoCapitalize="words"
                 autoCorrect={false}
                 clearButtonMode="while-editing"
-                onChangeText={surname => setForm({ ...form, surname })}
+                onChangeText={setSurname}
                 placeholder="Your Surname"
                 placeholderTextColor="#6b7280"
                 style={styles.inputControl}
-                value={form.surname} />
+                value={surname} />
             </View>
 
             <View style={styles.input}>
@@ -86,11 +82,11 @@ export default function RegistrationScreen() {
                 autoCorrect={false}
                 clearButtonMode="while-editing"
                 keyboardType="email-address"
-                onChangeText={email => setForm({ ...form, email })}
+                onChangeText={setEmail}
                 placeholder="Your Email"
                 placeholderTextColor="#6b7280"
                 style={styles.inputControl}
-                value={form.email} />
+                value={email} />
             </View>
 
             <View style={styles.input}>
@@ -99,11 +95,11 @@ export default function RegistrationScreen() {
                 autoCorrect={false}
                 clearButtonMode="while-editing"
                 keyboardType="phone-pad"
-                onChangeText={cellNumber => setForm({ ...form, cellNumber })}
+                onChangeText={setPhoneNo}
                 placeholder="Your Cell Number"
                 placeholderTextColor="#6b7280"
                 style={styles.inputControl}
-                value={form.cellNumber} />
+                value={phoneNo} />
             </View>
 
             <View style={styles.input}>
@@ -112,14 +108,14 @@ export default function RegistrationScreen() {
                 <TextInput
                   autoCorrect={false}
                   clearButtonMode="while-editing"
-                  onChangeText={password => setForm({ ...form, password })}
+                  onChangeText={setPassword}
                   placeholder="********"
                   placeholderTextColor="#6b7280"
                   style={styles.inputControl}
                   secureTextEntry={showPassword}
-                  value={form.password} />
+                  value={password} />
                 <Pressable
-                  onPress={togglePassword}
+                  onPress={() => setShowPassword(!showPassword)}
                   style={tw`absolute right-3 top-2/6 transform -translate-y-1/2`}
                 >
                   {showPassword ? (
@@ -137,12 +133,12 @@ export default function RegistrationScreen() {
                 <TextInput
                   autoCorrect={false}
                   clearButtonMode="while-editing"
-                  onChangeText={confirmPassword => setForm({ ...form, confirmPassword })}
+                  onChangeText={setConfirmPassword}
                   placeholder="********"
                   placeholderTextColor="#6b7280"
                   style={styles.inputControl}
                   secureTextEntry={showConfirmPassword}
-                  value={form.confirmPassword} />
+                  value={confirmPassword} />
                 <Pressable
                   onPress={toggleConfirmPassword}
                   style={tw`absolute right-3 top-2/6 transform -translate-y-1/2`}
@@ -155,7 +151,7 @@ export default function RegistrationScreen() {
                 </Pressable>
               </View>
             </View>
-            
+
             <View style={tw`flex-row items-center ml-1 mb-5`}>
               <CheckBox
                 value={isChecked}
@@ -165,21 +161,23 @@ export default function RegistrationScreen() {
               />
               <Text style={styles.checktext}>I have read the <Text style={styles.terms}>Terms and Conditions </Text></Text>
             </View>
-            
 
             <View style={styles.formAction}>
               <TouchableOpacity
                 onPress={() => {
+                  // Handle sign up logic here
                 }}>
                 <View style={styles.btn}>
                   <Text style={styles.btnText}>Sign Up</Text>
                 </View>
               </TouchableOpacity>
             </View>
-            
-            <View style={tw`flex-row justify-center mt-5`}> 
+
+            <View style={tw`flex-row justify-center mt-5`}>
               <Text style={styles.formLink}>Already have an account? {''}</Text>
-              <Pressable>
+              <Pressable
+                onPress={() => navigation.navigate('Login')}
+              >
                 <Text style={[styles.formLink, tw`underline`]}>Sign in</Text>
               </Pressable>
             </View>
@@ -196,9 +194,8 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    // margin: 24,
     padding: 24,
-    backgroundColor: 'rgba(245, 245, 245, 0.85)', 
+    backgroundColor: 'rgba(245, 245, 245, 0.85)',
     borderRadius: 8,
     ...StyleSheet.absoluteFillObject
   },
@@ -219,7 +216,7 @@ const styles = StyleSheet.create({
     color: '#075eec',
   },
   titleContainer: {
-    flexDirection: 'row', 
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
@@ -227,10 +224,7 @@ const styles = StyleSheet.create({
   header: {
     marginVertical: 60,
   },
-  form: {
-    // marginBottom: 24,
-    // flexGrow: 1,
-  },
+  form: {},
   formAction: {
     marginTop: 4,
     marginBottom: 16,
@@ -272,19 +266,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: '#075eec',
     borderColor: '#075eec',
-  },
-  btnText: {
-    fontSize: 18,
-    lineHeight: 26,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  checktext:{
-      fontSize:16,
-  },
-  terms:{
-    textDecorationLine:'underline',
-    color:'#075eec',
-
   },
 });
