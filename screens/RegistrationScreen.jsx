@@ -1,13 +1,13 @@
-import React, { useContext,useState } from 'react';
-import { StyleSheet, SafeAreaView, View, Image, Text, TouchableOpacity, TextInput, Pressable, StatusBar } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { SafeAreaView, View, Image, Text, TouchableOpacity, TextInput, Pressable, StatusBar, StyleSheet} from 'react-native';
 import CheckBox from 'expo-checkbox';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
 import Feather from '@expo/vector-icons/Feather';
-import DataContext from './Context/Context'; // Import the context
+import DataContext from './Context/Context';
 
-export default function RegistrationScreen({navigation}) {
+export default function RegistrationScreen({ navigation }) {
   const {
     name, setName,
     email, setEmail,
@@ -15,18 +15,18 @@ export default function RegistrationScreen({navigation}) {
     phoneNo, setPhoneNo,
     isChecked, setIsChecked,
     showPassword, setShowPassword
-  } = useContext(DataContext); 
+  } = useContext(DataContext);
 
-  const [surname, setSurname] = useState(''); 
-  const [confirmPassword, setConfirmPassword] = useState(''); 
-  const [showConfirmPassword, setShowConfirmPassword] = useState(true); 
+  const [surname, setSurname] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showConfirmPassword, setShowConfirmPassword] = useState(true);
 
   const toggleConfirmPassword = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
   return (
-    <SafeAreaView style={[tw`flex-1`, styles.safeArea]}>
+    <SafeAreaView style={tw`flex-1 bg-transparent`}>
       <StatusBar barStyle="dark-content" translucent />
       <Image
         source={{ uri: 'https://i.pinimg.com/originals/6b/f8/48/6bf848ae5afdb77782a1ff14067b194a.jpg' }}
@@ -38,19 +38,19 @@ export default function RegistrationScreen({navigation}) {
         intensity={1}
         tint="dark"
       />
-      <View style={styles.container}>
+      <View style={tw`flex-1 p-6 bg-[rgba(245,245,245,0.85)] rounded-lg`}>
         <KeyboardAwareScrollView showsVerticalScrollIndicator={false} bounces={false}>
-          <View style={styles.header}>
-            <View style={styles.titleContainer}>
-              <Text style={styles.title}>Sign up to </Text>
-              <Text style={styles.companyName}>MajorInvest</Text>
+          <View style={tw`mb-15`}>
+            <View style={tw`flex-row items-center justify-center mb-2`}>
+              <Text style={tw`text-2xl font-bold text-[#1D2A32]`}>Sign up to </Text>
+              <Text style={tw`text-2xl mb-0 text-[#075eec]`}>MajorInvest</Text>
             </View>
-            <Text style={styles.subtitle}>Create a new account</Text>
+            <Text style={tw`text-center text-base font-medium text-[#929292]`}>Create a new account</Text>
           </View>
 
-          <View style={styles.form}>
-            <View style={styles.input}>
-              <Text style={styles.inputLabel}>Name</Text>
+          <View>
+            <View style={tw`mb-4`}>
+              <Text style={tw`text-lg font-semibold text-[#222] mb-2 text-center`}>Name</Text>
               <TextInput
                 autoCapitalize="words"
                 autoCorrect={false}
@@ -58,12 +58,13 @@ export default function RegistrationScreen({navigation}) {
                 onChangeText={setName}
                 placeholder="Your Name"
                 placeholderTextColor="#6b7280"
-                style={styles.inputControl}
-                value={name} />
+                style={tw`h-12 bg-white px-4 rounded-lg text-base font-medium text-[#222] border border-[#C9D3DB]`}
+                value={name}
+              />
             </View>
 
-            <View style={styles.input}>
-              <Text style={styles.inputLabel}>Surname</Text>
+            <View style={tw`mb-4`}>
+              <Text style={tw`text-lg font-semibold text-[#222] mb-2 text-center`}>Surname</Text>
               <TextInput
                 autoCapitalize="words"
                 autoCorrect={false}
@@ -71,12 +72,13 @@ export default function RegistrationScreen({navigation}) {
                 onChangeText={setSurname}
                 placeholder="Your Surname"
                 placeholderTextColor="#6b7280"
-                style={styles.inputControl}
-                value={surname} />
+                style={tw`h-12 bg-white px-4 rounded-lg text-base font-medium text-[#222] border border-[#C9D3DB]`}
+                value={surname}
+              />
             </View>
 
-            <View style={styles.input}>
-              <Text style={styles.inputLabel}>Email Address</Text>
+            <View style={tw`mb-4`}>
+              <Text style={tw`text-lg font-semibold text-[#222] mb-2 text-center`}>Email Address</Text>
               <TextInput
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -85,12 +87,13 @@ export default function RegistrationScreen({navigation}) {
                 onChangeText={setEmail}
                 placeholder="Your Email"
                 placeholderTextColor="#6b7280"
-                style={styles.inputControl}
-                value={email} />
+                style={tw`h-12 bg-white px-4 rounded-lg text-base font-medium text-[#222] border border-[#C9D3DB]`}
+                value={email}
+              />
             </View>
 
-            <View style={styles.input}>
-              <Text style={styles.inputLabel}>Cell Number</Text>
+            <View style={tw`mb-4`}>
+              <Text style={tw`text-lg font-semibold text-[#222] mb-2 text-center`}>Cell Number</Text>
               <TextInput
                 autoCorrect={false}
                 clearButtonMode="while-editing"
@@ -98,12 +101,13 @@ export default function RegistrationScreen({navigation}) {
                 onChangeText={setPhoneNo}
                 placeholder="Your Cell Number"
                 placeholderTextColor="#6b7280"
-                style={styles.inputControl}
-                value={phoneNo} />
+                style={tw`h-12 bg-white px-4 rounded-lg text-base font-medium text-[#222] border border-[#C9D3DB]`}
+                value={phoneNo}
+              />
             </View>
 
-            <View style={styles.input}>
-              <Text style={styles.inputLabel}>Password</Text>
+            <View style={tw`mb-4`}>
+              <Text style={tw`text-lg font-semibold text-[#222] mb-2 text-center`}>Password</Text>
               <View style={tw`relative`}>
                 <TextInput
                   autoCorrect={false}
@@ -111,12 +115,13 @@ export default function RegistrationScreen({navigation}) {
                   onChangeText={setPassword}
                   placeholder="********"
                   placeholderTextColor="#6b7280"
-                  style={styles.inputControl}
+                  style={tw`h-12 bg-white px-4 rounded-lg text-base font-medium text-[#222] border border-[#C9D3DB]`}
                   secureTextEntry={showPassword}
-                  value={password} />
+                  value={password}
+                />
                 <Pressable
                   onPress={() => setShowPassword(!showPassword)}
-                  style={tw`absolute right-3 top-2/6 transform -translate-y-1/2`}
+                  style={tw`absolute right-3 top-3`}
                 >
                   {showPassword ? (
                     <Feather name="eye" size={20} color="black" />
@@ -127,8 +132,8 @@ export default function RegistrationScreen({navigation}) {
               </View>
             </View>
 
-            <View style={styles.input}>
-              <Text style={styles.inputLabel}>Confirm Password</Text>
+            <View style={tw`mb-4`}>
+              <Text style={tw`text-lg font-semibold text-[#222] mb-2 text-center`}>Confirm Password</Text>
               <View style={tw`relative`}>
                 <TextInput
                   autoCorrect={false}
@@ -136,12 +141,13 @@ export default function RegistrationScreen({navigation}) {
                   onChangeText={setConfirmPassword}
                   placeholder="********"
                   placeholderTextColor="#6b7280"
-                  style={styles.inputControl}
+                  style={tw`h-12 bg-white px-4 rounded-lg text-base font-medium text-[#222] border border-[#C9D3DB]`}
                   secureTextEntry={showConfirmPassword}
-                  value={confirmPassword} />
+                  value={confirmPassword}
+                />
                 <Pressable
                   onPress={toggleConfirmPassword}
-                  style={tw`absolute right-3 top-2/6 transform -translate-y-1/2`}
+                  style={tw`absolute right-3 top-3`}
                 >
                   {showConfirmPassword ? (
                     <Feather name="eye" size={20} color="black" />
@@ -159,26 +165,26 @@ export default function RegistrationScreen({navigation}) {
                 style={tw`mr-2 rounded-md border-black`}
                 tintColors={{ true: 'black', false: 'gray' }}
               />
-              <Text style={styles.checktext}>I have read the <Text style={styles.terms}>Terms and Conditions </Text></Text>
+              <Text style={tw`text-sm text-gray-600`}>I have read the <Text style={tw`text-[#075eec]`}>Terms and Conditions </Text></Text>
             </View>
 
-            <View style={styles.formAction}>
+            <View style={tw`mt-1 mb-4`}>
               <TouchableOpacity
                 onPress={() => {
                   // Handle sign up logic here
                 }}>
-                <View style={styles.btn}>
-                  <Text style={styles.btnText}>Sign Up</Text>
+                <View style={tw`flex-row items-center justify-center rounded-full py-3 px-6 bg-[#075eec] border border-[#075eec]`}>
+                  <Text style={tw`text-white text-lg font-semibold`}>Sign Up</Text>
                 </View>
               </TouchableOpacity>
             </View>
 
             <View style={tw`flex-row justify-center mt-5`}>
-              <Text style={styles.formLink}>Already have an account? {''}</Text>
+              <Text style={tw`text-lg font-semibold text-[#075eec]`}>Already have an account? </Text>
               <Pressable
                 onPress={() => navigation.navigate('Login')}
               >
-                <Text style={[styles.formLink, tw`underline`]}>Sign in</Text>
+                <Text style={tw`text-lg font-semibold underline text-[#075eec]`}>Sign in</Text>
               </Pressable>
             </View>
           </View>
@@ -187,7 +193,6 @@ export default function RegistrationScreen({navigation}) {
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   safeArea: {
     position: 'relative',
