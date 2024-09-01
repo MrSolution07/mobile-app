@@ -36,7 +36,7 @@ const LoginScreen = ({ navigation }) => {
 
       <SafeAreaView style={tw`flex-1`}>
         <View style={styles.contentContainer}>
-          <Text style={[tw`text-3xl font-bold text-left mb-12`, styles.header]}>Sign in to your account</Text>
+          <Text style={[tw`text-2xl font-bold text-left mb-15`, styles.header]}>Sign in to your account</Text>
 
           <TextInput
             placeholder='Enter your username'

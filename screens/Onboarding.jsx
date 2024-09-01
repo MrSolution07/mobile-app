@@ -1,9 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, StatusBar, Dimensions, Pressable, Animated, Easing } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Slide from '../components/Slide'; 
 import tw from 'twrnc';
 
 const { width, height } = Dimensions.get('window');
+
+// Colors
 const COLORS = { primary: '#282534', white: '#fff' };
 
 // Data for each slide
@@ -30,68 +33,33 @@ const slides = [
   },
 ];
 
-// Component to render each slide
-const Slide = ({ item, scrollX, index }) => {
-  const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
-  const scale = scrollX.interpolate({
-    inputRange,
-    outputRange: [0.8, 1, 0.8],
-    extrapolate: 'clamp',
-  });
-
-  return (
-    <View style={[tw`items-center px-4`, { width }]}>
-      <Animated.Image
-        source={item?.image}
-        style={{
-          height: height * 0.5,
-          width: '100%',
-          resizeMode: 'contain',
-          transform: [{ scale }],
-        }}
-      />
-      <View style={tw`items-center top-15`}>
-        <Text style={styles.title}>
-          {item.id === '3' ? (
-            <>
-              <Text style={styles.highlight}>{item.highlight} </Text>
-              {item.title}
-            </>
-          ) : (
-            <>
-              {item.title}
-              {item.highlight && <Text style={styles.highlight}> {item.highlight}</Text>}
-            </>
-          )}
-        </Text>
-      </View>
-    </View>
-  );
-};
-
-// Main Onboarding component
 const Onboarding = ({ navigation }) => {
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const [currentSlideIndex, setCurrentSlideIndex] = React.useState(0);
   const ref = React.useRef();
   const borderColorAnimation = React.useRef(new Animated.Value(0)).current;
 
+  // Function to play border color animation
+  const playBorderColorAnimation = () => {
+    borderColorAnimation.setValue(0); 
+    Animated.timing(borderColorAnimation, {
+      toValue: 1,
+      duration: 1300, 
+      easing: Easing.ease,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  // Effect for slide change
   React.useEffect(() => {
     if (currentSlideIndex === slides.length - 1) {
-
-      // Start animation on the last slide
-      Animated.timing(borderColorAnimation, {
-        toValue: 1,
-        duration: 2000, 
-        easing: Easing.linear,
-        useNativeDriver: false,
-      }).start();
+      playBorderColorAnimation(); 
     }
-  }, [currentSlideIndex]); 
+  }, [currentSlideIndex]); // Run effect on slide index change
 
   const borderColor = borderColorAnimation.interpolate({
     inputRange: [0, 0.5, 1],
-    outputRange: ['lightgray', 'purple', 'lightgray'],
+    outputRange: ['purple','#075eec','black'],
   });
 
   React.useEffect(() => {
@@ -173,7 +141,7 @@ const Onboarding = ({ navigation }) => {
                   style={styles.getStartedButton}
                   onPress={() => navigation.replace('Registration')}
                 >
-                  <Text style={tw`text-white  text-center text-sm`}>Get Started</Text>
+                  <Text style={tw`text-white text-center text-sm`}>Get Started</Text>
                 </Pressable>
               </Animated.View>
             </View>
@@ -191,14 +159,14 @@ const Onboarding = ({ navigation }) => {
 
   return (
     <SafeAreaView style={tw`flex-1 bg-white`}>
-      <StatusBar barStyle="light-content" translucent />
+      <StatusBar barStyle="dark-content" translucent />
       <Text style={styles.Header}>MetawaySA</Text>
       <Animated.FlatList
         ref={ref}
         onMomentumScrollEnd={updateCurrentSlideIndex}
         contentContainerStyle={{ height: height * 0.80 }}
         showsHorizontalScrollIndicator={false}
-        horizontal
+        horizontal={true}
         bounces={false}
         data={slides}
         pagingEnabled
@@ -218,9 +186,9 @@ const Onboarding = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   indicator: {
-    height: 6,
-    width: 20,
-    borderRadius: 5,
+    height: 4,
+    width: 15,
+    borderRadius: 15,
     backgroundColor: 'grey',
     marginHorizontal: 3,
     bottom: 35,
@@ -245,19 +213,20 @@ const styles = StyleSheet.create({
   getStartedButtonBorder: {
     width: '60%',
     height: '80%',
-    borderRadius:3,
-    borderWidth: 1.1,
+    borderRadius: 5,
+    borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor:'black',
   },
   getStartedButton: {
     width: '100%',
     height: '100%',
-    borderRadius:3,
+    borderRadius: 5,
     backgroundColor: 'black',
-    alignItems:'center',
-    justifyContent:'center',
-  }
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 
 export default Onboarding;

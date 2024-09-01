@@ -5,11 +5,11 @@ import tw from 'twrnc';
 const ForgotPassword = ({navigation}) => {
   return (
     <SafeAreaView style={[tw`flex-1`, styles.Container]}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
       <View style={tw`flex-1 justify-center items-center`}>
         <View style={[tw`absolute w-full h-full p-6 mt-5`]}>
           <View style={tw`w-full`}>
-            <Text style={[tw`text-3xl font-bold mb-6 mt-2`, styles.heading]}>
+            <Text style={[tw`text-3xl font-bold mb-6 mt-15`, styles.heading]}>
               Recover your account
             </Text>
             <Text style={[tw`text-left font-medium mb-8`, styles.text]}>

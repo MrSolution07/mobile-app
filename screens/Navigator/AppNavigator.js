@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from '@react-navigation/native';
 import DataContext from '../Context/Context'; // Adjust path if needed
 import { DataProvider } from '../Context/Context'; // Import DataProvider
+import { View } from 'react-native';
 
 // Import screens here
 import LoginScreen from '../LoginScreen';
@@ -18,14 +19,21 @@ export default function AppNavigator() {
         <DataProvider>
             <NavigationContainer>
                 <Stack.Navigator initialRouteName='Onboarding'>
-                    <Stack.Screen
-                        name="Login"
-                        component={LoginScreen}
-                        
+                <Stack.Screen
+                    name="Login"
+                    component={LoginScreen}
+                    options={{
+                        headerTitle: "",
+                        headerTransparent: true,
+                        headerBackground: () => (
+                        <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                        ),
+                    }}
                     />
                     <Stack.Screen
                         name="Registration"
                         component={RegistrationScreen}
+                        options={{headerShown:false}}
                     />
                     <Stack.Screen
                         name="Onboarding"
@@ -35,6 +43,11 @@ export default function AppNavigator() {
                     <Stack.Screen
                         name="ForgotPassword"
                         component={ForgotPassword}
+                        options={{headerTitle: "",
+                            headerTransparent: true,
+                            headerBackground: () => (
+                            <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                            ),}}
                     />
                     <Stack.Screen
                         name='Tabs'
