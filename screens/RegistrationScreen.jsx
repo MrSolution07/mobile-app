@@ -6,7 +6,7 @@ import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
 import Feather from '@expo/vector-icons/Feather';
 
-export default function RegistrationScreen() {
+export default function RegistrationScreen({ navigation }) {
   const [form, setForm] = useState({
     name: '',
     surname: '',
@@ -179,7 +179,7 @@ export default function RegistrationScreen() {
             
             <View style={tw`flex-row justify-center mt-5`}> 
               <Text style={styles.formLink}>Already have an account? {''}</Text>
-              <Pressable>
+              <Pressable onPress={() => navigation.navigate('Login')}>
                 <Text style={[styles.formLink, tw`underline`]}>Sign in</Text>
               </Pressable>
             </View>

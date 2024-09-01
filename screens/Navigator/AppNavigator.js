@@ -7,6 +7,7 @@ import { DataProvider } from '../Context/Context'; // Import DataProvider
 // Import screens here
 import LoginScreen from '../LoginScreen';
 import RegistrationScreen from '../RegistrationScreen';
+import Onboarding from '../Onboarding';
 import ForgotPassword from '../../components/ForgotPassword';
 import Tabs from '../Tabs/Tabs';
 
@@ -16,14 +17,20 @@ export default function AppNavigator() {
     return (
         <DataProvider>
             <NavigationContainer>
-                <Stack.Navigator initialRouteName='Login'>
+                <Stack.Navigator initialRouteName='Onboarding'>
                     <Stack.Screen
                         name="Login"
                         component={LoginScreen}
+                        
                     />
                     <Stack.Screen
                         name="Registration"
                         component={RegistrationScreen}
+                    />
+                    <Stack.Screen
+                        name="Onboarding"
+                        component={Onboarding}
+                        options={{headerShown:false}}
                     />
                     <Stack.Screen
                         name="ForgotPassword"

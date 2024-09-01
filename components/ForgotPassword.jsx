@@ -2,7 +2,7 @@ import React from 'react';
 import { TextInput, SafeAreaView, View, Text, Pressable, StatusBar, StyleSheet } from 'react-native';
 import tw from 'twrnc';
 
-const ForgotPassword = () => {
+const ForgotPassword = ({navigation}) => {
   return (
     <SafeAreaView style={[tw`flex-1`, styles.Container]}>
       <StatusBar barStyle="light-content" />
@@ -32,7 +32,7 @@ const ForgotPassword = () => {
             <View style={tw`flex-row justify-center mt-5 gap-x-px`}>
             <Text style={styles.formLink}>Don't have an account?{''}
             </Text>
-            <Pressable>
+            <Pressable onPress={()=> navigation.navigate('Registration')}>
               <Text style={[tw`underline`, styles.signUptext]}>Sign Up</Text>
             </Pressable>
           </View>
