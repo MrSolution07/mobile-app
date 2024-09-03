@@ -159,7 +159,7 @@ const Onboarding = ({ navigation }) => {
 
   return (
     <SafeAreaView style={tw`flex-1 bg-white`}>
-      <StatusBar barStyle="dark-content" translucent />
+      <StatusBar barStyle="light-content" translucent />
       <Text style={styles.Header}>MetawaySA</Text>
       <Animated.FlatList
         ref={ref}
