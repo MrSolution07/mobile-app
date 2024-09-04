@@ -29,10 +29,27 @@ export default function Tabs() {
           }
         })}
       >
-        <Tab.Screen name="name_A" component={name_A} options={{title:""}} />
-        <Tab.Screen name="name_B" component={name_A} options={{title:""}} />
-        <Tab.Screen name="name_C" component={name_A} options={{title:""}} />
-        <Tab.Screen name="name_D" component={name_A} options={{title:""}}/>
+        <Tab.Screen
+            name="name_A"
+            component={name_A}
+            options={{title:""}}
+          />
+          <Tab.Screen
+            name="name_B"
+            component={name_A}
+            options={{title:""}}
+          />
+          <Tab.Screen
+            name="name_C"
+            component={name_A}
+            options={{title:""}}
+          />
+          <Tab.Screen
+            name="name_D"
+            component={name_A}
+            options={{title:""}}
+          />
+        
       </Tab.Navigator>
   );
 }
@@ -55,14 +72,25 @@ const getIconName = (routeName) => {
 const styles = StyleSheet.create({
   
   tabBarStyle: {
-    height: 50,
-    borderRadius: 10,
-    backgroundColor: 'black',
-    opacity: 0.8,
-    elevation: 5,
-    alignSelf:'center',
-    bottom: 15,
-    width: '80%',
-    
+    // height: 50,
+    // borderRadius: 10,
+    // backgroundColor: 'black',
+    // opacity: 0.8,
+    // elevation: 5,
+    // alignSelf:'center',
+    // bottom: 15,
+    // width: '80%',
+      height: 60,
+      borderRadius: 10,
+      backgroundColor: 'black',
+      opacity: 0.9,
+      elevation: 5,
+      alignSelf: 'center',
+      bottom: 15,
+      width: '80%', 
+      flexDirection: 'row', 
+      justifyContent: 'space-between', 
+      paddingBottom: 10,
+      paddingTop: 10,
   },
 });
