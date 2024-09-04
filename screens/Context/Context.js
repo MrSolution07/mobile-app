@@ -10,6 +10,7 @@ export const DataProvider = ({ children }) => {
     const [phoneNo, setPhoneNo] = useState('');
     const [isChecked, setIsChecked] = useState(false);
     const [showPassword, setShowPassword] = useState(true);
+    const [ProfilleImage, setProfilleImage] = useState('');
 
     const globalData = {
         name,setName,
@@ -17,7 +18,8 @@ export const DataProvider = ({ children }) => {
         password,setPassword,
         phoneNo,setPhoneNo,
         isChecked, setIsChecked,
-        showPassword, setShowPassword
+        showPassword, setShowPassword,
+        ProfilleImage, setProfilleImage
     };
 
     return (

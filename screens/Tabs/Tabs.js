@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StyleSheet, View } from 'react-native';
 import { BlurView } from 'expo-blur';
 import CustomTabIcon from './CustomTabIcon'; 
-import name_A from './Tab1';
+import Home from './HomeScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -30,23 +30,23 @@ export default function Tabs() {
         })}
       >
         <Tab.Screen
-            name="name_A"
-            component={name_A}
+            name="Home"
+            component={Home}
             options={{title:""}}
           />
           <Tab.Screen
             name="name_B"
-            component={name_A}
+            component={Home}
             options={{title:""}}
           />
           <Tab.Screen
             name="name_C"
-            component={name_A}
+            component={Home}
             options={{title:""}}
           />
           <Tab.Screen
             name="name_D"
-            component={name_A}
+            component={Home}
             options={{title:""}}
           />
         
