@@ -26,7 +26,7 @@ export default function RegistrationScreen({ navigation }) {
 
   return (
     <SafeAreaView style={tw`flex-1 bg-transparent`}>
-      <StatusBar barStyle="dark-content" translucent />
+      <StatusBar barStyle="default" translucent />
       <View style={tw`flex-1`}>
         <Image
           source={{ uri: 'https://i.pinimg.com/originals/6b/f8/48/6bf848ae5afdb77782a1ff14067b194a.jpg' }}

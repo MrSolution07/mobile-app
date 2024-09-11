@@ -52,6 +52,7 @@ export default function AppNavigator() {
                     <Stack.Screen
                         name='Tabs'
                         component={Tabs}
+                        options={{headerTitle:""}}
                     />
                 </Stack.Navigator>
             </NavigationContainer>

@@ -59,11 +59,11 @@ const getIconName = (routeName) => {
     case 'name_A':
       return 'home'; 
     case 'name_B':
-      return 'magnifying-glass';
+      return 'compass';
       case 'name_C':
-      return 'shopping-cart'; 
+      return 'wallet'; 
     case 'name_D':
-      return 'wallet';
+      return 'upload';
     default:
       return 'home';
   }

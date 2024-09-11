@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useEffect,useState,useRef} from 'react';
 import { View, Text, StyleSheet, StatusBar, Dimensions, Pressable, Animated, Easing } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Slide from '../components/Slide'; 
@@ -6,8 +6,6 @@ import tw from 'twrnc';
 
 const { width, height } = Dimensions.get('window');
 
-// Colors
-const COLORS = { primary: '#282534', white: '#fff' };
 
 // Data for each slide
 const slides = [
@@ -34,10 +32,10 @@ const slides = [
 ];
 
 const Onboarding = ({ navigation }) => {
-  const scrollX = React.useRef(new Animated.Value(0)).current;
-  const [currentSlideIndex, setCurrentSlideIndex] = React.useState(0);
-  const ref = React.useRef();
-  const borderColorAnimation = React.useRef(new Animated.Value(0)).current;
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const ref = useRef();
+  const borderColorAnimation = useRef(new Animated.Value(0)).current;
 
   // Function to play border color animation
   const playBorderColorAnimation = () => {
@@ -50,19 +48,19 @@ const Onboarding = ({ navigation }) => {
     }).start();
   };
 
-  // Effect for slide change
-  React.useEffect(() => {
+  // Effect for border effect to occur on the last slide
+  useEffect(() => {
     if (currentSlideIndex === slides.length - 1) {
       playBorderColorAnimation(); 
     }
-  }, [currentSlideIndex]); // Run effect on slide index change
+  }, [currentSlideIndex]); 
 
   const borderColor = borderColorAnimation.interpolate({
     inputRange: [0, 0.5, 1],
     outputRange: ['purple','#075eec','black'],
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     const listener = scrollX.addListener(({ value }) => {
       const currentIndex = Math.round(value / width);
       setCurrentSlideIndex(currentIndex);
@@ -194,11 +192,11 @@ const styles = StyleSheet.create({
     bottom: 35,
   },
   Header: {
-    fontSize: 18,
+    fontSize: 13,
     color: '#075eec',
     textAlign: 'center',
-    top: 15,
-    fontWeight: 'bold',
+    top: 18,
+    fontWeight:'bold',
   },
   title: {
     fontSize: 28,

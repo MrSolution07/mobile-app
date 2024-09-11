@@ -21,7 +21,7 @@ const CustomTabIcon = ({ focused, name }) => {
                     />
                 </View>
             )}
-            <Entypo name={name} size={24} color="white" style={styles.icon} />
+            <Entypo name={name} size={25} color="white" style={styles.icon} />
         </View>
     );
 };

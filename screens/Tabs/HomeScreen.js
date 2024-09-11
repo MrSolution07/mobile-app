@@ -1,8 +1,11 @@
 import React, { useEffect, useState,useContext } from 'react';
-import { SafeAreaView, View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { SafeAreaView, View, Text, Image, FlatList, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import DataContext  from '../Context/Context';
+import tw from 'twrnc';
+
 
 const HomeScreen = () => {
   const [collections, setCollections] = useState([]);
@@ -20,13 +23,20 @@ const HomeScreen = () => {
 
     axios
       .get('https://api.opensea.io/api/v2/collections', options)
+      
       .then(response => {
+        console.log("Collections Fetched",response.data.collections);
         setCollections(response.data.collections || []);
       })
       .catch(err => console.error(err));
-  }, []);
+  }, [ ]);
 
-  const renderHorizontalItem = ({ item }) => (
+  const renderHorizontalItem = ({ item }) => 
+    
+    { console.log('Item:', item);
+      console.log('Image URL:', item.image_url || item.banner_image_url || item.featured_image_url);
+
+    return(
     <TouchableOpacity
       style={styles.collectionItem}
       onPress={() => navigation.navigate('NFTCollection', { url: `https://api.opensea.io/api/v2/collection/${item.slug}/nfts` })}
@@ -38,20 +48,32 @@ const HomeScreen = () => {
       )}
       
     </TouchableOpacity>
-  );
 
-  const renderVerticalItem = ({ item }) => (
-    <View style={styles.topSellingItem}>
-      {item.image_url ? (
-        <Image source={{ uri: item.image_url }} style={styles.topSellingImage} />
-      ) : (
-        <Image source={require('../../assets/images/NoImg.jpg')} style={styles.topSellingImage} />  // instead of having no images
-      )}
-      <TouchableOpacity style={styles.placeBidButton}>
-        <Text style={styles.placeBidText}>Place Bid</Text>
-      </TouchableOpacity>
-    </View>
   );
+}
+    const renderVerticalItem = ({ item }) => (
+      <View style={styles.topSellingItem}>
+        {item.image_url ? (
+          <Image source={{ uri: item.image_url }} style={styles.topSellingImage} />
+        ) : (
+          <Image source={require('../../assets/images/NoImg.jpg')} style={styles.topSellingImage} />
+        )}
+
+        <View style={styles.ethAndButtonContainer}>
+          <View style={styles.ethContainer}>
+            <Text style={[tw`text-white text-base font-black`, styles.ethText]}>0.31</Text>
+            <Text style={[tw`text-[#6d28d9] text-base font-black`, styles.ethText]}>ETH</Text>
+            <FontAwesome5 name="ethereum" size={24} color="black" />
+          </View>
+
+          <TouchableOpacity style={styles.placeBidButton}>
+            <Text style={styles.placeBidText}>Place Bid</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -146,11 +168,15 @@ const styles = StyleSheet.create({
   collectionItem: {
     marginRight: 15,
     alignItems: 'center',
+    borderRadius: 15,
+    width:150,
+    height:280,
   },
   collectionImage: {
-    width: 120,
-    height: 160,
-    borderRadius: 12,
+    width: '100%',
+    height: '100%',
+    borderRadius: 15,
+    resizeMode:'cover',
   },
   collectionText: {
     marginTop: 8,
@@ -163,20 +189,19 @@ const styles = StyleSheet.create({
   },
   topSellingItem: {
     marginBottom: 15,
-    alignItems: 'center',
+    width: 350,
+    height: 150,
+    justifyContent: 'center', 
     position: 'relative',
   },
   topSellingImage: {
     width: '100%',
-    height: 250,
+    height: '100%',
     borderRadius: 12,
+    resizeMode: 'cover',
   },
   placeBidButton: {
-    position: 'absolute',
-    bottom: 20,
-    left: '50%',
-    transform: [{ translateX: -75 }], // center the button
-    backgroundColor: '#000',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
     paddingVertical: 10,
     paddingHorizontal: 30,
     borderRadius: 20,
@@ -185,14 +210,24 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: 'bold',
   },
-  placeholderText: {
-    width: 120,
-    height: 160,
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    backgroundColor: '#f0f0f0',
-    borderRadius: 12,
-    color: '#888888',
+  ethAndButtonContainer: {
+    flexDirection: 'row', 
+    alignItems: 'center',
+    justifyContent: 'space-between',  
+    position: 'absolute', 
+    bottom: 10,  
+    width: '90%', 
+    paddingHorizontal: 10,  
+  },
+  ethContainer: {
+    flexDirection: 'row',  
+    alignItems: 'center',
+    backgroundColor:'rgba(0, 0, 0, 0.8)',
+    padding: 5,
+    borderRadius: 20,
+  },
+  ethText: {
+    marginRight: 5,
   },
 });
 
