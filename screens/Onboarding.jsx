@@ -1,13 +1,12 @@
-import React,{useEffect,useState,useRef} from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, StatusBar, Dimensions, Pressable, Animated, Easing } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Slide from '../components/Slide'; 
 import tw from 'twrnc';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
 
 const { width, height } = Dimensions.get('window');
 
-
-// Data for each slide
 const slides = [
   {
     id: '1',
@@ -37,7 +36,6 @@ const Onboarding = ({ navigation }) => {
   const ref = useRef();
   const borderColorAnimation = useRef(new Animated.Value(0)).current;
 
-  // Function to play border color animation
   const playBorderColorAnimation = () => {
     borderColorAnimation.setValue(0); 
     Animated.timing(borderColorAnimation, {
@@ -48,7 +46,6 @@ const Onboarding = ({ navigation }) => {
     }).start();
   };
 
-  // Effect for border effect to occur on the last slide
   useEffect(() => {
     if (currentSlideIndex === slides.length - 1) {
       playBorderColorAnimation(); 
@@ -126,13 +123,13 @@ const Onboarding = ({ navigation }) => {
           })}
         </View>
 
-        <View style={{ marginBottom: 20 }}>
+        <View style={{ marginBottom: hp('3%') }}> 
           {currentSlideIndex === slides.length - 1 ? (
-            <View style={{ height: 50, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ height: hp('7%'), alignItems: 'center', justifyContent: 'center' }}>
               <Animated.View
                 style={[
                   styles.getStartedButtonBorder,
-                  { borderColor: borderColor }, // Animated border color
+                  { borderColor: borderColor }, 
                 ]}
               >
                 <Pressable
@@ -184,38 +181,28 @@ const Onboarding = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   indicator: {
-    height: 4,
-    width: 15,
+    height: hp('0.6%'),  
+    width: wp('3%'),
     borderRadius: 15,
     backgroundColor: 'grey',
     marginHorizontal: 3,
     bottom: 35,
   },
   Header: {
-    fontSize: 13,
+    fontSize: wp('3%'), 
     color: '#075eec',
     textAlign: 'center',
     top: 18,
-    fontWeight:'bold',
-  },
-  title: {
-    fontSize: 28,
-    textAlign: 'center',
-    marginTop: 10,
-    color: 'black',
-    width: width * 0.8,
-  },
-  highlight: {
-    color: '#075eec',
+    fontWeight: 'bold',
   },
   getStartedButtonBorder: {
-    width: '60%',
-    height: '80%',
+    width: wp('50%'),  
+    height: hp('7%'),  
     borderRadius: 5,
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor:'black',
+    backgroundColor: 'black',
   },
   getStartedButton: {
     width: '100%',

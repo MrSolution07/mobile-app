@@ -1,4 +1,3 @@
-// Context.js
 import React, { createContext, useState } from 'react';
 
 const DataContext = createContext();
@@ -11,6 +10,12 @@ export const DataProvider = ({ children }) => {
     const [isChecked, setIsChecked] = useState(false);
     const [showPassword, setShowPassword] = useState(true);
     const [ProfilleImage, setProfilleImage] = useState('');
+    const [amount, setAmount] = useState('');
+    const [referenceNumber, setReferenceNumber] = useState('');
+    const [ethAmount, setEthAmount] = useState('');
+    const [zarAmount, setZarAmount] = useState('');
+    const [withdrawAmount, setWithdrawAmount] = useState('')
+
 
     const globalData = {
         name,setName,
@@ -19,7 +24,12 @@ export const DataProvider = ({ children }) => {
         phoneNo,setPhoneNo,
         isChecked, setIsChecked,
         showPassword, setShowPassword,
-        ProfilleImage, setProfilleImage
+        ProfilleImage, setProfilleImage,
+        amount, setAmount,
+        referenceNumber, setReferenceNumber,
+        ethAmount, setEthAmount,
+        zarAmount, setZarAmount,
+        withdrawAmount, setWithdrawAmount
     };
 
     return (

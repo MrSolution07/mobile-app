@@ -4,13 +4,14 @@ import { StyleSheet, View } from 'react-native';
 import { BlurView } from 'expo-blur';
 import CustomTabIcon from './CustomTabIcon'; 
 import Home from './HomeScreen';
+import Wallet from './Wallet';
 
 const Tab = createBottomTabNavigator();
 
 export default function Tabs() {
   return (
       <Tab.Navigator
-        initialRouteName="name_A"
+        initialRouteName="Home"
         screenOptions={({ route }) => ({
           tabBarActiveTintColor: 'white',
           tabBarInactiveTintColor: 'white',
@@ -32,7 +33,7 @@ export default function Tabs() {
         <Tab.Screen
             name="Home"
             component={Home}
-            options={{title:""}}
+            options={{title:"",headerShown: false}}
           />
           <Tab.Screen
             name="name_B"
@@ -40,9 +41,12 @@ export default function Tabs() {
             options={{title:""}}
           />
           <Tab.Screen
-            name="name_C"
-            component={Home}
-            options={{title:""}}
+            name="Wallet"
+            component={Wallet}
+            options={{
+              title: "",
+              headerShown: false,
+            }}
           />
           <Tab.Screen
             name="name_D"
@@ -60,7 +64,7 @@ const getIconName = (routeName) => {
       return 'home'; 
     case 'name_B':
       return 'compass';
-      case 'name_C':
+      case 'Wallet':
       return 'wallet'; 
     case 'name_D':
       return 'upload';

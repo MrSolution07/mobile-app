@@ -10,6 +10,10 @@ import LoginScreen from '../LoginScreen';
 import RegistrationScreen from '../RegistrationScreen';
 import Onboarding from '../Onboarding';
 import ForgotPassword from '../../components/ForgotPassword';
+import TopUp from '../TopUpScreen';
+import BuyEth from '../BuyEth';
+import Withdraw from '../Withdraw';
+import Account from '../../components/Account';
 import Tabs from '../Tabs/Tabs';
 
 const Stack = createStackNavigator();
@@ -33,7 +37,12 @@ export default function AppNavigator() {
                     <Stack.Screen
                         name="Registration"
                         component={RegistrationScreen}
-                        options={{headerShown:false}}
+                        options={{ headerTitle: "",
+                            headerTransparent: true,
+                            headerBackground: () => (
+                            <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                            ),
+                        }}
                     />
                     <Stack.Screen
                         name="Onboarding"
@@ -43,11 +52,57 @@ export default function AppNavigator() {
                     <Stack.Screen
                         name="ForgotPassword"
                         component={ForgotPassword}
-                        options={{headerTitle: "",
+                        options={{
+                            headerTitle: "",
                             headerTransparent: true,
                             headerBackground: () => (
                             <View style={{ backgroundColor: 'transparent', flex: 1 }} />
-                            ),}}
+                            ),
+                        }}
+                    />
+                    <Stack.Screen
+                        name="TopUp"
+                        component={TopUp}
+                        options={{
+                            headerTitle: "",
+                            headerTransparent: true,
+                            headerBackground: () => (
+                            <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                            ),
+                        }}
+                    />
+                    <Stack.Screen
+                        name="BuyEth"
+                        component={BuyEth}
+                        options={{
+                            headerTitle: "",
+                            headerTransparent: true,
+                            headerBackground: () => (
+                            <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                            ),
+                        }}
+                    />
+                    <Stack.Screen
+                        name="Withdraw"
+                        component={Withdraw}
+                        options={{
+                            headerTitle: "",
+                            headerTransparent: true,
+                            headerBackground: () => (
+                            <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                            ),
+                        }}
+                    />
+                    <Stack.Screen
+                        name="Account"
+                        component={Account}
+                        options={{
+                            headerTitle: "",
+                            headerTransparent: true,
+                            headerBackground: () => (
+                            <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                            ),
+                        }}
                     />
                     <Stack.Screen
                         name='Tabs'

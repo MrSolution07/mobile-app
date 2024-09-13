@@ -5,7 +5,7 @@ import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Feather from '@expo/vector-icons/Feather';
-import DataContext from '../screens/Context/Context'; // Adjust path if needed
+import DataContext from '../screens/Context/Context'; 
 
 const LoginScreen = ({ navigation }) => {
   const {

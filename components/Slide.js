@@ -1,4 +1,3 @@
-// Slide.jsx
 import React from 'react';
 import { View, Text, Animated, Dimensions, StyleSheet } from 'react-native';
 import tw from 'twrnc';

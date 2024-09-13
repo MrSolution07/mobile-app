@@ -171,7 +171,8 @@ export default function RegistrationScreen({ navigation }) {
                   style={tw`mr-2 rounded-md border-black`}
                   tintColors={{ true: 'black', false: 'gray' }}
                 />
-                <Text style={tw`text-sm text-gray-600`}>I have read the <Text style={tw`text-[#075eec]`}>Terms and Conditions </Text></Text>
+                <Text style={tw`text-sm text-gray-600`}>I have read the </Text>
+                  <Pressable><Text style={tw`text-[#075eec]`}>Terms and Conditions </Text></Pressable>
               </View>
 
               <View style={tw`mt-1 mb-4`}>
