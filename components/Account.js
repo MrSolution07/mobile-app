@@ -31,7 +31,7 @@ const Account = () => {
                                                         : (amount - (withdrawAmount || 0)).toFixed(2)
                                                       } ZAR</Text>
 
-                  <View style={tw`flex-row rounded-md gap-x-2 justify-center w-40 p-2 top-3 `}>
+                  <View style={tw`flex-row rounded-md gap-x-2 items-center justify-center w-40 p-2 top-3 `}>
                     <Text style={tw`font-bold text-xl text-white`}>{ethAmount ? ethAmount:0} </Text>
                     <Text style={tw`text-[#6d28d9] font-bold text-xl`}>ETH</Text>
                     <FontAwesome5 name="ethereum" size={20} color="whitesmoke" />

@@ -137,7 +137,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
-    paddingHorizontal: wp('4%'), 
+    paddingHorizontal: wp('4%'),
+    top: hp('2%'), 
     paddingVertical: hp('2%'), 
   },
   header: {
@@ -178,7 +179,7 @@ const styles = StyleSheet.create({
   },
   collectionItem: {
     marginRight: 20,
-    marginBottom: 18, 
+    marginBottom: hp('6%'), 
     alignItems: 'center',
     borderRadius: wp('2%'), 
     width: wp('35%'), 
