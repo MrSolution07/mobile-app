@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { SafeAreaView, View, Text, Image, FlatList, TouchableOpacity, StyleSheet, ScrollView, Animated } from 'react-native';
+import { SafeAreaView, View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
@@ -30,7 +30,6 @@ const HomeScreen = () => {
       .catch(err => console.error(err));
   }, []);
 
-// scroll based animation that will scale as the item comes into view 
   const renderHorizontalItem = ({ item, index }) => {
     const scale = scrollX.interpolate({
       inputRange: [
@@ -55,6 +54,7 @@ const HomeScreen = () => {
       </Animated.View>
     );
   };
+
   const renderVerticalItem = ({ item }) => (
     <View style={styles.topSellingItem}>
       {item.image_url ? (
@@ -79,55 +79,49 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.greeting}>
-              Hello, <Text style={styles.username}>{name}</Text>
-            </Text>
-            <TouchableOpacity onPress={() => { /* Add your profile navigation here */ }}>
-              <Image
-                source={ProfilleImage ? { uri: ProfilleImage } : require('../../assets/images/NoImg.jpg')}
-                style={styles.profileImage}
-              />
-            </TouchableOpacity>
-          </View>
-          
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Top Collections</Text>
-            <TouchableOpacity onPress={() => { /* Navigate to the collections list */ }}>
-              <Text style={styles.sectionLink}>See All</Text>
-            </TouchableOpacity>
-          </View>
+      <FlatList
+        ListHeaderComponent={() => (
+          <View>
+            <View style={styles.header}>
+              <Text style={styles.greeting}>
+                Hello, <Text style={styles.username}>{name}</Text>
+              </Text>
+              <TouchableOpacity onPress={() => { /* Add your profile navigation here */ }}>
+                <Image
+                  source={ProfilleImage ? { uri: ProfilleImage } : require('../../assets/images/NoImg.jpg')}
+                  style={styles.profileImage}
+                />
+              </TouchableOpacity>
+            </View>
 
-          <Animated.FlatList
-          data={collections.slice(0, 10)}
-          renderItem={renderHorizontalItem}
-          keyExtractor={item => item.slug}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.horizontalList}
-          onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: false })}
-          scrollEventThrottle={16}
-        />
-          
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Top Selling</Text>
-          </View>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Top Collections</Text>
+              <TouchableOpacity onPress={() => { /* Navigate to the collections list */ }}>
+                <Text style={styles.sectionLink}>See All</Text>
+              </TouchableOpacity>
+            </View>
 
-          <FlatList
-            data={collections.slice(3, 7)}
-            renderItem={renderVerticalItem}
-            keyExtractor={item => item.slug}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.verticalList}
-          />
-        </View>
-      </ScrollView>
+            <Animated.FlatList
+              data={collections.slice(0, 10)}
+              renderItem={renderHorizontalItem}
+              keyExtractor={(item, index) => `${item.slug}-${index}`}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.horizontalList}
+              onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: false })}
+              scrollEventThrottle={16}
+            />
+          </View>
+        )}
+        data={collections.slice(3, 7)}
+        renderItem={renderVerticalItem}
+        keyExtractor={(item, index) => `${item.slug}-${index}`}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.verticalList}
+      />
     </SafeAreaView>
   );
 };
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
