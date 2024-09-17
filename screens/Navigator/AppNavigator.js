@@ -1,8 +1,8 @@
 import React from 'react';
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from '@react-navigation/native';
-import DataContext from '../Context/Context'; // Adjust path if needed
-import { DataProvider } from '../Context/Context'; // Import DataProvider
+import DataContext from '../Context/Context';
+import { DataProvider } from '../Context/Context'; 
 import { View } from 'react-native';
 
 // Import screens here
@@ -15,6 +15,8 @@ import BuyEth from '../BuyEth';
 import Withdraw from '../Withdraw';
 import Account from '../../components/Account';
 import Tabs from '../Tabs/Tabs';
+import ProfileScreen from '../ProfileScreen';
+// import EditProfile from '../EditProfile';
 
 const Stack = createStackNavigator();
 
@@ -23,31 +25,32 @@ export default function AppNavigator() {
         <DataProvider>
             <NavigationContainer>
                 <Stack.Navigator initialRouteName='Onboarding'>
-                <Stack.Screen
-                    name="Login"
-                    component={LoginScreen}
-                    options={{
-                        headerTitle: "",
-                        headerTransparent: true,
-                        headerBackground: () => (
-                        <View style={{ backgroundColor: 'transparent', flex: 1 }} />
-                        ),
-                    }}
+                    <Stack.Screen
+                        name="Login"
+                        component={LoginScreen}
+                        options={{
+                            headerTitle: "",
+                            headerTransparent: true,
+                            headerBackground: () => (
+                                <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                            ),
+                        }}
                     />
                     <Stack.Screen
                         name="Registration"
                         component={RegistrationScreen}
-                        options={{ headerTitle: "",
+                        options={{
+                            headerTitle: "",
                             headerTransparent: true,
                             headerBackground: () => (
-                            <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                                <View style={{ backgroundColor: 'transparent', flex: 1 }} />
                             ),
                         }}
                     />
                     <Stack.Screen
                         name="Onboarding"
                         component={Onboarding}
-                        options={{headerShown:false}}
+                        options={{ headerShown: false }}
                     />
                     <Stack.Screen
                         name="ForgotPassword"
@@ -56,7 +59,7 @@ export default function AppNavigator() {
                             headerTitle: "",
                             headerTransparent: true,
                             headerBackground: () => (
-                            <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                                <View style={{ backgroundColor: 'transparent', flex: 1 }} />
                             ),
                         }}
                     />
@@ -67,7 +70,7 @@ export default function AppNavigator() {
                             headerTitle: "",
                             headerTransparent: true,
                             headerBackground: () => (
-                            <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                                <View style={{ backgroundColor: 'transparent', flex: 1 }} />
                             ),
                         }}
                     />
@@ -78,7 +81,7 @@ export default function AppNavigator() {
                             headerTitle: "",
                             headerTransparent: true,
                             headerBackground: () => (
-                            <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                                <View style={{ backgroundColor: 'transparent', flex: 1 }} />
                             ),
                         }}
                     />
@@ -89,7 +92,7 @@ export default function AppNavigator() {
                             headerTitle: "",
                             headerTransparent: true,
                             headerBackground: () => (
-                            <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                                <View style={{ backgroundColor: 'transparent', flex: 1 }} />
                             ),
                         }}
                     />
@@ -100,17 +103,39 @@ export default function AppNavigator() {
                             headerTitle: "",
                             headerTransparent: true,
                             headerBackground: () => (
-                            <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                                <View style={{ backgroundColor: 'transparent', flex: 1 }} />
                             ),
                         }}
                     />
                     <Stack.Screen
                         name='Tabs'
                         component={Tabs}
-                        options={{headerTitle:""}}
+                        options={{ headerTitle: "" }}
                     />
+                    <Stack.Screen
+                        name="ProfileScreen"
+                        component={ProfileScreen}
+                        options={{
+                            headerTitle: "",
+                            headerTransparent: true,
+                            headerBackground: () => (
+                                <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                            ),
+                        }}
+                    />
+                    {/* <Stack.Screen
+                        name="EditProfile"
+                        component={EditProfile}
+                        options={{
+                            headerTitle: "",
+                            headerTransparent: true,
+                            headerBackground: () => (
+                                <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                            ),
+                        }}
+                    /> */}
                 </Stack.Navigator>
             </NavigationContainer>
         </DataProvider>
     );
-}   
+}

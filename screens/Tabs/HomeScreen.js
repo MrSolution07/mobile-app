@@ -86,7 +86,7 @@ const HomeScreen = () => {
               <Text style={styles.greeting}>
                 Hello, <Text style={styles.username}>{name}</Text>
               </Text>
-              <TouchableOpacity onPress={() => { /* Add your profile navigation here */ }}>
+              <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
                 <Image
                   source={ProfilleImage ? { uri: ProfilleImage } : require('../../assets/images/NoImg.jpg')}
                   style={styles.profileImage}
