@@ -33,7 +33,7 @@ export default function Tabs() {
         <Tab.Screen
             name="Home"
             component={Home}
-            options={{title:"",headerShown: false}}
+            options={{title:""}}
           />
           <Tab.Screen
             name="name_B"
@@ -43,10 +43,7 @@ export default function Tabs() {
           <Tab.Screen
             name="Wallet"
             component={Wallet}
-            options={{
-              title: "",
-              headerShown: false,
-            }}
+            options={{title: ""}}
           />
           <Tab.Screen
             name="name_D"

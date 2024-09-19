@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   },
   container: {
     paddingHorizontal: wp('4%'),
-    top: hp('2%'), 
+    marginTop: hp('8%'),
     paddingVertical: hp('2%'), 
   },
   header: {
