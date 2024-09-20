@@ -11,60 +11,68 @@ const Account = () => {
   const { amount, ethAmount, zarAmount, withdrawAmount } = useContext(DataContext);
 
   return (
-        <View style={[tw`justify-center items-center`,styles.accountContainer]}>          
-              <View style={styles.balanceContainer}>
-                <Text style={styles.balanceTitle}>BALANCE </Text>
-                <Text style={styles.balanceAmount}>
-                  {amount
-                    ? (amount - (zarAmount || 0)).toFixed(2)
-                    : (amount - (withdrawAmount || 0)).toFixed(2)}{' '}
-                  ZAR
-                </Text>
+    <View style={styles.accountContainer}>    
+      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>      
+        <View style={styles.balanceContainer}>
+          <Text style={styles.balanceTitle}>BALANCE </Text>
+          <Text style={styles.balanceAmount}>
+            {amount
+              ? (amount - (zarAmount || 0)).toFixed(2)
+              : (amount - (withdrawAmount || 0)).toFixed(2)}{' '}
+            ZAR
+          </Text>
 
-                <View style={tw`flex-row rounded-md gap-x-2 items-center justify-center w-40 p-2 top-3`}>
-                  <Text style={tw`font-bold text-xl text-black`}>{ethAmount ? ethAmount : 0} </Text>
-                  <Text style={tw`text-[#6d28d9] font-bold text-xl`}>ETH</Text>
-                  <FontAwesome5 name="ethereum" size={20} color="black" />
-                </View>
-                <View style={tw`flex-row justify-between gap-x-3 mt-10`}>
-                <Pressable style={styles.actionButton} onPress={() => navigation.navigate('TopUp')}>
-                  <Text style={styles.buttonText}>Transfer</Text>
-                </Pressable>
-                <Pressable style={styles.actionButton} onPress={() => navigation.navigate('Withdraw')}>
-                  <Text style={styles.buttonText}>Withdraw</Text>
-                </Pressable>
-                <Pressable style={styles.actionButton} onPress={() => navigation.navigate('BuyEth')}>
-                  <Text style={styles.buttonText}>Buy ETH</Text>
-                </Pressable>
-              </View>
-              </View>
+          <View style={tw`flex-row rounded-md gap-x-2 items-center justify-center w-40 p-2 top-3`}>
+            <Text style={tw`font-bold text-xl text-black`}>{ethAmount ? ethAmount : 0} </Text>
+            <Text style={tw`text-[#6d28d9] font-bold text-xl`}>ETH</Text>
+            <FontAwesome5 name="ethereum" size={20} color="black" />
           </View>
-          
+
+          <View style={tw`flex-row justify-between gap-x-3 mt-10`}>
+            <Pressable style={styles.actionButton} onPress={() => navigation.navigate('TopUp')}>
+              <Text style={styles.buttonText}>Transfer</Text>
+            </Pressable>
+            <Pressable style={styles.actionButton} onPress={() => navigation.navigate('Withdraw')}>
+              <Text style={styles.buttonText}>Withdraw</Text>
+            </Pressable>
+            <Pressable style={styles.actionButton} onPress={() => navigation.navigate('BuyEth')}>
+              <Text style={styles.buttonText}>Buy ETH</Text>
+            </Pressable>
+          </View>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  accountContainer:{
-    marginTop:hp('33%'),
+  accountContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: hp('5.5%'),
   },
-    balanceContainer: {
+  scrollContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 30,
+  },
+  balanceContainer: {
     width: wp('90%'),
-    height:hp('45%'),
-    backgroundColor: 'rgba(255,255,255,0.8)',
+    backgroundColor: 'rgba(255,255,255,0.9)',
     borderRadius: 20,
     paddingVertical: 30,
     paddingHorizontal: 20,
-    justifyContent:'center',
+    justifyContent: 'center',
     alignItems: 'center',
-    position:'absolute',
   },
   balanceTitle: {
     color: '#333333',
     fontSize: 17,
-    textAlign:'center',
+    textAlign: 'center',
     letterSpacing: 0.8,
     fontWeight: 'bold',
-    marginBottom: hp('6%'),
+    marginBottom: hp('3%'),
   },
   balanceAmount: {
     fontSize: 34,

@@ -37,7 +37,7 @@ const HomeScreen = () => {
         index * wp('35%'),
         (index + 1) * wp('35%')
       ],
-      outputRange: [1, 1.2, 1],
+      outputRange: [1, 1.1, 1],
       extrapolate: 'clamp',
     });
 
@@ -79,6 +79,7 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
       <FlatList
         ListHeaderComponent={() => (
           <View>
@@ -111,6 +112,13 @@ const HomeScreen = () => {
               onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: false })}
               scrollEventThrottle={16}
             />
+            <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Top Selling</Text>
+            <TouchableOpacity onPress={() => { /* Navigate to top selling list */ }}>
+              <Text style={styles.sectionLink}>See All</Text>
+            </TouchableOpacity>
+          </View>
+
           </View>
         )}
         data={collections.slice(3, 7)}
@@ -119,6 +127,7 @@ const HomeScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.verticalList}
       />
+      </View>
     </SafeAreaView>
   );
 };
@@ -132,7 +141,8 @@ const styles = StyleSheet.create({
   },
   container: {
     paddingHorizontal: wp('4%'),
-    marginTop: hp('8%'),
+    marginTop: hp('5%'),
+    // padding: '3%',
     paddingVertical: hp('2%'), 
   },
   header: {
@@ -150,7 +160,8 @@ const styles = StyleSheet.create({
   profileImage: {
     width: wp('10%'), 
     height: wp('10%'), 
-    borderRadius: wp('5%'), 
+    borderRadius: wp('5%'),
+    backgroundColor:'grey', 
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -198,8 +209,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   topSellingItem: {
-    marginBottom: hp('2%'), 
+    marginTop: hp('2%'),
+    marginLeft: wp('3%'), 
     width: wp('90%'), 
+    padding: '1%',
     height: hp('20%'), 
     justifyContent: 'center',
     position: 'relative',

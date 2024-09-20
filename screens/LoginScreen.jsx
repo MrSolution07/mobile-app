@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { SafeAreaView, View, Image, Text, TextInput, Pressable, StatusBar, StyleSheet, ScrollView } from 'react-native';
+import { SafeAreaView, View, Image, Text, TextInput, Pressable, StatusBar, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import CheckBox from 'expo-checkbox';
 import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
@@ -21,58 +21,65 @@ const LoginScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="default" translucent />
-      <View style={styles.container}>
-        <Image
-          source={{ uri: 'https://i.pinimg.com/originals/6b/f8/48/6bf848ae5afdb77782a1ff14067b194a.jpg' }}
-          style={styles.backgroundImage}
-          resizeMode='cover'
-        />
-        <BlurView
-          style={StyleSheet.absoluteFillObject}
-          intensity={1}
-          tint="dark"
-        />
-        <ScrollView
-          contentContainerStyle={styles.scrollViewContent}
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.formContainer}>
-            <Text style={styles.header}>
-              Sign in to your account
-            </Text>
-            <TextInput
-              placeholder='Enter your username'
-              placeholderTextColor='gray'
-              style={styles.textInput}
-            />
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.container}>
+          <Image
+            source={{ uri: 'https://i.pinimg.com/originals/6b/f8/48/6bf848ae5afdb77782a1ff14067b194a.jpg' }}
+            style={styles.backgroundImage}
+            resizeMode='cover'
+          />
+          <BlurView
+            style={StyleSheet.absoluteFillObject}
+            intensity={1}
+            tint="dark"
+          />
 
-            <View style={styles.passwordContainer}>
-              <TextInput
-                placeholder='Enter your password'
-                placeholderTextColor='gray'
-                secureTextEntry={showPassword}
-                autoCorrect={false}
-                value={password}
-                autoCapitalize="none"
-                onChangeText={setPassword}
-                style={styles.textInput}
-              />
-              <Pressable
-                onPress={togglePassword}
-                style={styles.eyeIcon}
-              >
-                {showPassword ? (
-                  <Feather name="eye" size={20} color="black" />
-                ) : (
-                  <Feather name="eye-off" size={20} color="black" />
-                )}
-              </Pressable>
-            </View>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.keyboardAvoidingView}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+          >
+            <ScrollView
+              contentContainerStyle={styles.scrollViewContent}
+              style={styles.scrollView}
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              <View style={styles.formContainer}>
+                <Text style={styles.header}>
+                  Sign in to your account
+                </Text>
+                <TextInput
+                  placeholder='Enter your username'
+                  placeholderTextColor='gray'
+                  style={styles.textInput}
+                />
 
-            <View style={tw`flex-row justify-between items-center mb-5`}>
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    placeholder='Enter your password'
+                    placeholderTextColor='gray'
+                    secureTextEntry={showPassword}
+                    autoCorrect={false}
+                    value={password}
+                    autoCapitalize="none"
+                    onChangeText={setPassword}
+                    style={styles.textInput}
+                  />
+                  <Pressable
+                    onPress={togglePassword}
+                    style={styles.eyeIcon}
+                  >
+                    {showPassword ? (
+                      <Feather name="eye" size={20} color="black" />
+                    ) : (
+                      <Feather name="eye-off" size={20} color="black" />
+                    )}
+                  </Pressable>
+                </View>
+
+                <View style={tw`flex-row justify-between items-center mb-5`}>
                   <View style={tw`flex-row items-center ml-1`}>
                     <CheckBox
                       value={isChecked}
@@ -88,33 +95,35 @@ const LoginScreen = ({ navigation }) => {
                   </Pressable>
                 </View>
 
-            <Pressable
-              style={styles.loginButton}
-              android_ripple={{ color: 'lightgray' }}
-              onPress={() => navigation.navigate('Tabs')}
-            >
-              <Text style={styles.loginButtonText}>Login</Text>
-            </Pressable>
+                <Pressable
+                  style={styles.loginButton}
+                  android_ripple={{ color: 'lightgray' }}
+                  onPress={() => navigation.navigate('Tabs')}
+                >
+                  <Text style={styles.loginButtonText}>Login</Text>
+                </Pressable>
 
-            <Pressable style={styles.socialButton}>
-            <FontAwesome name="google" size={20} color="black" style={tw`right-3`} />
-            <Text style={styles.socialButtonText}>Login with Google</Text>
-            </Pressable>
+                <Pressable style={styles.socialButton}>
+                  <FontAwesome name="google" size={20} color="black" style={tw`right-3`} />
+                  <Text style={styles.socialButtonText}>Login with Google</Text>
+                </Pressable>
 
-            <Pressable style={styles.socialButton}>
-              <FontAwesome name="facebook" size={20} color="black" style={tw`right-3`}/>
-              <Text style={styles.socialButtonText}>Login with Facebook</Text>
-            </Pressable>
+                <Pressable style={styles.socialButton}>
+                  <FontAwesome name="facebook" size={20} color="black" style={tw`right-3`} />
+                  <Text style={styles.socialButtonText}>Login with Facebook</Text>
+                </Pressable>
 
-            <View style={styles.signUpContainer}>
-              <Text style={styles.signUpText}>Don't have an account?{' '}</Text>
-              <Pressable onPress={() => navigation.navigate('Registration')}>
-                <Text style={styles.signUpLink}>Sign Up</Text>
-              </Pressable>
-            </View>
-          </View>
-        </ScrollView>
-      </View>
+                <View style={styles.signUpContainer}>
+                  <Text style={styles.signUpText}>Don't have an account?{' '}</Text>
+                  <Pressable onPress={() => navigation.navigate('Registration')}>
+                    <Text style={styles.signUpLink}>Sign Up</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 };
@@ -130,6 +139,9 @@ const styles = StyleSheet.create({
   backgroundImage: {
     ...StyleSheet.absoluteFillObject
   },
+  keyboardAvoidingView: {
+    flex: 1
+  },
   scrollView: {
     flex: 1
   },
@@ -138,7 +150,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     flex: 1,
-    justifyContent:'center',
+    justifyContent: 'center',
     padding: 24,
     backgroundColor: 'rgba(255, 255, 255, 0.85)',
     borderRadius: 8
@@ -169,25 +181,6 @@ const styles = StyleSheet.create({
     right: 16,
     top: '30%'
   },
-  rememberMeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent:'center',
-    columnGap: 20,
-    marginBottom: 16,
-  },
-  checkBox: {
-  },
-  rememberMeText: {
-    fontSize: 16,
-    textAlign:'left',
-    color: '#333'
-  },
-  forgotPasswordText: {
-    fontSize: 16,
-    color: '#075eec',
-    textDecorationLine: 'underline'
-  },
   loginButton: {
     backgroundColor: '#075eec',
     paddingVertical: 12,
@@ -208,9 +201,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 16,
     justifyContent: 'center'
-  },
-  socialIcon: {
-    marginRight: 8
   },
   socialButtonText: {
     color: '#333',

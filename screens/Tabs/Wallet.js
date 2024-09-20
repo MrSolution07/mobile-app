@@ -6,6 +6,7 @@ import Items from '../../components/Items';
 import Activity from '../../components/Activity';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
 import tw from 'twrnc';
+import { BlurView } from 'expo-blur';
 
 const Wallet = () => {
   const [activeTab, setActiveTab] = useState('Account');
@@ -25,9 +26,9 @@ const Wallet = () => {
   return (
     <View style={[tw`flex-1`, styles.walletContainer]}>
       <LinearGradient
-        colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 100, 200, 0.7)', 'rgba(0, 0, 0, 0.9)']}
-        start={[0.2, 0.2]}
-        end={[0.8, 0.8]}
+        colors={['rgba(255, 255, 255, 0.5)', 'rgba(7, 94, 236, 0.5)', 'rgba(128, 0, 128, 0.5)']}
+        // start={[0.2, 0.2]}
+        // end={[0.8, 0.8]}
         style={styles.gradientBackground}
       />
       <View style={tw`items-center top-40 justify-center`}> 
@@ -80,6 +81,8 @@ const styles = StyleSheet.create({
     alignContent:'center',
     width: '100%',
     height: '50%',
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
   },
   contentContainer: {
     flex: 1,
