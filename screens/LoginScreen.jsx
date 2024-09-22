@@ -1,23 +1,78 @@
-import React, { useContext } from 'react';
-import { SafeAreaView, View, Image, Text, TextInput, Pressable, StatusBar, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import React, { useContext,useEffect } from 'react';
+import { Alert,SafeAreaView, View, Image, Text, TextInput, Pressable, StatusBar, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import CheckBox from 'expo-checkbox';
 import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Feather from '@expo/vector-icons/Feather';
 import DataContext from '../screens/Context/Context'; 
+import * as Google from "expo-auth-session/providers/google";
+import * as WebBrowser from 'expo-web-browser';
+import { signInWithCredential, GoogleAuthProvider, getAuth,signInWithEmailAndPassword } from 'firebase/auth';
+
+const webClientId = '348282660108-kt8fic5e05o92i5df2ah4sqnaeoflnhb.apps.googleusercontent.com'
+const iosClientId = '348282660108-5m00pvh46a3vrp973l0sce7q9m6nolke.apps.googleusercontent.com'
+const androidClientId = '348282660108-abudgte82ncrt748dbpnod8er6re1gi9.apps.googleusercontent.com'
+
+WebBrowser.maybeCompleteAuthSession();
 
 const LoginScreen = ({ navigation }) => {
   const {
     isChecked, setIsChecked,
     password, setPassword,
-    showPassword, setShowPassword
+    showPassword, setShowPassword,
+    email, setEmail
   } = useContext(DataContext);
 
   const togglePassword = () => {
     setShowPassword(!showPassword);
   };
+  const config = {
+    webClientId, 
+    iosClientId,
+    androidClientId
+  };
+  
+  const [request, response, promptAsync] = Google.useAuthRequest(config);
 
+  const handleToken = async () => {
+    if (response?.type === 'success') {
+      const { authentication } = response;
+      const token = authentication?.accessToken;
+
+      if (token) {
+        const auth = getAuth();
+        const credential = GoogleAuthProvider.credential(null, token);
+
+        try {
+          const result = await signInWithCredential(auth, credential);
+          const user = result.user;
+          console.log('User signed in:', user);
+          navigation.navigate('Tabs'); // Navigate to main app screen
+        } catch (error) {
+          // console.error('Error signing in:', error);
+          // Alert.alert('Sign-In Error', error.message);
+          Alert.alert('Sign-In Error');
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    handleToken();
+  }, [response]);
+
+  const handleLogin = async () => {
+    try {
+      const auth = getAuth();
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log('User logged in:', userCredential.user);
+      navigation.navigate('Tabs');
+    } catch (error) {
+      // Alert.alert('Login Error', error.message); 
+      Alert.alert('Sign-In Error');
+    }
+  };
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="default" translucent />
@@ -51,8 +106,9 @@ const LoginScreen = ({ navigation }) => {
                   Sign in to your account
                 </Text>
                 <TextInput
-                  placeholder='Enter your username'
+                  placeholder='Enter your email'
                   placeholderTextColor='gray'
+                  onChangeText={setEmail}
                   style={styles.textInput}
                 />
 
@@ -66,6 +122,7 @@ const LoginScreen = ({ navigation }) => {
                     autoCapitalize="none"
                     onChangeText={setPassword}
                     style={styles.textInput}
+
                   />
                   <Pressable
                     onPress={togglePassword}
@@ -98,12 +155,16 @@ const LoginScreen = ({ navigation }) => {
                 <Pressable
                   style={styles.loginButton}
                   android_ripple={{ color: 'lightgray' }}
-                  onPress={() => navigation.navigate('Tabs')}
+                  onPress={handleLogin}
                 >
                   <Text style={styles.loginButtonText}>Login</Text>
                 </Pressable>
 
-                <Pressable style={styles.socialButton}>
+                <Pressable 
+                  style={styles.socialButton}
+                  onPress={() => promptAsync()}
+                  disabled={!request}
+                >
                   <FontAwesome name="google" size={20} color="black" style={tw`right-3`} />
                   <Text style={styles.socialButtonText}>Login with Google</Text>
                 </Pressable>

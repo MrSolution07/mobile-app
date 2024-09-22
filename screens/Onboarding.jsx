@@ -134,7 +134,7 @@ const Onboarding = ({ navigation }) => {
               >
                 <Pressable
                   style={styles.getStartedButton}
-                  onPress={() => navigation.replace('Registration')}
+                  onPress={() => navigation.replace('Login')}
                 >
                   <Text style={tw`text-white text-center text-sm`}>Get Started</Text>
                 </Pressable>

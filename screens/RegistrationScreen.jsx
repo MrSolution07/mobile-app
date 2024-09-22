@@ -1,10 +1,12 @@
-import React, { useContext, useState } from 'react';
-import { SafeAreaView, View, Image, Text, TouchableOpacity, TextInput, Pressable, StatusBar, StyleSheet, ScrollView} from 'react-native';
+import React, { useContext, useState, useEffect } from 'react';
+import { SafeAreaView, View, Image, Text, TouchableOpacity, TextInput, Pressable, StatusBar, StyleSheet, ScrollView,Alert} from 'react-native';
 import CheckBox from 'expo-checkbox';
 import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
 import Feather from '@expo/vector-icons/Feather';
 import DataContext from './Context/Context';
+import { getApp,auth, getAuth, db, createUserWithEmailAndPassword, setDoc, doc } from '../config/firebaseConfig';
+
 
 export default function RegistrationScreen({ navigation }) {
   const {
@@ -22,6 +24,49 @@ export default function RegistrationScreen({ navigation }) {
 
   const toggleConfirmPassword = () => {
     setShowConfirmPassword(!showConfirmPassword);
+  };
+  const [loading, setLoading] = useState(false);
+
+  const handleSignUp = async () => {
+    if (!isChecked) {
+      Alert.alert('Error', 'You must agree to the terms and conditions.');
+      return;
+    }
+  
+    if (password.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters long.');
+      return;
+    }
+  
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match.');
+      return;
+    }
+  
+    setLoading(true);
+  
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+  
+      await setDoc(doc(db, 'users', user.uid), {
+        name,
+        surname,
+        email,
+        phoneNo,
+      });
+  
+      Alert.alert('Success', 'Account created successfully!');
+      navigation.navigate('Login');
+    } catch (error) {
+      if (error.code === 'auth/email-already-in-use') {
+        Alert.alert('Error', 'This email is already in use. Please use a different email or log in.');
+      } else {
+        Alert.alert('Error', error.message);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -176,14 +221,17 @@ export default function RegistrationScreen({ navigation }) {
               </View>
 
               <View style={tw`mt-1 mb-4`}>
-                <TouchableOpacity
-                  onPress={() => {
-                    // Handle sign up logic here
-                  }}>
-                  <View style={tw`flex-row items-center justify-center rounded-lg py-3 px-6 bg-[#075eec] border border-[#075eec]`}>
-                    <Text style={tw`text-white text-lg font-semibold`}>Sign Up</Text>
-                  </View>
-                </TouchableOpacity>
+              <TouchableOpacity 
+                onPress={handleSignUp} 
+                disabled={loading}
+        
+              >
+                <View style={tw`flex-row items-center justify-center rounded-lg py-3 px-6 bg-[#075eec] border border-[#075eec]`}>
+                  <Text style={tw`text-white text-lg font-semibold`}>
+                    {loading ? 'Signing Up...' : 'Sign Up'}
+                  </Text>
+                </View>
+              </TouchableOpacity>
               </View>
 
               <View style={tw`flex-row justify-center mt-5`}>
