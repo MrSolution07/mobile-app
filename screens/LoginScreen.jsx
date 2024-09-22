@@ -110,6 +110,7 @@ const LoginScreen = ({ navigation }) => {
                   placeholderTextColor='gray'
                   onChangeText={setEmail}
                   style={styles.textInput}
+                  value={email}
                 />
 
                 <View style={styles.passwordContainer}>
