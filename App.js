@@ -9,6 +9,7 @@ import AppNavigator from './screens/Navigator/AppNavigator.js';
 
 
 
+
 export default function App() {
   const fontsLoaded = useCustomFonts();
 
@@ -22,9 +23,11 @@ export default function App() {
     return null; 
   }
   return (
+    
     <View style={styles.container}>
       <AppNavigator />
     </View>
+    
   );
 }
 
