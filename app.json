@@ -1,44 +1,19 @@
 {
   "expo": {
-    "plugins": [
-      [
-        "expo-dev-launcher",
-        {
-          "launchMode": "most-recent"
-        }
-      ]
-    ],
     "name": "mobile-app",
     "slug": "mobile-app",
     "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.mrsolution.mobileapp",
-      "scheme": "mobileapp" 
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.mr_solution.mobileapp",
-      "scheme": "mobileapp" 
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
     "extra": {
       "eas": {
         "projectId": "e1efd1de-84ab-4602-a753-0e6d4b0d9e6c"
       }
+    },
+    "android": {
+      "package": "com.mr_solution.mobileapp"
+    },
+    "ios": {
+      "bundleIdentifier": "com.mrsolution.mobileapp",
+      "scheme": "mobileapp" 
     }
   }
 }
