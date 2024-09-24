@@ -16,22 +16,18 @@ const Gemini = () => {
     "How are NFTs different from cryptocurrencies?",
     "What makes an NFT valuable?",
     "Are NFTs a good investment?"
-];
+  ];
 
-
-  // Handle when a suggested prompt is clicked
   const handleSuggestedPrompt = (prompt) => {
-    setInput(prompt); // Set the input to the suggested prompt
-    setTimeout(() => onSent(), 3); // Call onSent after the input is updated
+    setInput(prompt);
+    setTimeout(() => onSent(), 3);
   };
 
-  // Handle Back button to return to greeting
   const handleBack = () => {
     setShowResult(false);
-    setInput(''); // Clear input when going back
+    setInput('');
   };
 
-  // Prevent sending empty prompt
   const handleSend = () => {
     if (input.trim()) {
       onSent();
@@ -39,20 +35,18 @@ const Gemini = () => {
   };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <View style={styles.mainContainer}>
-            {/* Display Greeting or Results */}
             {!showResult ? (
               <>
                 <View style={styles.greet}>
                   <Text style={styles.greetText}>Hello, {name}</Text>
-                  <Text style={styles.subText}>How can I help you today?</Text>
+                  <Text style={styles.subText}>How can MetaWay AI I assist you today?</Text>
                 </View>
 
-                {/* Horizontal ScrollView for Suggested Prompts */}
-                <ScrollView horizontal={true} style={styles.cardsContainer}>
+                <ScrollView horizontal={true} style={styles.cardsContainer} showsHorizontalScrollIndicator={false}>
                   {suggestedPrompts.map((prompt, index) => (
                     <TouchableOpacity key={index} style={styles.card} onPress={() => handleSuggestedPrompt(prompt)}>
                       <Text style={styles.cardText}>{prompt}</Text>
@@ -63,37 +57,36 @@ const Gemini = () => {
             ) : (
               <View style={styles.resultContainer}>
                 <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                  <Text style={styles.backButtonText}>Back</Text>
+                  <Text style={styles.backButtonText}>Reset</Text>
                 </TouchableOpacity>
                 <View style={styles.resultTitle}>
-                  <Text>{recentPrompt}</Text>
+                  <Text style={styles.promptText}>{recentPrompt}</Text>
                 </View>
                 <View style={styles.resultData}>
                   {loading ? (
                     <ActivityIndicator size="large" color="#007bff" />
                   ) : (
-                    <Text>{resultData}</Text> // Result displayed word-by-word
+                    <Text style={styles.resultText}>{resultData}</Text>
                   )}
                 </View>
               </View>
             )}
 
-            {/* Bottom Input Area */}
             <View style={styles.bottomContainer}>
               <View style={styles.searchBox}>
                 <TextInput
                   style={styles.input}
                   value={input}
                   onChangeText={(text) => setInput(text)}
-                  placeholder="Enter a prompt here"
-                  placeholderTextColor="#999"
+                  placeholder="Ask me anything..."
+                  placeholderTextColor="#aaa"
                 />
                 <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
                   <Text style={styles.sendButtonText}>Send</Text>
                 </TouchableOpacity>
               </View>
               <Text style={styles.bottomInfo}>
-                Gravity. It keeps you rooted to the ground...
+                Nft can make you rich...
               </Text>
             </View>
           </View>
@@ -104,93 +97,119 @@ const Gemini = () => {
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F0F4F8',
+  },
   scrollContainer: {
     flexGrow: 1,
   },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
   },
   mainContainer: {
-    padding: 16,
+    padding: 20,
     flex: 1,
   },
   greet: {
-    marginBottom: 16,
+    marginBottom: 24,
   },
   greetText: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#333',
   },
   subText: {
-    fontSize: 16,
-    color: '#555',
+    fontSize: 18,
+    color: '#666',
   },
   cardsContainer: {
     flexDirection: 'row',
   },
   card: {
-    backgroundColor: '#f9f9f9',
-    padding: 16,
-    borderRadius: 8,
+    backgroundColor: '#E8EEF3',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
     marginRight: 16,
-    width: 200,
+    width: 220,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
   },
   cardText: {
-    fontSize: 14,
-    marginBottom: 10,
+    fontSize: 16,
+    color: '#333',
     textAlign: 'center',
   },
   resultContainer: {
     flex: 1,
   },
   resultTitle: {
-    marginBottom: 16,
+    marginBottom: 20,
+  },
+  promptText: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#555',
   },
   resultData: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
+  },
+  resultText: {
+    fontSize: 16,
+    color: '#333',
   },
   backButton: {
     alignSelf: 'flex-start',
-    padding: 10,
-    marginBottom: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
     backgroundColor: '#007bff',
-    borderRadius: 8,
+    borderRadius: 10,
+    marginBottom: 20,
   },
   backButtonText: {
     color: '#fff',
     fontSize: 16,
   },
   bottomContainer: {
-    marginTop: 16,
+    marginTop: 20,
   },
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f1f1f1',
-    padding: 8,
-    borderRadius: 8,
+    backgroundColor: '#F0F4F8',
+    padding: 12,
+    borderRadius: 10,
   },
   input: {
     flex: 1,
-    padding: 8,
+    padding: 10,
+    fontSize: 16,
     color: '#333',
+    backgroundColor: '#FFF',
+    borderRadius: 8,
   },
   sendButton: {
     backgroundColor: '#007bff',
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
     borderRadius: 8,
     marginLeft: 8,
   },
   sendButtonText: {
     color: '#fff',
+    fontSize: 16,
   },
   bottomInfo: {
-    marginTop: 16,
+    marginTop: 24,
     fontSize: 12,
     color: '#777',
     textAlign: 'center',
