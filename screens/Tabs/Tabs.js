@@ -5,6 +5,7 @@ import { BlurView } from 'expo-blur';
 import CustomTabIcon from './CustomTabIcon'; 
 import Home from './HomeScreen';
 import Wallet from './Wallet';
+import Gemini from './Gemini';
 
 const Tab = createBottomTabNavigator();
 
@@ -50,6 +51,11 @@ export default function Tabs() {
             component={Home}
             options={{title:""}}
           />
+           <Tab.Screen
+            name="name_E"
+            component={Gemini}
+            options={{title:""}}
+          />
         
       </Tab.Navigator>
   );
@@ -65,6 +71,8 @@ const getIconName = (routeName) => {
       return 'wallet'; 
     case 'name_D':
       return 'upload';
+      case 'name_E':
+        return 'star';
     default:
       return 'home';
   }
