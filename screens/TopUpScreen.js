@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet,Pressable } from 'react-native';
-import DataContext from '../screens/Context/Context'; 
+import DataContext from './Context/Context'; 
 import tw from 'twrnc';
 
 const TopUpScreen = () => {
