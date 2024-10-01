@@ -6,12 +6,12 @@ const { width, height } = Dimensions.get('window');
 
 // Component to render each slide
 const Slide = ({ item, scrollX, index }) => {
-  const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
-  const scale = scrollX.interpolate({
-    inputRange,
-    outputRange: [0.8, 1, 0.8],
-    extrapolate: 'clamp',
-  });
+  // const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
+  // const scale = scrollX.interpolate({
+  //   inputRange,
+  //   outputRange: [0.8, 1, 0.8],
+  //   extrapolate: 'clamp',
+  // });
 
   return (
     <View style={[tw`items-center px-4`, { width }]}>
@@ -21,10 +21,10 @@ const Slide = ({ item, scrollX, index }) => {
           height: height * 0.5,
           width: '100%',
           resizeMode: 'contain',
-          transform: [{ scale }],
+          // transform: [{ scale }],
         }}
       />
-      <View style={tw`items-center top-15`}>
+      <View style={tw`items-center top-5`}>
         <Text style={styles.title}>
           {item.id === '3' ? (
             <>
@@ -47,12 +47,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: 20,
     color: 'black',
+    fontFamily:'MavenPro_400Regular',
     width: width * 0.8,
   },
   highlight: {
     color: '#075eec',
+    fontFamily:'VarelaRound_400Regular',
   },
 });
 

@@ -5,6 +5,7 @@ import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
 import Feather from '@expo/vector-icons/Feather';
 import DataContext from './Context/Context';
+import TermsAndConditions from '../components/TermsAndConditions';
 import { getApp,auth, getAuth, db, createUserWithEmailAndPassword, setDoc, doc } from '../config/firebaseConfig';
 
 
@@ -17,6 +18,10 @@ export default function RegistrationScreen({ navigation }) {
     isChecked, setIsChecked,
     showPassword, setShowPassword
   } = useContext(DataContext);
+
+  
+  const [isModalVisible, setModalVisible] = useState(false); // State for modal visibility
+
 
   const [surname, setSurname] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -217,7 +222,7 @@ export default function RegistrationScreen({ navigation }) {
                   tintColors={{ true: 'black', false: 'gray' }}
                 />
                 <Text style={tw`text-sm text-gray-600`}>I have read the </Text>
-                  <Pressable><Text style={tw`text-[#075eec]`}>Terms and Conditions </Text></Pressable>
+                  <Pressable onPress={() => setModalVisible(true)}><Text style={tw`text-[#075eec]`}>Terms and Conditions </Text></Pressable>
               </View>
 
               <View style={tw`mt-1 mb-4`}>
@@ -235,98 +240,112 @@ export default function RegistrationScreen({ navigation }) {
               </View>
 
               <View style={tw`flex-row justify-center mt-5`}>
-                <Text style={tw`text-lg font-semibold text-[#075eec]`}>Already have an account? </Text>
+                <Text style={[tw`text-lg font-semibold text-[#075eec]`,styles.btnSignInText]}>Already have an account? </Text>
                 <Pressable
                   onPress={() => navigation.navigate('Login')}
                 >
-                  <Text style={tw`text-lg font-semibold underline text-[#075eec]`}>Sign in</Text>
+                  <Text style={[tw`text-lg font-semibold underline text-[#075eec]`,styles.btnText]}>Sign in</Text>
                 </Pressable>
               </View>
             </View>
           </View>
         </ScrollView>
       </View>
+      <TermsAndConditions 
+        isVisible={isModalVisible} 
+        onClose={() => setModalVisible(false)} 
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    position: 'relative',
+  // safeArea: {
+  //   position: 'relative',
+  // },
+  // container: {
+  //   flex: 1,
+  //   padding: 24,
+  //   backgroundColor: 'rgba(245, 245, 245, 0.85)',
+  //   borderRadius: 8,
+  //   ...StyleSheet.absoluteFillObject
+  // },
+  // title: {
+  //   fontSize: 26,
+  //   fontWeight: '700',
+  //   color: '#1D2A32',
+  // },
+  // subtitle: {
+  //   fontSize: 15,
+  //   fontWeight: '500',
+  //   color: '#929292',
+  //   textAlign: 'center',
+  // },
+  // companyName: {
+  //   fontSize: 26,
+  //   marginBottom: 0,
+  //   color: '#075eec',
+  // },
+  // titleContainer: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   marginBottom: 8,
+  // },
+  // header: {
+  //   marginVertical: 60,
+  // },
+  // form: {},
+  // formAction: {
+  //   marginTop: 4,
+  //   marginBottom: 16,
+  // },
+  // formLink: {
+  //   fontSize: 16,
+  //   fontWeight: '600',
+  //   color: '#075eec',
+  // },
+  // input: {
+  //   marginBottom: 16,
+  // },
+  // inputLabel: {
+  //   fontSize: 17,
+  //   fontWeight: '600',
+  //   color: '#222',
+  //   marginBottom: 8,
+  //   textAlign: 'center',
+  // },
+  // inputControl: {
+  //   height: 50,
+  //   backgroundColor: '#fff',
+  //   paddingHorizontal: 16,
+  //   borderRadius: 12,
+  //   fontSize: 15,
+  //   fontWeight: '500',
+  //   color: '#222',
+  //   borderWidth: 1,
+  //   borderColor: '#C9D3DB',
+  //   borderStyle: 'solid',
+  // },
+  // btn: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   borderRadius: 30,
+  //   paddingVertical: 10,
+  //   paddingHorizontal: 20,
+  //   borderWidth: 1,
+  //   backgroundColor: '#075eec',
+  //   borderColor: '#075eec',
+  // },
+  btnSignInText:{
+    color: '#333',
+    fontFamily:'Roboto_400Regular',
+    fontSize:16,
   },
-  container: {
-    flex: 1,
-    padding: 24,
-    backgroundColor: 'rgba(245, 245, 245, 0.85)',
-    borderRadius: 8,
-    ...StyleSheet.absoluteFillObject
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#1D2A32',
-  },
-  subtitle: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#929292',
-    textAlign: 'center',
-  },
-  companyName: {
-    fontSize: 26,
-    marginBottom: 0,
-    color: '#075eec',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  header: {
-    marginVertical: 60,
-  },
-  form: {},
-  formAction: {
-    marginTop: 4,
-    marginBottom: 16,
-  },
-  formLink: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#075eec',
-  },
-  input: {
-    marginBottom: 16,
-  },
-  inputLabel: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#222',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  inputControl: {
-    height: 50,
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#222',
-    borderWidth: 1,
-    borderColor: '#C9D3DB',
-    borderStyle: 'solid',
-  },
-  btn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 30,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderWidth: 1,
-    backgroundColor: '#075eec',
-    borderColor: '#075eec',
-  },
+
+  btnText: {
+    fontFamily:'Roboto_400Regular',
+    fontSize:16,
+  }
 });

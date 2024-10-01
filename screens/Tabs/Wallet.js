@@ -6,7 +6,6 @@ import Items from '../../components/Items';
 import Activity from '../../components/Activity';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
 import tw from 'twrnc';
-import { BlurView } from 'expo-blur';
 
 const Wallet = () => {
   const [activeTab, setActiveTab] = useState('Account');

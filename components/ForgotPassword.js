@@ -5,11 +5,11 @@ import tw from 'twrnc';
 const ForgotPassword = ({navigation}) => {
   return (
     <SafeAreaView style={[tw`flex-1`, styles.Container]}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="default" />
       <View style={tw`flex-1 justify-center items-center`}>
         <View style={[tw`absolute w-full h-full p-6 mt-5`]}>
           <View style={tw`w-full`}>
-            <Text style={[tw`text-3xl font-bold mb-6 mt-15`, styles.heading]}>
+            <Text style={[tw`text-3xl mb-6 mt-15`, styles.heading]}>
               Recover your account
             </Text>
             <Text style={[tw`text-left font-medium mb-8`, styles.text]}>
@@ -24,7 +24,7 @@ const ForgotPassword = ({navigation}) => {
               style={[tw`w-full h-12 justify-center mb-2 rounded-lg`, styles.resetPasswordbtn]}
               android_ripple={{ color: 'lightgray' }}
             >
-              <Text style={[tw`text-white text-center text-lg font-medium`]}>
+              <Text style={[tw`text-white text-center text-lg font-medium`,styles.resetText]}>
                 Reset Password
               </Text>
             </Pressable>
@@ -52,6 +52,7 @@ const styles = StyleSheet.create({
   heading: {
     color: '#1D2A32',
     textAlign: 'left',
+    fontFamily:'Roboto_700Bold',
   },
   text: {
     fontFamily: 'Roboto_400Regular',
@@ -64,15 +65,21 @@ const styles = StyleSheet.create({
   resetPasswordbtn: {
     backgroundColor: '#075eec',
   },
+  resetText:{
+    fontFamily:'Roboto_400Regular',
+  },
+
   signUptext: {
     fontSize: 16,
     fontWeight: '500',
     color: '#075eec',
+    fontFamily:'Roboto_400Regular',
   },
   formLink: {
     fontSize: 16,
     fontWeight: '500',
     color: '#075eec',
+    fontFamily:'Roboto_400Regular',
   },
 });
 

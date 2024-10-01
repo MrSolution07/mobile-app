@@ -14,7 +14,6 @@ import TopUp from '../TopUpScreen';
 import BuyEth from '../BuyEth';
 import Withdraw from '../Withdraw';
 import HomeScreen from '../Tabs/HomeScreen';
-import Account from '../../components/Account';
 import Tabs from '../Tabs/Tabs';
 import ProfileScreen from '../ProfileScreen';
 // import EditProfile from '../EditProfile';
@@ -64,6 +63,17 @@ export default function AppNavigator() {
                             ),
                         }}
                     />
+                     {/* <Stack.Screen
+                        name="TermsAndConditions"
+                        component={TermsAndConditions}
+                        options={{
+                            headerTitle: "",
+                            headerTransparent: true,
+                            headerBackground: () => (
+                                <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                            ),
+                        }}
+                    /> */}
                     <Stack.Screen
                         name="HomeScreen"
                         component={HomeScreen}
@@ -108,17 +118,7 @@ export default function AppNavigator() {
                             ),
                         }}
                     />
-                    {/* <Stack.Screen
-                        name="Account"
-                        component={Account}
-                        options={{
-                            headerTitle: "",
-                            headerTransparent: true,
-                            headerBackground: () => (
-                                <View style={{ backgroundColor: 'transparent', flex: 1 }} />
-                            ),
-                        }}
-                    /> */}
+                   
                     <Stack.Screen
                         name='Tabs'
                         component={Tabs}

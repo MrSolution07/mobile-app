@@ -1,11 +1,12 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { BlurView } from 'expo-blur';
 import CustomTabIcon from './CustomTabIcon'; 
 import Home from './HomeScreen';
 import Wallet from './Wallet';
 import Gemini from './Gemini';
+import UserUpload from './UserUpload';
 
 const Tab = createBottomTabNavigator();
 
@@ -48,7 +49,7 @@ export default function Tabs() {
           />
           <Tab.Screen
             name="name_D"
-            component={Home}
+            component={UserUpload}
             options={{title:""}}
           />
            <Tab.Screen

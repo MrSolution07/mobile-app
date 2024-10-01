@@ -1,13 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import tw from 'twrnc'; 
+import { StyleSheet, View } from 'react-native';
 import { useCustomFonts } from './assets/fonts/fonts.js'; 
 import * as SplashScreen from 'expo-splash-screen';
 import AppNavigator from './screens/Navigator/AppNavigator.js'; 
-
-
-
-
 
 
 export default function App() {

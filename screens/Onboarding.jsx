@@ -18,7 +18,7 @@ const slides = [
   {
     id: '2',
     image: require('../assets/images/secondslide.png'),
-    title: `Manage, Sell and Buy `,
+    title: `Manage, Sell and Buy`,
     highlight: 'digital assets',
     subtitle: 'Skip',
   },
@@ -54,7 +54,7 @@ const Onboarding = ({ navigation }) => {
 
   const borderColor = borderColorAnimation.interpolate({
     inputRange: [0, 0.5, 1],
-    outputRange: ['purple','#075eec','black'],
+    outputRange: ['purple', '#075eec', 'black'],
   });
 
   useEffect(() => {
@@ -88,44 +88,75 @@ const Onboarding = ({ navigation }) => {
   };
 
   const Footer = () => {
+    const circleRadius = 90; // Adjust the circle's radius to make it smaller
+  
+    // Define positions for each slide (in radians)
+    const positions = [
+      (7 * Math.PI) / 6.5,   
+      (3 * Math.PI) / 2,   
+      (9 * Math.PI) / 4.7, 
+    ];
+  
     return (
-      <View style={{ height: height * 0.15, justifyContent: 'space-between', paddingHorizontal: 20 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
+      <View style={{ height: height * 0.25, justifyContent: 'flex-end', alignItems: 'center' }}>
+        {/* Outer gray circle, now only showing the top half */}
+        <View
+          style={{
+            width: circleRadius * 2,
+            height: circleRadius * 2,
+            borderRadius: circleRadius,
+            borderWidth: 1.5,
+            borderColor: '#DADADA',
+            justifyContent: 'center',
+            alignItems: 'center',
+            // overflow: 'hidden', 
+            position: 'absolute',
+            bottom: -85, 
+          }}
+        >
           {slides.map((_, index) => {
             const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
-
-            const dotWidth = scrollX.interpolate({
+  
+            const scale = scrollX.interpolate({
               inputRange,
-              outputRange: [10, 20, 10],
+              outputRange: [1, 1.5, 1],
               extrapolate: 'clamp',
             });
-
+  
             const opacity = scrollX.interpolate({
               inputRange,
               outputRange: [0.3, 1, 0.3],
               extrapolate: 'clamp',
             });
-
+  
+            const angle = positions[index];
+            const x = circleRadius * Math.cos(angle) - 2;
+            const y = circleRadius * Math.sin(angle) - 2;
+  
             return (
-              <Pressable key={index} onPress={() => goToSlide(index)}>
-                <Animated.View
-                  style={[
-                    styles.indicator,
-                    {
-                      width: dotWidth,
-                      opacity,
-                      backgroundColor: currentSlideIndex === index ? '#075eec' : 'grey',
-                    },
-                  ]}
-                />
-              </Pressable>
+              <Animated.View
+                key={index}
+                style={[
+                  styles.indicator,
+                  {
+                    position: 'absolute',
+                    transform: [
+                      { translateX: x },
+                      { translateY: y },
+                      { scale },
+                    ],
+                    opacity,
+                    backgroundColor: currentSlideIndex === index ? '#075eec' : 'grey',
+                  },
+                ]}
+              />
             );
           })}
         </View>
-
-        <View style={{ marginBottom: hp('3%') }}> 
+  
+        <View style={{ width: '100%', position: 'absolute', bottom: 10 }}>
           {currentSlideIndex === slides.length - 1 ? (
-            <View style={{ height: hp('7%'), alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ alignItems: 'center' }}>
               <Animated.View
                 style={[
                   styles.getStartedButtonBorder,
@@ -141,9 +172,9 @@ const Onboarding = ({ navigation }) => {
               </Animated.View>
             </View>
           ) : (
-            <View style={tw`items-end justify-end`}>
+            <View style={{ position: 'absolute', right: 20, bottom: 5 }}>
               <Pressable onPress={skip}>
-                <Text style={tw`text-black text-sm`}>Skip</Text>
+                <Text style={tw`text-black text-sm`}></Text>
               </Pressable>
             </View>
           )}
@@ -151,6 +182,7 @@ const Onboarding = ({ navigation }) => {
       </View>
     );
   };
+  
 
   return (
     <SafeAreaView style={tw`flex-1 bg-white`}>
@@ -181,12 +213,10 @@ const Onboarding = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   indicator: {
-    height: hp('0.6%'),  
-    width: wp('3%'),
-    borderRadius: 15,
+    width: 12,
+    height: 12, 
+    borderRadius: 6, 
     backgroundColor: 'grey',
-    marginHorizontal: 3,
-    bottom: 35,
   },
   Header: {
     fontSize: wp('3%'), 
@@ -197,7 +227,8 @@ const styles = StyleSheet.create({
   },
   getStartedButtonBorder: {
     width: wp('50%'),  
-    height: hp('7%'),  
+    height: hp('7%'),
+    bottom:115,  
     borderRadius: 5,
     borderWidth: 2,
     alignItems: 'center',
@@ -207,10 +238,14 @@ const styles = StyleSheet.create({
   getStartedButton: {
     width: '100%',
     height: '100%',
+    // bottom: 20,
     borderRadius: 5,
     backgroundColor: 'black',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  btnText: {
+    fontFamily: 'VarelaRound_400Regular',
   },
 });
 

@@ -1,6 +1,8 @@
 import React, { useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, SafeAreaView, MaskedViewComponent } from 'react-native';
 import DataContext from '../Context/Context';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
+import { LinearGradient } from 'expo-linear-gradient';
 
 const Gemini = () => {
   const { onSent, recentPrompt, showResult, loading, resultData, setInput, input, setShowResult, name } = useContext(DataContext);
@@ -16,18 +18,21 @@ const Gemini = () => {
     "How are NFTs different from cryptocurrencies?",
     "What makes an NFT valuable?",
     "Are NFTs a good investment?"
-  ];
+];
 
+  // Handle when a suggested prompt is clicked
   const handleSuggestedPrompt = (prompt) => {
-    setInput(prompt);
-    setTimeout(() => onSent(), 3);
+    setInput(prompt); // Set the input to the suggested prompt
+    setTimeout(() => onSent(), 3); // Call onSent after the input is updated
   };
 
+  // Handle Back button to return to greeting
   const handleBack = () => {
     setShowResult(false);
-    setInput('');
+    setInput(''); // Clear input when going back
   };
 
+  // Prevent sending empty prompt
   const handleSend = () => {
     if (input.trim()) {
       onSent();
@@ -35,18 +40,20 @@ const Gemini = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={{flex:1}}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <View style={styles.mainContainer}>
+            {/* Display Greeting or Results */}
             {!showResult ? (
               <>
                 <View style={styles.greet}>
-                  <Text style={styles.greetText}>Hello, {name}</Text>
-                  <Text style={styles.subText}>How can MetaWay AI I assist you today?</Text>
+                  <Text style={styles.greetText}>Hello, <Text style={styles.name}>Hello</Text> </Text>
+                  <Text style={styles.subText}>How can I help you today?</Text>
                 </View>
 
-                <ScrollView horizontal={true} style={styles.cardsContainer} showsHorizontalScrollIndicator={false}>
+                {/* Horizontal ScrollView for Suggested Prompts */}
+                <ScrollView horizontal={true} style={styles.cardsContainer}>
                   {suggestedPrompts.map((prompt, index) => (
                     <TouchableOpacity key={index} style={styles.card} onPress={() => handleSuggestedPrompt(prompt)}>
                       <Text style={styles.cardText}>{prompt}</Text>
@@ -57,36 +64,37 @@ const Gemini = () => {
             ) : (
               <View style={styles.resultContainer}>
                 <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                  <Text style={styles.backButtonText}>Reset</Text>
+                  <Text style={styles.backButtonText}>Back</Text>
                 </TouchableOpacity>
                 <View style={styles.resultTitle}>
-                  <Text style={styles.promptText}>{recentPrompt}</Text>
+                  <Text>{recentPrompt}</Text>
                 </View>
                 <View style={styles.resultData}>
                   {loading ? (
                     <ActivityIndicator size="large" color="#007bff" />
                   ) : (
-                    <Text style={styles.resultText}>{resultData}</Text>
+                    <Text>{resultData}</Text> // Result displayed word-by-word
                   )}
                 </View>
               </View>
             )}
 
+            {/* Bottom Input Area */}
             <View style={styles.bottomContainer}>
               <View style={styles.searchBox}>
                 <TextInput
                   style={styles.input}
                   value={input}
                   onChangeText={(text) => setInput(text)}
-                  placeholder="Ask me anything..."
-                  placeholderTextColor="#aaa"
+                  placeholder="Enter a prompt here"
+                  placeholderTextColor="#999"
                 />
                 <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
                   <Text style={styles.sendButtonText}>Send</Text>
                 </TouchableOpacity>
               </View>
               <Text style={styles.bottomInfo}>
-                Nft can make you rich...
+                Gravity. It keeps you rooted to the ground...
               </Text>
             </View>
           </View>
@@ -97,119 +105,104 @@ const Gemini = () => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#F0F4F8',
-  },
   scrollContainer: {
     flexGrow: 1,
   },
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fff',
+    padding:15,
   },
   mainContainer: {
-    padding: 20,
+    padding: 10,
     flex: 1,
+    marginTop: hp('5%'),
+
   },
   greet: {
-    marginBottom: 24,
+    marginBottom: 20,
+  },
+  name:{
+    color:'#6a4f8c',
+    fontWeight: '700',
   },
   greetText: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#333',
+    fontSize: 21,
+    fontWeight: 'bold',
+    marginBottom: hp('2%'),
   },
   subText: {
-    fontSize: 18,
-    color: '#666',
+    fontSize: 16,
+    color: '#555',
   },
   cardsContainer: {
     flexDirection: 'row',
   },
   card: {
-    backgroundColor: '#E8EEF3',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
+    backgroundColor: '#f9f9f9',
+    padding: 16,
+    borderRadius: 8,
     marginRight: 16,
-    width: 220,
+    width: 200,
+    height: 120,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
   },
   cardText: {
-    fontSize: 16,
-    color: '#333',
+    fontSize: 14,
+    marginBottom: 10,
     textAlign: 'center',
   },
   resultContainer: {
     flex: 1,
+    // backgroundColor:'rgba(0,0,0,0.1)',
   },
   resultTitle: {
-    marginBottom: 20,
-  },
-  promptText: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#555',
+    marginBottom: 16,
   },
   resultData: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-  },
-  resultText: {
-    fontSize: 16,
-    color: '#333',
+   
   },
   backButton: {
     alignSelf: 'flex-start',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    backgroundColor: '#007bff',
-    borderRadius: 10,
+    padding: 10,
     marginBottom: 20,
+    backgroundColor: '#007bff',
+    borderRadius: 8,
   },
   backButtonText: {
     color: '#fff',
     fontSize: 16,
   },
   bottomContainer: {
-    marginTop: 20,
+    marginTop: 16,
   },
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0F4F8',
-    padding: 12,
-    borderRadius: 10,
+    backgroundColor: '#f1f1f1',
+    padding: 8,
+    borderRadius: 8,
   },
   input: {
     flex: 1,
-    padding: 10,
-    fontSize: 16,
+    padding: 8,
     color: '#333',
-    backgroundColor: '#FFF',
-    borderRadius: 8,
   },
   sendButton: {
     backgroundColor: '#007bff',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    padding: 10,
     borderRadius: 8,
     marginLeft: 8,
   },
   sendButtonText: {
     color: '#fff',
-    fontSize: 16,
   },
   bottomInfo: {
-    marginTop: 24,
+    marginTop: 16,
     fontSize: 12,
     color: '#777',
     textAlign: 'center',

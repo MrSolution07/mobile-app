@@ -1,13 +1,58 @@
-import React from 'react'
-import { View,Text } from 'react-native'
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, FlatList } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import tw from 'twrnc';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+
 
 const Items = () => {
-  return (
-    <View style={tw`flex-1 justify-center items-center`}>
-      <Text style={tw`text-medium text-[#075eec]`}>Recently Minted,Purchased or Bid on NFTs</Text>
-    </View>
-  )
-}
+  const [nftItems, setNftItems] = useState([]);
 
-export default Items
+  useEffect(() => {
+    const fetchNFTData = async () => {
+      try {
+        const storedNFTData = await AsyncStorage.getItem('nftData');
+        if (storedNFTData) {
+          setNftItems(JSON.parse(storedNFTData));
+        }
+      } catch (error) {
+        console.error('Error fetching NFT data:', error);
+      }
+    };
+
+    fetchNFTData();
+  }, []);
+
+  const renderItem = ({ item }) => (
+    <View style={tw`bg-white m-2 items-left p-2 rounded-lg shadow-md`}>
+      <Image source={{ uri: item.imageUri }} style={tw`h-48 w-full rounded-md`} /> 
+      <Text style={tw`text-lg font-bold mt-2`}>{item.title}</Text>
+      <Text style={tw`text-sm text-gray-500`}>{item.description}</Text>
+      <Text style={tw`text-sm text-gray-400 mt-1`}>Tags: {item.tags}</Text>
+      <Text style={tw`text-sm text-[#333333] mt-1`}>Token ID: {item.tokenId}</Text>
+      <Text style={tw`text-sm text-purple-600 mt-1`}>Price: {item.price} ETH</Text>
+      <FontAwesome5 name="ethereum" size={18} color="black" />
+    </View>
+  );
+
+  return (
+    <View style={tw`flex-1 top-30 p-2`}> 
+      <Text style={tw`text-xl font-bold text-[#075eec] mb-4 mt-8`}>Recently Minted NFTs</Text>
+      <FlatList
+        data={nftItems}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => `${item.tokenId}-${index}`}
+        ListEmptyComponent={<Text style={tw`text-center mt-4`}>No NFTs minted yet.</Text>}
+        style={tw`mb-5`}
+        contentContainerStyle={{ paddingBottom: 15, flexGrow: 1, paddingHorizontal: 10 }} />
+      
+      <Text style={tw`text-xl font-bold text-[#075eec] mb-4`}>Purchased NFTs</Text>
+      <Text style={tw`text-center mt-4 text-gray-500`}>No NFTs purchased yet.</Text>
+
+      <Text style={tw`text-xl font-bold text-[#075eec] mb-4 mt-8`}>Sold NFTs</Text>
+      <Text style={tw`text-center mt-4 text-gray-500`}>No NFTs sold yet.</Text>
+    </View>
+  );
+};
+
+export default Items;

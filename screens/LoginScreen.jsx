@@ -149,7 +149,7 @@ const LoginScreen = ({ navigation }) => {
                   </View>
 
                   <Pressable style={tw`ml-10`} onPress={() => navigation.navigate('ForgotPassword')}>
-                    <Text style={tw`text-[#075eec] underline`}>Forgot Password?</Text>
+                    <Text style={tw`text-[#075eec] underline `}>Forgot Password?</Text>
                   </Pressable>
                 </View>
 
@@ -275,11 +275,13 @@ const styles = StyleSheet.create({
   },
   signUpText: {
     fontSize: 16,
-    color: '#333'
+    color: '#333',
+    fontFamily:'Roboto_400Regular',
   },
   signUpLink: {
     fontSize: 16,
     color: '#075eec',
+    fontFamily:'Roboto_400Regular',
     textDecorationLine: 'underline'
   }
 });
