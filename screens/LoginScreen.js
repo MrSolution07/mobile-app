@@ -1,5 +1,5 @@
-import React, { useContext,useEffect } from 'react';
-import { Alert,SafeAreaView, View, Image, Text, TextInput, Pressable, StatusBar, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { Alert, SafeAreaView, View, Image, Text, TextInput, Pressable, StatusBar, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import CheckBox from 'expo-checkbox';
 import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
@@ -7,12 +7,14 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Feather from '@expo/vector-icons/Feather';
 import DataContext from '../screens/Context/Context'; 
 import * as Google from "expo-auth-session/providers/google";
+import * as Facebook from 'expo-auth-session/providers/facebook';
 import * as WebBrowser from 'expo-web-browser';
-import { signInWithCredential, GoogleAuthProvider, getAuth,signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithCredential, GoogleAuthProvider, getAuth, signInWithEmailAndPassword, FacebookAuthProvider } from 'firebase/auth';
 
 const webClientId = '348282660108-kt8fic5e05o92i5df2ah4sqnaeoflnhb.apps.googleusercontent.com'
 const iosClientId = '348282660108-5m00pvh46a3vrp973l0sce7q9m6nolke.apps.googleusercontent.com'
 const androidClientId = '348282660108-abudgte82ncrt748dbpnod8er6re1gi9.apps.googleusercontent.com'
+
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -70,9 +72,40 @@ const LoginScreen = ({ navigation }) => {
       navigation.navigate('Tabs');
     } catch (error) {
       // Alert.alert('Login Error', error.message); 
-      Alert.alert('Sign-In Error');
+      Alert.alert('Invalid Credentials');
     }
   };
+
+  const [facebookRequest, facebookResponse, promptFacebookLogin] = Facebook.useAuthRequest({
+    clientId: '568695575728130',
+  });
+
+  const handleFacebookToken = async () => {
+    if (facebookResponse?.type === 'success') {
+      const { authentication } = facebookResponse;
+      const token = authentication?.accessToken;
+
+      if (token) {
+        const auth = getAuth();
+        const credential = FacebookAuthProvider.credential(token);
+
+        try {
+          const result = await signInWithCredential(auth, credential);
+          const user = result.user;
+          console.log('User signed in with Facebook:', user);
+          navigation.navigate('Tabs');
+        } catch (error) {
+          Alert.alert('Sign-In Error');
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    handleFacebookToken();
+  }, [facebookResponse]); 
+
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="default" translucent />
@@ -170,7 +203,9 @@ const LoginScreen = ({ navigation }) => {
                   <Text style={styles.socialButtonText}>Login with Google</Text>
                 </Pressable>
 
-                <Pressable style={styles.socialButton}>
+                <Pressable style={styles.socialButton} 
+                  onPress={() => promptFacebookLogin()}
+                >
                   <FontAwesome name="facebook" size={20} color="black" style={tw`right-3`} />
                   <Text style={styles.socialButtonText}>Login with Facebook</Text>
                 </Pressable>

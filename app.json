@@ -9,7 +9,8 @@
       }
     },
     "android": {
-      "package": "com.mr_solution.mobileapp"
+      "package": "com.mr_solution.mobileapp",
+      "scheme": "fb568695575728130"
     },
     "ios": {
       "bundleIdentifier": "com.mrsolution.mobileapp",
@@ -17,3 +18,5 @@
     }
   }
 }
+
+

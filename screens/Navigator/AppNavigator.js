@@ -16,6 +16,8 @@ import Withdraw from '../Withdraw';
 import HomeScreen from '../Tabs/HomeScreen';
 import Tabs from '../Tabs/Tabs';
 import ProfileScreen from '../ProfileScreen';
+import CollectionDetailScreen from '../CollectionDetailScreen';
+import ArtDetailsScreen from '../ArtDetailsScreen';
 // import EditProfile from '../EditProfile';
 
 const Stack = createStackNavigator();
@@ -127,6 +129,28 @@ export default function AppNavigator() {
                     <Stack.Screen
                         name="ProfileScreen"
                         component={ProfileScreen}
+                        options={{
+                            headerTitle: "",
+                            headerTransparent: true,
+                            headerBackground: () => (
+                                <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                            ),
+                        }}
+                    />
+                      <Stack.Screen
+                        name="CollectionDetailScreen"
+                        component={CollectionDetailScreen}
+                        options={{
+                            headerTitle: "",
+                            headerTransparent: true,
+                            headerBackground: () => (
+                                <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+                            ),
+                        }}
+                    />
+                        <Stack.Screen
+                        name="ArtDetailsScreen"
+                        component={ArtDetailsScreen}
                         options={{
                             headerTitle: "",
                             headerTransparent: true,
