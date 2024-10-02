@@ -1,14 +1,33 @@
-import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
+const { width } = Dimensions.get('window'); // Get screen width for dynamic positioning
+
 const ArtDetailsScreen = () => {
   const route = useRoute();
   const { nft } = route.params; // Receiving NFT data from the previous screen
-  
+
   const [activeTab, setActiveTab] = useState('Details'); // State to track the active tab
+  const underlinePosition = useRef(new Animated.Value(0)).current; // Animated value for underline position
+
+  const underlineWidth = 50;
+  const tabOffsetMap = {
+    Details: 15,
+    Owners: 100,
+    Bids: 180,
+    History: 255,
+  };
+
+  useEffect(() => {
+    Animated.timing(underlinePosition, {
+      toValue: tabOffsetMap['Details'],
+      duration: 0,
+      useNativeDriver: false,
+    }).start();
+  }, []);
 
   // Tab rendering function
   const renderTabContent = () => {
@@ -60,6 +79,16 @@ const ArtDetailsScreen = () => {
     }
   };
 
+  // Function to handle tab switching with animation
+  const handleTabPress = (tab) => {
+    setActiveTab(tab);
+    Animated.timing(underlinePosition, {
+      toValue: tabOffsetMap[tab],
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
@@ -77,11 +106,18 @@ const ArtDetailsScreen = () => {
 
         {/* Tabs for Details, Owners, Bids, History */}
         <View style={styles.tabContainer}>
-          {['Details', 'Owners', 'Bids', 'History'].map((tab) => (
-            <TouchableOpacity key={tab} onPress={() => setActiveTab(tab)}>
+          {['Details', 'Owners', 'Bids', 'History'].map((tab, index) => (
+            <TouchableOpacity key={tab} onPress={() => handleTabPress(tab, index)}>
               <Text style={[styles.tab, activeTab === tab && styles.activeTab]}>{tab}</Text>
             </TouchableOpacity>
           ))}
+          {/* Animated underline */}
+          <Animated.View
+            style={[
+              styles.underline,
+              { width: underlineWidth, transform: [{ translateX: underlinePosition }] },
+            ]}
+          />
         </View>
 
         {/* Render content based on selected tab */}
@@ -139,14 +175,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginTop: hp('2%'),
+    position: 'relative', 
   },
   tab: {
     fontSize: hp('2%'),
     color: '#aaa',
+    textAlign: 'center',
   },
   activeTab: {
     fontWeight: 'bold',
     color: '#000',
+  },
+  underline: {
+    height: 2,
+    backgroundColor: '#000',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
   },
   descriptionContainer: {
     marginTop: hp('3%'),
@@ -209,7 +254,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   bidContainer: {
-    marginTop: hp('4%'),
+    marginTop: hp('8%'),
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -222,6 +267,12 @@ const styles = StyleSheet.create({
     fontSize: hp('2.5%'),
     fontWeight: 'bold',
     color: '#000',
+  },
+  historyContainer:{
+    top:hp('1%'),
+  },
+  historyTitle:{
+    top:hp('5%'),
   },
   offerButton: {
     backgroundColor: '#222',

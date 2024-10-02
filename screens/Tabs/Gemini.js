@@ -1,8 +1,7 @@
 import React, { useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, SafeAreaView, MaskedViewComponent } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, SafeAreaView } from 'react-native';
 import DataContext from '../Context/Context';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
-import { LinearGradient } from 'expo-linear-gradient';
 
 const Gemini = () => {
   const { onSent, recentPrompt, showResult, loading, resultData, setInput, input, setShowResult, name } = useContext(DataContext);
@@ -48,7 +47,7 @@ const Gemini = () => {
             {!showResult ? (
               <>
                 <View style={styles.greet}>
-                  <Text style={styles.greetText}>Hello, <Text style={styles.name}>Hello</Text> </Text>
+                  <Text style={styles.greetText}>Hello, <Text style={styles.name}>{name}</Text> </Text>
                   <Text style={styles.subText}>How can I help you today?</Text>
                 </View>
 

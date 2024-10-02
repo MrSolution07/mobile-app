@@ -4,6 +4,8 @@ import { Input } from 'react-native-elements';
 import * as ImagePicker from 'expo-image-picker';
 import { useForm, Controller } from 'react-hook-form';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+
 
 const UploadNFTScreen = () => {
     const { control, handleSubmit, formState: { errors } } = useForm();
@@ -187,14 +189,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         padding: 20,
         backgroundColor: '#f0f4f8',
-        marginTop: 20, 
+        top: hp('4%'), 
     },
     screenTitle: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: 'bold',
         textAlign: 'center',
-        marginBottom: 20,
-        color: '#1068EC',
+        marginTop: hp('8%'),
+        color: '#075eec',
     },
     formContainer: {
         backgroundColor: '#fff',

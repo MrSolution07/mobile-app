@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, FlatList, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, Text, Image, FlatList, StyleSheet, SafeAreaView, Pressable } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
@@ -15,14 +15,14 @@ const CollectionDetailScreen = () => {
 
   // Render individual NFTs from the collection
   const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => onNftPress(item)}>
+    <Pressable onPress={() => onNftPress(item)}>
       <View style={styles.nftItem}>
         <Image source={item.image} style={styles.nftImage} />
         <Text style={styles.nftName}>{item.name}</Text>
         <Text style={styles.nftCreator}>Creator: {item.creator}</Text>
         <Text style={styles.nftPrice}>{item.price} ETH</Text>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 
   return (
@@ -42,8 +42,10 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#fff',
+    padding: 6,
   },
   collectionTitle: {
+    marginTop: hp('8%'),
     fontSize: hp('3%'),
     fontWeight: 'bold',
     textAlign: 'center',

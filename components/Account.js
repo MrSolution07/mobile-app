@@ -10,16 +10,15 @@ const Account = () => {
   const navigation = useNavigation();
   const { amount, ethAmount, zarAmount, withdrawAmount } = useContext(DataContext);
 
+  const currentZarBalance = parseFloat(amount || 0) - (withdrawAmount ? parseFloat(withdrawAmount) + 0.02 : 0);
+
   return (
     <View style={styles.accountContainer}>    
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>      
         <View style={styles.balanceContainer}>
           <Text style={styles.balanceTitle}>BALANCE </Text>
           <Text style={styles.balanceAmount}>
-            {amount
-              ? (amount - (zarAmount || 0)).toFixed(2)
-              : (amount - (withdrawAmount || 0)).toFixed(2)}{' '}
-            ZAR
+            {currentZarBalance.toFixed(2)} ZAR
           </Text>
 
           <View style={tw`flex-row rounded-md gap-x-2 items-center justify-center w-40 p-2 top-3`}>
@@ -35,7 +34,13 @@ const Account = () => {
             <Pressable style={styles.actionButton} onPress={() => navigation.navigate('Withdraw')}>
               <Text style={styles.buttonText}>Withdraw</Text>
             </Pressable>
-            <Pressable style={styles.actionButton} onPress={() => navigation.navigate('BuyEth')}>
+            <Pressable style={styles.actionButton} onPress={() => {
+              if (currentZarBalance >= 50) { 
+                navigation.navigate('BuyEth');
+              } else {
+                alert("Insufficient funds to purchase ETH.");
+              }
+            }}>
               <Text style={styles.buttonText}>Buy ETH</Text>
             </Pressable>
           </View>

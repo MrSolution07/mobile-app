@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, FlatList } from 'react-native';
+import { View, Text, Image, FlatList, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import tw from 'twrnc';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-
 
 const Items = () => {
   const [nftItems, setNftItems] = useState([]);
@@ -36,22 +35,26 @@ const Items = () => {
   );
 
   return (
-    <View style={tw`flex-1 top-30 p-2`}> 
-      <Text style={tw`text-xl font-bold text-[#075eec] mb-4 mt-8`}>Recently Minted NFTs</Text>
-      <FlatList
-        data={nftItems}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => `${item.tokenId}-${index}`}
-        ListEmptyComponent={<Text style={tw`text-center mt-4`}>No NFTs minted yet.</Text>}
-        style={tw`mb-5`}
-        contentContainerStyle={{ paddingBottom: 15, flexGrow: 1, paddingHorizontal: 10 }} />
-      
-      <Text style={tw`text-xl font-bold text-[#075eec] mb-4`}>Purchased NFTs</Text>
-      <Text style={tw`text-center mt-4 text-gray-500`}>No NFTs purchased yet.</Text>
+      <View style={tw`flex-1 p-6 top-20 `}>
+        <Text style={tw`text-xl font-bold text-[#075eec] mb-4 mt-8`}>Recently Minted NFTs</Text>
+        <FlatList
+          data={nftItems}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => `${item.tokenId}-${index}`}
+          ListEmptyComponent={<Text style={tw`text-center mt-4`}>No NFTs minted yet.</Text>}
+          style={tw`mb-5`}
+          contentContainerStyle={{ paddingBottom: 15 }} 
+        />
+    <ScrollView contentContainerStyle={tw`flex-grow p-2`}>
 
-      <Text style={tw`text-xl font-bold text-[#075eec] mb-4 mt-8`}>Sold NFTs</Text>
-      <Text style={tw`text-center mt-4 text-gray-500`}>No NFTs sold yet.</Text>
-    </View>
+        <Text style={tw`text-xl font-bold text-[#075eec] mb-4`}>Purchased NFTs</Text>
+        <Text style={tw`text-center mt-4 text-gray-500`}>No NFTs purchased yet.</Text>
+
+        <Text style={tw`text-xl font-bold text-[#075eec] mb-4 mt-8`}>Sold NFTs</Text>
+        <Text style={tw`text-center mt-4 text-gray-500`}>No NFTs sold yet.</Text>
+      </ScrollView>
+
+      </View>
   );
 };
 
