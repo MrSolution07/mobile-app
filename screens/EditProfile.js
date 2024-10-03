@@ -1,7 +1,7 @@
 //Firebase is showing me flames
 //I'm trying to update the user's profile but I'm getting an error
 //I don't know what I'm doing wrong
-//If anyone can help, I would really appreciate it 
+//If anyone can help, I would really appreciate it
 
 
 import React, { useState, useContext } from 'react';
@@ -17,7 +17,7 @@ const EditProfile = ({ navigation }) => {
   const [username, setUsername] = useState(name);
   const [userEmail, setUserEmail] = useState(email);
   const [password, setPassword] = useState('');
-  const [avatar, setAvatar] = useState(ProfilleImage || { uri: 'https://i.pinimg.com/originals/6b/f8/48/6bf848ae5afdb77782a1ff14067b194a.jpg' });
+  const [avatar, setAvatar] = useState(ProfilleImage || { uri: 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' });
 
 
   const handlePickImage = async () => {
