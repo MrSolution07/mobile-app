@@ -18,7 +18,7 @@ import Tabs from '../Tabs/Tabs';
 import ProfileScreen from '../ProfileScreen';
 import CollectionDetailScreen from '../CollectionDetailScreen';
 import ArtDetailsScreen from '../ArtDetailsScreen';
-// import EditProfile from '../EditProfile';
+import EditProfile from '../EditProfile';
 
 const Stack = createStackNavigator();
 
@@ -159,7 +159,7 @@ export default function AppNavigator() {
                             ),
                         }}
                     />
-                    {/* <Stack.Screen
+                    <Stack.Screen
                         name="EditProfile"
                         component={EditProfile}
                         options={{
@@ -169,7 +169,7 @@ export default function AppNavigator() {
                                 <View style={{ backgroundColor: 'transparent', flex: 1 }} />
                             ),
                         }}
-                    /> */}
+                    />
                 </Stack.Navigator>
             </NavigationContainer>
         </DataProvider>
