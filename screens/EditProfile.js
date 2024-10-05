@@ -1,24 +1,41 @@
-//Firebase is showing me flames
-//I'm trying to update the user's profile but I'm getting an error
-//I don't know what I'm doing wrong
-//If anyone can help, I would really appreciate it
-
-
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TextInput, StyleSheet, Image, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
 import { BlurView } from 'expo-blur';
 import * as ImagePicker from 'expo-image-picker';
+import { db, auth } from '../config/firebaseConfig'; 
 import DataContext from '../screens/Context/Context'; 
-import firebase from '../config/firebaseConfig';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 
 const EditProfile = ({ navigation }) => {
-  const { name, email, phoneNo, ProfilleImage, updateProfile } = useContext(DataContext);
+  const { name, email, phoneNo, location } = useContext(DataContext); 
 
+  // State variables
+  const [avatar, setAvatar] = useState(null);
   const [username, setUsername] = useState(name);
   const [userEmail, setUserEmail] = useState(email);
+  const [userPhoneNo, setUserPhoneNo] = useState(phoneNo || ''); // New phone number state
+  const [userLocation, setUserLocation] = useState(location || ''); // New location state
   const [password, setPassword] = useState('');
-  const [avatar, setAvatar] = useState(ProfilleImage || { uri: 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' });
 
+  useEffect(() => {
+    const fetchProfileImage = async () => {
+      const currentUser = auth.currentUser;
+
+      if (currentUser) {
+        const userRef = doc(db, 'users', currentUser.uid);
+        const userDoc = await getDoc(userRef);
+        
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setAvatar(userData.ProfilleImage ? { uri: userData.ProfilleImage } : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"); 
+        } else {
+          console.log("No such document!");
+        }
+      }
+    };
+
+    fetchProfileImage();
+  }, []);
 
   const handlePickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -34,26 +51,40 @@ const EditProfile = ({ navigation }) => {
   };
 
   const handleSave = async () => {
-    if (!username || !userEmail || !password) {
-      Alert.alert('Error', 'All fields are required.');
+    if (!username || !userEmail) {
+      Alert.alert('Error', 'Username and Email are required.');
       return;
     }
 
     try {
-      const userRef = firebase.firestore().collection('users').doc(currentUser.id);
-      await userRef.update({
-        name: username,
-        email: userEmail,
-        phoneNo: phoneNo,
-        ProfilleImage: avatar.uri,
-      });
+      const currentUser = auth.currentUser;
 
-      await firebase.auth().currentUser.updatePassword(password);
+      if (currentUser) {
+        const userRef = doc(db, 'users', currentUser.uid);
+        
+        // Prepare update data
+        const updateData = {
+          name: username || name,
+          email: userEmail || email,
+          phoneNo: userPhoneNo || phoneNo, 
+          location: userLocation || location, 
+          ProfilleImage: avatar?.uri || '', 
+        };
 
-      Alert.alert('Success', 'Profile updated successfully!');
-      navigation.navigate('UserProfile');
+       
+        await updateDoc(userRef, updateData);
+
+        if (password) {
+          await currentUser.updatePassword(password);
+        }
+
+        Alert.alert('Success', 'Profile updated successfully!');
+        navigation.navigate('ProfileScreen');
+      } else {
+        Alert.alert('Error', 'No user is currently logged in.');
+      }
     } catch (error) {
-      Alert.alert('Error', 'Failed to update profile. Please try again.');
+      Alert.alert('Error', `Failed to update profile: ${error.message}`);
     }
   };
 
@@ -69,7 +100,10 @@ const EditProfile = ({ navigation }) => {
         <View style={styles.contentContainer}>
           <View style={styles.formContainer}>
             <TouchableOpacity onPress={handlePickImage}>
-              <Image source={avatar} style={styles.avatar} />
+              <Image 
+                source={avatar ? avatar : { uri: 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }} 
+                style={styles.avatar} 
+              />
             </TouchableOpacity>
             <TextInput
               style={styles.input}
@@ -86,7 +120,20 @@ const EditProfile = ({ navigation }) => {
             />
             <TextInput
               style={styles.input}
-              placeholder="Password"
+              placeholder="Phone Number"
+              value={userPhoneNo}
+              onChangeText={setUserPhoneNo} // Update phone number state
+              keyboardType="phone-pad"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Location"
+              value={userLocation}
+              onChangeText={setUserLocation} // Update location state
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="New Password (leave blank to keep current)"
               value={password}
               onChangeText={setPassword}
               secureTextEntry

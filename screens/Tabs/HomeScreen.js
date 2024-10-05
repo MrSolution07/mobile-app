@@ -270,20 +270,45 @@
 
 
 
-import React, { useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { SafeAreaView, View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import DataContext from '../Context/Context';
-import tw from 'twrnc';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
+import DataContext from '../Context/Context';
+import { db, auth } from '../../config/firebaseConfig'; 
+import { doc, getDoc } from 'firebase/firestore';
+import tw from 'twrnc';
 import { Collection1, Collection2, Collection3 } from '../NFT/dummy';
 
 const collections = [Collection1, Collection2, Collection3];
 
 const HomeScreen = () => {
   const navigation = useNavigation();
-  const { name, ProfilleImage } = useContext(DataContext);
+  const { name } = useContext(DataContext);
   const scrollX = new Animated.Value(0);
+  const [profileImage, setProfileImage] = useState(null); // State for profile image
+
+  // Fetch profile image from Firestore
+  useEffect(() => {
+    const fetchProfileImage = async () => {
+      const currentUser = auth.currentUser;
+
+      if (currentUser) {
+        const userRef = doc(db, 'users', currentUser.uid);
+        const userDoc = await getDoc(userRef);
+        
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setProfileImage(userData.ProfilleImage ? { uri: userData.ProfilleImage } : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"); 
+        } else {
+          // console.log("No such document!");
+          setProfileImage(require('../../assets/images/NoImg.jpg')); //
+        }
+      }
+    };
+
+    fetchProfileImage();
+  }, []);
 
   // Function to navigate to the CollectionDetailScreen when a collection is clicked
   const onCollectionPress = (collection) => {
@@ -300,7 +325,7 @@ const HomeScreen = () => {
       outputRange: [1, 1.1, 1],
       extrapolate: 'clamp',
     });
-
+    
     return (
       <TouchableOpacity onPress={() => onCollectionPress(item)}>
         <Animated.View style={[styles.collectionItem, { transform: [{ scale }] }]}>
@@ -314,13 +339,11 @@ const HomeScreen = () => {
   const renderVerticalItem = ({ item }) => (
     <View style={styles.topSellingItem}>
       <Image source={item.image} style={styles.topSellingImage} />
-
       <View style={styles.ethAndButtonContainer}>
         <View style={styles.ethContainer}>
           <Text style={[tw`text-white text-base font-black`, styles.ethText]}>0.31</Text>
           <Text style={[tw`text-[#6d28d9] text-base font-black`, styles.ethText]}>ETH</Text>
         </View>
-
         <TouchableOpacity style={styles.placeBidButton}>
           <Text style={styles.placeBidText}>Place Bid</Text>
         </TouchableOpacity>
@@ -340,7 +363,7 @@ const HomeScreen = () => {
                 </Text>
                 <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
                   <Image
-                    source={ProfilleImage ? { uri: ProfilleImage } : require('../../assets/images/NoImg.jpg')}
+                    source={profileImage} // Use the fetched profile image
                     style={styles.profileImage}
                   />
                 </TouchableOpacity>
@@ -381,8 +404,6 @@ const HomeScreen = () => {
     </SafeAreaView>
   );
 };
-
-
 
 const styles = StyleSheet.create({
   safeArea: {

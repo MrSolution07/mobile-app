@@ -1,8 +1,27 @@
-import React from 'react';
-import { TextInput, SafeAreaView, View, Text, Pressable, StatusBar, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { TextInput, SafeAreaView, View, Text, Pressable, StatusBar, StyleSheet, Alert } from 'react-native';
 import tw from 'twrnc';
+import { getAuth, sendPasswordResetEmail } from 'firebase/auth'; // Import the required method from Firebase
 
 const ForgotPassword = ({navigation}) => {
+  const [email, setEmail] = useState(''); // State for email input
+
+  const handleResetPassword = async () => {
+    if (!email) {
+      Alert.alert('Error', 'Please enter an email address');
+      return;
+    }
+
+    try {
+      const auth = getAuth(); // Get Firebase Auth instance
+      await sendPasswordResetEmail(auth, email); // Send reset password email
+      Alert.alert('Success', 'Password reset email sent! Please check your inbox.');
+      navigation.navigate('Login'); // Navigate to the Login screen after successful email
+    } catch (error) {
+      Alert.alert('Error', error.message);
+    }
+  };
+
   return (
     <SafeAreaView style={[tw`flex-1`, styles.Container]}>
       <StatusBar barStyle="default" />
@@ -18,10 +37,15 @@ const ForgotPassword = ({navigation}) => {
             <TextInput
               placeholder='Enter your email'
               placeholderTextColor='gray'
+              value={email} // Bind email state to input
+              onChangeText={setEmail} // Update email state on input change
+              keyboardType="email-address"
+              autoCapitalize="none"
               style={[tw`rounded-md bg-white text-black h-12 w-full mb-5 p-3`, styles.textInput]}
             />
             <Pressable
               style={[tw`w-full h-12 justify-center mb-2 rounded-lg`, styles.resetPasswordbtn]}
+              onPress={handleResetPassword} // Handle password reset on button press
               android_ripple={{ color: 'lightgray' }}
             >
               <Text style={[tw`text-white text-center text-lg font-medium`,styles.resetText]}>
@@ -30,12 +54,11 @@ const ForgotPassword = ({navigation}) => {
             </Pressable>
 
             <View style={tw`flex-row justify-center mt-5 gap-x-px`}>
-            <Text style={styles.formLink}>Don't have an account?{''}
-            </Text>
-            <Pressable onPress={()=> navigation.navigate('Registration')}>
-              <Text style={[tw`underline`, styles.signUptext]}>Sign Up</Text>
-            </Pressable>
-          </View>
+              <Text style={styles.formLink}>Don't have an account?{''}</Text>
+              <Pressable onPress={() => navigation.navigate('Registration')}>
+                <Text style={[tw`underline`, styles.signUptext]}>Sign Up</Text>
+              </Pressable>
+            </View>
 
           </View>
         </View>
@@ -48,11 +71,10 @@ const styles = StyleSheet.create({
   Container: {
     backgroundColor: 'whitesmoke',
   },
-  
   heading: {
     color: '#1D2A32',
     textAlign: 'left',
-    fontFamily:'Roboto_700Bold',
+    fontFamily: 'Roboto_700Bold',
   },
   text: {
     fontFamily: 'Roboto_400Regular',
@@ -65,21 +87,20 @@ const styles = StyleSheet.create({
   resetPasswordbtn: {
     backgroundColor: '#075eec',
   },
-  resetText:{
-    fontFamily:'Roboto_400Regular',
+  resetText: {
+    fontFamily: 'Roboto_400Regular',
   },
-
   signUptext: {
     fontSize: 16,
     fontWeight: '500',
     color: '#075eec',
-    fontFamily:'Roboto_400Regular',
+    fontFamily: 'Roboto_400Regular',
   },
   formLink: {
     fontSize: 16,
     fontWeight: '500',
     color: '#075eec',
-    fontFamily:'Roboto_400Regular',
+    fontFamily: 'Roboto_400Regular',
   },
 });
 

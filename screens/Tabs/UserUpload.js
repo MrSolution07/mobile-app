@@ -1,11 +1,11 @@
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import React, { useState } from 'react';
 import { StyleSheet, Image, ScrollView, View, Text, KeyboardAvoidingView, Platform, Pressable, ActivityIndicator } from 'react-native';
 import { Input } from 'react-native-elements';
 import * as ImagePicker from 'expo-image-picker';
-import { useForm, Controller } from 'react-hook-form';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-
+import { useForm, Controller, set } from 'react-hook-form';
+import { setDoc, doc } from '../../config/firebaseConfig'; // Import Firestore functions
+import { db } from '../../config/firebaseConfig'; // Firestore instance
 
 const UploadNFTScreen = () => {
     const { control, handleSubmit, formState: { errors } } = useForm();
@@ -33,14 +33,17 @@ const UploadNFTScreen = () => {
         return Math.random().toString(36).substring(2, 8); // random token id
     };
 
-    const saveNFTData = async (nftData) => {
+    // New function to upload NFT data to Firestore
+    const uploadNFTToFirestore = async (nftData) => {
         try {
-            const existingData = await AsyncStorage.getItem('nftData');
-            const newNFTData = existingData ? [...JSON.parse(existingData), nftData] : [nftData];
-            await AsyncStorage.setItem('nftData', JSON.stringify(newNFTData));
-            console.log('NFT data saved:', newNFTData); 
+            const nftDocRef = doc(db, 'nfts', nftData.tokenId); // Create reference with tokenId
+            await setDoc(nftDocRef, nftData); // Upload data to Firestore
+            // console.log('NFT data saved to Firestore:', nftData);
+            setImageUri(null); // Clear image after upload
+            setMessage('NFT uploaded successfully!');
         } catch (error) {
-            console.error('Error saving NFT data:', error);
+            console.error('Error saving NFT to Firestore:', error);
+            throw new Error('Failed to upload NFT to Firestore');
         }
     };
 
@@ -54,14 +57,19 @@ const UploadNFTScreen = () => {
 
         try {
             const tokenId = generateTokenId(); 
-            const nftData = { ...data, imageUri, tokenId, price: data.price  }; 
-            await saveNFTData(nftData); 
+            const nftData = {
+                ...data,
+                imageUri,
+                tokenId,
+                price: data.price,
+                bids: [], // Initialize bids as an empty array
+                createdAt: new Date().toISOString() // Add a timestamp
+            };
 
-            console.log('Uploaded NFT Data:', nftData);
+            await uploadNFTToFirestore(nftData); // Upload to Firestore
             setMessage('NFT uploaded successfully!');
         } catch (error) {
             setMessage('Error uploading NFT: ' + error.message);
-            console.error('Error in onSubmit:', error); 
         } finally {
             setLoading(false);
         }
@@ -71,7 +79,7 @@ const UploadNFTScreen = () => {
         <KeyboardAvoidingView
             style={styles.keyboardAvoidingContainer}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={100} 
+            keyboardVerticalOffset={100}
         >
             <Text style={styles.screenTitle}>Upload Your NFT</Text>
             <ScrollView contentContainerStyle={styles.container}>
@@ -179,7 +187,6 @@ const UploadNFTScreen = () => {
         </KeyboardAvoidingView>
     );
 };
-
 const styles = StyleSheet.create({
     keyboardAvoidingContainer: {
         flex: 1,

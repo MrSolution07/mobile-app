@@ -1,15 +1,65 @@
-import React, { useContext } from 'react';
-import { View, Text, StyleSheet, Image, SafeAreaView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, SafeAreaView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import DataContext from '../screens/Context/Context'; 
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../config/firebaseConfig'; 
+import { useFocusEffect } from '@react-navigation/native'; 
 
 const UserProfile = ({ navigation }) => {
-  const { name, balance, email, phoneNo, location, ProfilleImage} = useContext(DataContext);
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true); // Loader while data is being fetched from the db
+
+  // Fetch the user's profile data from Firestore
+  const fetchUserData = async () => {
+    setLoading(true); //
+    try {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+          setUserData(userDoc.data()); 
+        } else {
+          // console.error('No user data found!');
+        }
+      }
+    } catch (error) {
+      // console.error('Error fetching user data:', error);
+    } finally {
+      setLoading(false); 
+    }
+  };
+
+  // Use useFocusEffect to fetch user data when screen is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserData();
+    }, [])
+  );
 
   const handleLogout = () => {
     navigation.navigate('Login');
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </SafeAreaView>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <SafeAreaView style={styles.loaderContainer}>
+        <Text>No user data found</Text>
+      </SafeAreaView>
+    );
+  }
+
+  const { name, balance, email, phoneNo, location, ProfilleImage } = userData;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -19,34 +69,26 @@ const UserProfile = ({ navigation }) => {
           style={styles.backgroundImage}
           resizeMode='cover'
         />
-        <BlurView
-          style={styles.blurView}
-          intensity={1}
-          tint="dark"
-        />
+        <BlurView style={styles.blurView} intensity={1} tint="dark" />
         <View style={styles.content}>
           <LinearGradient
             colors={['rgba(255, 255, 255, 0.5)', 'rgba(7, 94, 236, 0.5)', 'rgba(128, 0, 128, 0.5)']}
             style={styles.header}
           >
-            <BlurView
-              style={styles.headerBlur}
-              intensity={50}
-              tint="light"
-            />
+            <BlurView style={styles.headerBlur} intensity={50} tint="light" />
           </LinearGradient>
           <View style={styles.contentContainer}>
             <View style={styles.avatarCard}>
               <View style={styles.avatarContainer}>
                 <Image
-                  source={{ uri: ProfilleImage }}
+                  source={{ uri: ProfilleImage || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }}
                   style={styles.avatar}
                 />
               </View>
               <View style={styles.userInfo}>
                 <Text style={styles.name}>{name}</Text>
                 <Text style={styles.assetsLabel}>Total Assets</Text>
-                <Text style={styles.balance}>{balance}</Text>
+                <Text style={styles.balance}>{balance || '0.00'}</Text>
               </View>
             </View>
             <View style={styles.detailsCard}>
@@ -80,7 +122,6 @@ const InfoItem = ({ icon, value }) => (
     <Text style={styles.infoValue}>{value}</Text>
   </View>
 );
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
