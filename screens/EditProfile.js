@@ -105,12 +105,14 @@ const EditProfile = ({ navigation }) => {
                 style={styles.avatar} 
               />
             </TouchableOpacity>
+            <Text>Username</Text>
             <TextInput
               style={styles.input}
-              placeholder="Username"
-              value={username}
+              placeholder="username"
+              // value={username}
               onChangeText={setUsername}
             />
+            <Text>email</Text>
             <TextInput
               style={styles.input}
               placeholder="Email"
@@ -118,19 +120,22 @@ const EditProfile = ({ navigation }) => {
               onChangeText={setUserEmail}
               keyboardType="email-address"
             />
+             <Text>phoneNo</Text>
             <TextInput
               style={styles.input}
               placeholder="Phone Number"
-              value={userPhoneNo}
+              // value={userPhoneNo}
               onChangeText={setUserPhoneNo} // Update phone number state
               keyboardType="phone-pad"
             />
+             <Text>Location</Text>
             <TextInput
               style={styles.input}
               placeholder="Location"
               value={userLocation}
               onChangeText={setUserLocation} // Update location state
             />
+            <Text>New Password (leave blank to keep current)</Text>
             <TextInput
               style={styles.input}
               placeholder="New Password (leave blank to keep current)"

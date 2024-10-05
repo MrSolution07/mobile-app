@@ -284,7 +284,7 @@ const collections = [Collection1, Collection2, Collection3];
 
 const HomeScreen = () => {
   const navigation = useNavigation();
-  const { name } = useContext(DataContext);
+  const [name,setName] = useState('');
   const scrollX = new Animated.Value(0);
   const [profileImage, setProfileImage] = useState(null); // State for profile image
 
@@ -299,6 +299,7 @@ const HomeScreen = () => {
         
         if (userDoc.exists()) {
           const userData = userDoc.data();
+          setName(userData.name);
           setProfileImage(userData.ProfilleImage ? { uri: userData.ProfilleImage } : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"); 
         } else {
           // console.log("No such document!");

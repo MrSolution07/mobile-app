@@ -85,7 +85,9 @@ export default function AppNavigator() {
                             headerBackground: () => (
                                 <View style={{ backgroundColor: 'transparent', flex: 1 }} />
                             ),
+                            gestureEnabled: false ,
                         }}
+                        
                     />
                     <Stack.Screen
                         name="TopUp"
@@ -124,7 +126,9 @@ export default function AppNavigator() {
                     <Stack.Screen
                         name='Tabs'
                         component={Tabs}
-                        options={{ headerShown:false}}
+                        options={{headerShown:false,
+                            gestureEnabled: false,
+                    }}
                     />
                     <Stack.Screen
                         name="ProfileScreen"

@@ -39,5 +39,8 @@ yarn.lock
 
 testing.json
 
-ios
-android
+#ios
+ios/
+
+#android
+android/
