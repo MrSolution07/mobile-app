@@ -8,27 +8,27 @@
 // import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
 
 // const HomeScreen = () => {
-//   const [collections, setCollections] = useState([]);
+  // const [collections, setCollections] = useState([]);
 //   const navigation = useNavigation();
 //   const { name, ProfilleImage } = useContext(DataContext);
 //   const scrollX = new Animated.Value(0);
 
-//   useEffect(() => {
-//     const options = {
-//       method: 'GET',
-//       headers: {
-//         accept: 'application/json',
-//         'x-api-key': '73b5488d384f4be88dab537a9276bd0f',
-//       },
-//     };
+  // useEffect(() => {
+  //   const options = {
+  //     method: 'GET',
+  //     headers: {
+  //       accept: 'application/json',
+  //       'x-api-key': '73b5488d384f4be88dab537a9276bd0f',
+  //     },
+  //   };
 
-//     axios
-//       .get('https://api.opensea.io/api/v2/collections', options)
-//       .then(response => {
-//         setCollections(response.data.collections || []);
-//       })
-//       .catch(err => console.error(err));
-//   }, []);
+  //   axios
+  //     .get('https://api.opensea.io/api/v2/collections', options)
+  //     .then(response => {
+  //       setCollections(response.data.collections || []);
+  //     })
+  //     .catch(err => console.error(err));
+  // }, []);
 
 //   const renderHorizontalItem = ({ item, index }) => {
 //     const scale = scrollX.interpolate({
@@ -271,6 +271,7 @@
 
 
 import React, { useState, useEffect, useContext } from 'react';
+import axios from 'axios';
 import { SafeAreaView, View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
@@ -283,10 +284,29 @@ import { Collection1, Collection2, Collection3 } from '../NFT/dummy';
 const collections = [Collection1, Collection2, Collection3];
 
 const HomeScreen = () => {
+  
   const navigation = useNavigation();
   const [name,setName] = useState('');
   const scrollX = new Animated.Value(0);
   const [profileImage, setProfileImage] = useState(null); // State for profile image
+
+
+  useEffect(() => {
+    const options = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        'x-api-key': '73b5488d384f4be88dab537a9276bd0f',
+      },
+    };
+
+    axios
+      .get('https://api.opensea.io/api/v2/collections', options)
+      .then(response => {
+        setCollections(response.data.collections || []);
+      })
+      .catch(err => console.error(err));
+  }, []);
 
   // Fetch profile image from Firestore
   useEffect(() => {

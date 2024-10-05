@@ -20,6 +20,7 @@ import CollectionDetailScreen from '../CollectionDetailScreen';
 import ArtDetailsScreen from '../ArtDetailsScreen';
 import EditProfile from '../EditProfile';
 
+
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
@@ -174,6 +175,7 @@ export default function AppNavigator() {
                             ),
                         }}
                     />
+                
                 </Stack.Navigator>
             </NavigationContainer>
         </DataProvider>

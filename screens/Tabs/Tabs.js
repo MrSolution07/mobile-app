@@ -7,6 +7,7 @@ import Home from './HomeScreen';
 import Wallet from './Wallet';
 import Gemini from './Gemini';
 import UserUpload from './UserUpload';
+import Explore from './Explore';
 
 const Tab = createBottomTabNavigator();
 
@@ -39,7 +40,7 @@ export default function Tabs() {
           />
           <Tab.Screen
             name="name_B"
-            component={Home}
+            component={Explore}
             options={{title:""}}
           />
           <Tab.Screen
