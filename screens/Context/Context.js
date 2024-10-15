@@ -140,6 +140,9 @@ const DataProvider = ({ children }) => {
     const [zarAmount, setZarAmount] = useState('');
     const [withdrawAmount, setWithdrawAmount] = useState('');
     const [balance, setBalance] = useState('R0.00');
+    const updateEthAmount = (newEthAmount) => {
+        setEthAmount((prevEth) => (parseFloat(prevEth) + parseFloat(newEthAmount)).toFixed(4));
+      };
     const [location, setLocation] = useState('SA');
 
     // THIS IS FOR GEMINI
@@ -208,6 +211,7 @@ const DataProvider = ({ children }) => {
         referenceNumber, setReferenceNumber,
         ethAmount, setEthAmount,
         zarAmount, setZarAmount,
+        updateEthAmount,
         withdrawAmount, setWithdrawAmount,
         balance, setBalance,
         location, setLocation,

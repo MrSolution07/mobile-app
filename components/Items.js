@@ -23,7 +23,7 @@ const Items = () => {
   }, []);
 
   const renderItem = ({ item }) => (
-    <View style={tw`bg-white m-2 items-left p-2 rounded-lg shadow-md`}>
+    <View style={tw`bg-white m-2 p-2 rounded-lg shadow-md`}>
       <Image source={{ uri: item.imageUri }} style={tw`h-48 w-full rounded-md`} /> 
       <Text style={tw`text-lg font-bold mt-2`}>{item.title}</Text>
       <Text style={tw`text-sm text-gray-500`}>{item.description}</Text>

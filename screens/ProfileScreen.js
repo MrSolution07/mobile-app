@@ -1,18 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, SafeAreaView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useState } from 'react';
+import {View,Text,StyleSheet,Image,SafeAreaView,ActivityIndicator} from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebaseConfig'; 
-import { useFocusEffect } from '@react-navigation/native'; 
+import { useFocusEffect } from '@react-navigation/native';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
+
 
 const UserProfile = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true); // Loader while data is being fetched from the db
 
+  
+
   // Fetch the user's profile data from Firestore
   const fetchUserData = async () => {
-    setLoading(true); //
+    setLoading(true);
     try {
       const currentUser = auth.currentUser;
       if (currentUser) {
@@ -22,16 +27,16 @@ const UserProfile = ({ navigation }) => {
         if (userDoc.exists()) {
           setUserData(userDoc.data()); 
         } else {
-          // console.error('No user data found!');
+          console.error('No user data found!');
         }
       }
     } catch (error) {
-      // console.error('Error fetching user data:', error);
+      console.error('Error fetching user data:', error);
     } finally {
       setLoading(false); 
     }
   };
-
+  
   // Use useFocusEffect to fetch user data when screen is focused
   useFocusEffect(
     React.useCallback(() => {
@@ -40,6 +45,8 @@ const UserProfile = ({ navigation }) => {
   );
 
   const handleLogout = () => {
+    // Implement your logout logic here (e.g., sign out from Firebase)
+    // For now, we'll just navigate to the Login screen
     navigation.navigate('Login');
   };
 
@@ -64,12 +71,14 @@ const UserProfile = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
+
         <Image
           source={{ uri: 'https://i.pinimg.com/originals/6b/f8/48/6bf848ae5afdb77782a1ff14067b194a.jpg' }}
           style={styles.backgroundImage}
           resizeMode='cover'
         />
         <BlurView style={styles.blurView} intensity={1} tint="dark" />
+
         <View style={styles.content}>
           <LinearGradient
             colors={['rgba(255, 255, 255, 0.5)', 'rgba(7, 94, 236, 0.5)', 'rgba(128, 0, 128, 0.5)']}
@@ -77,6 +86,7 @@ const UserProfile = ({ navigation }) => {
           >
             <BlurView style={styles.headerBlur} intensity={50} tint="light" />
           </LinearGradient>
+
           <View style={styles.contentContainer}>
             <View style={styles.avatarCard}>
               <View style={styles.avatarContainer}>
@@ -91,25 +101,31 @@ const UserProfile = ({ navigation }) => {
                 <Text style={styles.balance}>{balance || '0.00'}</Text>
               </View>
             </View>
-            <View style={styles.detailsCard}>
-              <InfoItem icon="📧" value={email} />
-              <InfoItem icon="📱" value={phoneNo} />
-              <InfoItem icon="📍" value={location} />
+
+            <View style={styles.detailsContainer}>
+              <View style={styles.detailsCard}>
+                <InfoItem icon="📧" value={email} />
+                <InfoItem icon="📱" value={phoneNo} />
+                <InfoItem icon="📍" value={location} />
+              </View>
             </View>
           </View>
-          <TouchableOpacity
+
+          {/* Edit Profile Button */}
+          {/* <TouchableOpacity
             style={styles.button}
             onPress={() => navigation.navigate('EditProfile')}
           >
             <Text style={styles.buttonText}>Edit Profile</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
-          <TouchableOpacity
+          {/* Logout Button */}
+          {/* <TouchableOpacity
             style={styles.logoutButton}
             onPress={handleLogout}
           >
             <Text style={styles.logoutButtonText}>Logout</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     </SafeAreaView>
@@ -122,6 +138,7 @@ const InfoItem = ({ icon, value }) => (
     <Text style={styles.infoValue}>{value}</Text>
   </View>
 );
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -129,6 +146,17 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+  },
+  loaderContainer:{
+    flex: 1,
+    justifyContent:'center',
+    alignItems:'center',
+  },
+  menuButton: {
+    position: 'absolute',
+    top: 40, 
+    left: 20,
+    zIndex: 10, 
   },
   backgroundImage: {
     position: 'absolute',
@@ -155,13 +183,13 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    marginTop: -100,
+    top: hp(-12),
     paddingHorizontal: 10,
     paddingBottom: 20,
     width: '100%',
   },
   avatarCard: {
-    backgroundColor: 'whitesmoke',
+    backgroundColor: 'white',
     borderRadius: 20,
     padding: 20,
     alignItems: 'center',
@@ -186,33 +214,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   name: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 10,
+    marginBottom: 5, 
   },
   assetsLabel: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#666',
-    marginBottom: 5,
+    marginBottom: 3, 
   },
   balance: {
-    fontSize: 26,
+    fontSize: 22, 
     color: '#666',
     marginBottom: 20,
+  },
+  detailsContainer:{
+    alignItems:'center',
+    justifyContent:'center',
   },
   detailsCard: {
     backgroundColor: 'whitesmoke',
     borderRadius: 20,
-    padding: 20,
-    marginBottom: 10,
+    padding: 25,
+    bottom: 8,
     elevation: 5,
     width: '100%',
+    height: 160,
   },
   infoItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 25,
+    marginBottom: 20, 
   },
   infoIcon: {
     fontSize: 20,
@@ -221,7 +254,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   infoValue: {
-    fontSize: 18,
+    fontSize: 16, 
     color: '#333',
     flex: 1,
   },
@@ -231,7 +264,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     alignItems: 'center',
     marginHorizontal: 20,
-    marginBottom: 20,
+    bottom: 1,
   },
   buttonText: {
     color: 'white',
@@ -244,7 +277,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     alignItems: 'center',
     marginHorizontal: 20,
-    marginBottom: 20,
+    marginBottom: 10,
+    marginTop: 10, 
   },
   logoutButtonText: {
     color: 'white',

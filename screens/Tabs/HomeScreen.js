@@ -272,13 +272,14 @@
 
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { SafeAreaView, View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { SafeAreaView, View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Animated, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
 import DataContext from '../Context/Context';
 import { db, auth } from '../../config/firebaseConfig'; 
 import { doc, getDoc } from 'firebase/firestore';
 import tw from 'twrnc';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Collection1, Collection2, Collection3 } from '../NFT/dummy';
 
 const collections = [Collection1, Collection2, Collection3];
@@ -286,6 +287,11 @@ const collections = [Collection1, Collection2, Collection3];
 const HomeScreen = () => {
   
   const navigation = useNavigation();
+
+  const toggleDrawer = () => {
+    navigation.getParent()?.toggleDrawer();
+  };
+
   const [name,setName] = useState('');
   const scrollX = new Animated.Value(0);
   const [profileImage, setProfileImage] = useState(null); // State for profile image
@@ -379,15 +385,21 @@ const HomeScreen = () => {
           ListHeaderComponent={() => (
             <View>
               <View style={styles.header}>
-                <Text style={styles.greeting}>
-                  Hello, <Text style={styles.username}>{name}</Text>
-                </Text>
-                <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
+              <Pressable onPress={toggleDrawer}>
+              <Ionicons name="menu-sharp" size={28} color="black" />
+             </Pressable>
+               <TouchableOpacity >
                   <Image
                     source={profileImage} // Use the fetched profile image
                     style={styles.profileImage}
                   />
                 </TouchableOpacity>
+              </View>
+
+              <View style={styles.greetingContainer}>
+              <Text style={styles.greeting}>
+                  Hello, <Text style={styles.username}>{name}</Text>
+                </Text>
               </View>
 
               <View style={styles.sectionHeader}>
@@ -440,6 +452,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  greetingContainer: {
+    marginTop: hp('2%'), 
   },
   greeting: {
     fontSize: hp('3.5%'),

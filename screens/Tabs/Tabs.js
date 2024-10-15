@@ -48,11 +48,11 @@ export default function Tabs() {
             component={Wallet}
             options={{title: ""}}
           />
-          <Tab.Screen
+          {/* <Tab.Screen
             name="name_D"
             component={UserUpload}
             options={{title:""}}
-          />
+          /> */}
            <Tab.Screen
             name="name_E"
             component={Gemini}
@@ -71,10 +71,10 @@ const getIconName = (routeName) => {
       return 'compass';
       case 'Wallet':
       return 'wallet'; 
-    case 'name_D':
-      return 'upload';
+    // case 'name_D':
+    //   return 'upload';
       case 'name_E':
-        return 'star';
+        return 'chat';
     default:
       return 'home';
   }

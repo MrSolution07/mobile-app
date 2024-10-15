@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, View, Image, FlatList, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { SafeAreaView, View, Image, FlatList, StyleSheet, Text, TextInput, Pressable } from 'react-native';
 import { Collection1, Collection2, Collection3 } from '../NFT/dummy';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
-
-const Explore = ({navigation}) => {
+const Explore = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const collections = [Collection1, Collection2, Collection3];
   const [filteredCollections, setFilteredCollections] = useState(collections);
@@ -17,13 +17,13 @@ const Explore = ({navigation}) => {
   }, [searchQuery]);
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity
+    <Pressable
       style={styles.collectionContainer}
       onPress={() => navigation.navigate('CollectionDetailScreen', { collection: item })}
     >
       <Image source={item.image} style={styles.image} />
       <Text style={styles.text}>{item.name}</Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 
   return (
@@ -38,6 +38,8 @@ const Explore = ({navigation}) => {
         data={filteredCollections}
         renderItem={renderItem}
         keyExtractor={(item) => item.name}
+        numColumns={2} // Ensure two items per row
+        columnWrapperStyle={styles.columnWrapper} // Add styling for columns
       />
     </SafeAreaView>
   );
@@ -46,30 +48,39 @@ const Explore = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
+    padding: wp('4%'),
     backgroundColor: '#fff',
   },
   searchBar: {
-    height: 40,
+    height: hp('6%'),
     borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 20,
+    borderRadius: wp('2%'),
+    marginTop:hp('8%'),
+    paddingHorizontal: wp('4%'),
+    marginBottom: hp('2%'),
+    fontSize: hp('2%'), // Adjust font size for better readability
   },
   collectionContainer: {
     flex: 1,
+    flexGrow:1,
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: hp('2.5%'),
+    marginHorizontal: wp('2%'),
+    margin:hp ('5%'),
   },
   image: {
-    width: 150,
-    height: 150,
-    borderRadius: 8,
+    width: wp('40%'),
+    height: hp('20%'),
+    borderRadius: wp('2%'),
   },
   text: {
-    marginTop: 5,
+    marginTop: hp('1%'),
     textAlign: 'center',
+    fontSize: hp('2%'),
+  },
+  columnWrapper: {
+    justifyContent: 'space-between',
   },
 });
 

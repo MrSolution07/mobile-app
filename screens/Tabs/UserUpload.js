@@ -3,15 +3,23 @@ import React, { useState } from 'react';
 import { StyleSheet, Image, ScrollView, View, Text, KeyboardAvoidingView, Platform, Pressable, ActivityIndicator } from 'react-native';
 import { Input } from 'react-native-elements';
 import * as ImagePicker from 'expo-image-picker';
-import { useForm, Controller, set } from 'react-hook-form';
-import { setDoc, doc } from '../../config/firebaseConfig'; // Import Firestore functions
-import { db } from '../../config/firebaseConfig'; // Firestore instance
+import { useForm, Controller } from 'react-hook-form';
+import { setDoc, doc } from '../../config/firebaseConfig'; 
+import { db } from '../../config/firebaseConfig'; 
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
+
 
 const UploadNFTScreen = () => {
+    const navigation = useNavigation();
     const { control, handleSubmit, formState: { errors } } = useForm();
     const [imageUri, setImageUri] = useState(null);
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
+
+    const handleMenuPress = () => {
+        navigation.toggleDrawer();
+    };
 
     const handlePickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -33,12 +41,10 @@ const UploadNFTScreen = () => {
         return Math.random().toString(36).substring(2, 8); // random token id
     };
 
-    // New function to upload NFT data to Firestore
     const uploadNFTToFirestore = async (nftData) => {
         try {
             const nftDocRef = doc(db, 'nfts', nftData.tokenId); // Create reference with tokenId
             await setDoc(nftDocRef, nftData); // Upload data to Firestore
-            // console.log('NFT data saved to Firestore:', nftData);
             setImageUri(null); // Clear image after upload
             setMessage('NFT uploaded successfully!');
         } catch (error) {
@@ -81,7 +87,15 @@ const UploadNFTScreen = () => {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={100}
         >
-            <Text style={styles.screenTitle}>Upload Your NFT</Text>
+            <View style={styles.header}>
+                <Ionicons 
+                    name="menu-sharp" 
+                    size={30} 
+                    onPress={handleMenuPress} 
+                    style={styles.menuIcon}
+                />
+                <Text style={styles.screenTitle}>Upload Your NFT</Text>
+            </View>
             <ScrollView contentContainerStyle={styles.container}>
                 <View style={styles.formContainer}>
                     <Controller
@@ -161,7 +175,7 @@ const UploadNFTScreen = () => {
                     />
                     <Pressable
                         onPress={handlePickImage}
-                        style={styles.button}
+                        style={styles.imageButton}
                     >
                         <Text style={styles.buttonText}>Select Image</Text>
                     </Pressable>
@@ -187,76 +201,105 @@ const UploadNFTScreen = () => {
         </KeyboardAvoidingView>
     );
 };
+
 const styles = StyleSheet.create({
     keyboardAvoidingContainer: {
         flex: 1,
+        backgroundColor: '#f7f9fc', 
+    },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 20,
+        padding: 15,
+        marginTop: hp('6%'),
+        // backgroundColor: '#fff',
+        // elevation: 5, 
+        // borderBottomLeftRadius: 15,
+        // borderBottomRightRadius: 15,
+    },
+    menuIcon: {
+        position: 'absolute',
+        left: 20,
     },
     container: {
         flexGrow: 1, 
         justifyContent: 'center',
-        padding: 20,
-        backgroundColor: '#f0f4f8',
-        top: hp('4%'), 
+        padding: 12,
+        
     },
     screenTitle: {
         fontSize: 28,
         fontWeight: 'bold',
         textAlign: 'center',
-        marginTop: hp('8%'),
         color: '#075eec',
     },
     formContainer: {
-        backgroundColor: '#fff',
-        padding: 20,
-        borderRadius: 10,
+        backgroundColor: '#ffffff',
+        padding: 18,
+        borderRadius: 15,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowOpacity: 0.15,
+        shadowRadius: 10,
         elevation: 5,
     },
     inputContainer: {
         borderBottomWidth: 0,
-        backgroundColor: '#eef3f9',
-        borderRadius: 8,
-        padding: 10,
+        backgroundColor: 'rgba(0,0,0,0.1)', 
+        borderRadius: 10,
+        padding: 8,
         marginBottom: 20,
     },
     label: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#333',
+        color: '#333333', 
         marginBottom: 5,
     },
     input: {
         fontSize: 16,
         color: '#333',
     },
-    button: {
-        backgroundColor: '#1068EC',
+    imageButton: {
+        backgroundColor: '#075eec', 
         paddingVertical: 15,
-        borderRadius: 8,
+        borderRadius: 10,
         marginBottom: 15,
         alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+    },
+    button: {
+        backgroundColor: '#4caf50', 
+        paddingVertical: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
     },
     buttonText: {
-        color: '#fff',
-        fontSize: 16,
+        color: 'white',
+        fontSize: 18,
         fontWeight: 'bold',
     },
     image: {
-        width: '100%',
-        height: 200,
-        marginTop: 20,
-        borderRadius: 10,
-        borderColor: '#ddd',
-        borderWidth: 1,
+        width: wp('80%'),
+        height: hp('30%'),
+        borderRadius: 15,
+        marginVertical: 15,
+        alignSelf: 'center',
     },
     message: {
-        marginTop: 20,
         textAlign: 'center',
-        color: 'green',
+        color: '#e74c3c',
         fontSize: 16,
+        marginTop: 10,
     },
 });
 

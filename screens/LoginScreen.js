@@ -69,7 +69,7 @@ const LoginScreen = ({ navigation }) => {
       const auth = getAuth();
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log('User logged in:', userCredential.user);
-      navigation.navigate('Tabs');
+      navigation.navigate('MainDrawer');
     } catch (error) {
       // Alert.alert('Login Error', error.message); 
       Alert.alert('Invalid Credentials');

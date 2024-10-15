@@ -1,3 +1,4 @@
+import 'react-native-reanimated';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useCustomFonts } from './assets/fonts/fonts.js'; 
