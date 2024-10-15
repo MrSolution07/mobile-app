@@ -309,7 +309,7 @@ const HomeScreen = () => {
     axios
       .get('https://api.opensea.io/api/v2/collections', options)
       .then(response => {
-        setCollections(response.data.collections || []);
+        // setCollections(response.data.collections || []);
       })
       .catch(err => console.error(err));
   }, []);

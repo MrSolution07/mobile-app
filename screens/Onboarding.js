@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Slide from '../components/Slide'; 
 import tw from 'twrnc';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -87,6 +88,15 @@ const Onboarding = ({ navigation }) => {
     setCurrentSlideIndex(index);
   };
 
+  const completeOnboarding = async () => {
+    try {
+      await AsyncStorage.setItem('hasOnboarded', 'true');
+      navigation.replace('Login'); // Navigate to login after onboarding
+    } catch (e) {
+      console.log('Error saving onboarding status:', e);
+    }
+  };
+
   const Footer = () => {
     const circleRadius = 90; // Adjust the circle's radius to make it smaller
   
@@ -164,8 +174,8 @@ const Onboarding = ({ navigation }) => {
                 ]}
               >
                 <Pressable
-                  style={styles.getStartedButton}
-                  onPress={() => navigation.replace('Login')}
+                   style={styles.getStartedButton}
+                   onPress={completeOnboarding}
                 >
                   <Text style={tw`text-white text-center text-sm`}>Get Started</Text>
                 </Pressable>
