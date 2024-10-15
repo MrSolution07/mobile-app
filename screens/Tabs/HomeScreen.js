@@ -280,9 +280,9 @@ import { db, auth } from '../../config/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import tw from 'twrnc';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Collection1, Collection2, Collection3 } from '../NFT/dummy';
+import { Collection1, Collection2, Collection3 , Collection4} from '../NFT/dummy';
 
-const collections = [Collection1, Collection2, Collection3];
+const collections = [Collection1, Collection2, Collection3, Collection4,];
 
 const HomeScreen = () => {
   

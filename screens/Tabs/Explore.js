@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, View, Image, FlatList, StyleSheet, Text, TextInput, Pressable } from 'react-native';
-import { Collection1, Collection2, Collection3 } from '../NFT/dummy';
+import { Collection1, Collection2, Collection3,
+  Collection4, Collection5, Collection6, Collection7,
+  Collection8, Collection9, Collection10
+ } from '../NFT/dummy';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const Explore = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const collections = [Collection1, Collection2, Collection3];
+  const collections = [Collection1, Collection2, Collection3, Collection4,
+    Collection5,Collection6, Collection7, Collection8, Collection9,
+    Collection10
+  ];
   const [filteredCollections, setFilteredCollections] = useState(collections);
 
   // Filter collections based on the search query
