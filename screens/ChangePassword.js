@@ -1,16 +1,9 @@
-// screens/ChangePassword.js
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import {View,Text,StyleSheet,SafeAreaView,TextInput,TouchableOpacity,Alert} from 'react-native';
 import { auth } from '../config/firebaseConfig';
 import { updatePassword } from 'firebase/auth';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
+
 
 const ChangePassword = ({ navigation }) => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -76,39 +69,40 @@ const styles = StyleSheet.create({
     backgroundColor: '#f2f2f2',
   },
   container: {
-    flex: 1,
+    // flex: 1,
     padding: 20,
-    justifyContent: 'center',
+    marginTop: hp('10%'),
+    // justifyContent: 'center',
   },
   title: {
     fontSize: 24,
     fontWeight: '700',
     color: '#333',
     marginBottom: 30,
-    textAlign: 'center',
+    textAlign: 'left',
   },
   input: {
     backgroundColor: '#fff',
-    padding: 15,
+    padding: 14,
     borderRadius: 10,
     marginBottom: 20,
     fontSize: 16,
-    elevation: 2, // For Android
-    shadowColor: '#000', // For iOS
-    shadowOffset: { width: 0, height: 2 }, // For iOS
-    shadowOpacity: 0.1, // For iOS
-    shadowRadius: 4, // For iOS
+    elevation: 2,
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.1, 
+    shadowRadius: 4, 
   },
   button: {
     backgroundColor: '#47ABCE',
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',
-    elevation: 2, // For Android
-    shadowColor: '#000', // For iOS
-    shadowOffset: { width: 0, height: 2 }, // For iOS
-    shadowOpacity: 0.2, // For iOS
-    shadowRadius: 4, // For iOS
+    elevation: 2, 
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.2, 
+    shadowRadius: 4,
   },
   buttonText: {
     color: '#fff',

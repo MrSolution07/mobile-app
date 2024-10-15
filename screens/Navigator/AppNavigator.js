@@ -200,12 +200,14 @@ import ForgotPassword from '../../components/ForgotPassword';
 import TopUp from '../TopUpScreen';
 import BuyEth from '../BuyEth';
 import Withdraw from '../Withdraw';
-import DrawerNavigator from './DrawerNavigator';
+import MainDrawer from './DrawerNavigator';
 import CollectionDetailScreen from '../CollectionDetailScreen';
 import ArtDetailsScreen from '../ArtDetailsScreen';
 import EditProfile from '../EditProfile';
 import ChangePassword from '../ChangePassword';
 import UserProfile from '../ProfileScreen';
+import Tabs from '../Tabs/Tabs';
+import ProfileScreen from '../ProfileScreen';
 
 const Stack = createStackNavigator();
 
@@ -219,7 +221,7 @@ export default function AppNavigator() {
         const onboarded = await AsyncStorage.getItem('hasOnboarded');
         if (onboarded === 'true') {
           await handleBiometricAuth(); // If onboarded, trigger biometric auth
-          setInitialRoute('Tabs'); // After successful auth, go to Home (Tabs)
+          setInitialRoute('MainDrawer'); // After successful auth, go to Home (Tabs)
         } else {
           setInitialRoute('Onboarding'); // If not onboarded, start at Onboarding
         }
@@ -310,6 +312,18 @@ export default function AppNavigator() {
             }}
           />
           <Stack.Screen
+            name="MainDrawer"
+            component={MainDrawer}
+            options={{
+              headerShown:false,
+              headerTitle: "",
+              headerTransparent: true,
+              headerBackground: () => (
+                <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+              ),
+            }}
+          />
+          {/* <Stack.Screen
             name="HomeScreen"
             component={HomeScreen}
             options={{
@@ -320,7 +334,7 @@ export default function AppNavigator() {
               ),
               gestureEnabled: false,
             }}
-          />
+          /> */}
           <Stack.Screen
             name="TopUp"
             component={TopUp}
@@ -354,14 +368,14 @@ export default function AppNavigator() {
               ),
             }}
           />
-          <Stack.Screen
+          {/* <Stack.Screen
             name="Tabs"
             component={Tabs}
             options={{
               headerShown: false,
               gestureEnabled: false,
             }}
-          />
+          /> */}
           <Stack.Screen
             name="ProfileScreen"
             component={ProfileScreen}

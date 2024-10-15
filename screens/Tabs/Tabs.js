@@ -6,7 +6,7 @@ import CustomTabIcon from './CustomTabIcon';
 import Home from './HomeScreen';
 import Wallet from './Wallet';
 import Gemini from './Gemini';
-import UserUpload from './UserUpload';
+// import UserUpload from './UserUpload';
 import Explore from './Explore';
 
 const Tab = createBottomTabNavigator();

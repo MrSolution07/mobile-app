@@ -87,13 +87,13 @@ const UploadNFTScreen = () => {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={100}
         >
-            <View style={styles.header}>
                 <Ionicons 
                     name="menu-sharp" 
-                    size={30} 
+                    size={29} 
                     onPress={handleMenuPress} 
                     style={styles.menuIcon}
                 />
+                <View style={styles.header}>
                 <Text style={styles.screenTitle}>Upload Your NFT</Text>
             </View>
             <ScrollView contentContainerStyle={styles.container}>
@@ -209,11 +209,11 @@ const styles = StyleSheet.create({
     },
     header: {
         flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
         marginBottom: 20,
         padding: 15,
-        marginTop: hp('6%'),
+        marginTop: hp('8.5%'),
         // backgroundColor: '#fff',
         // elevation: 5, 
         // borderBottomLeftRadius: 15,
@@ -221,7 +221,8 @@ const styles = StyleSheet.create({
     },
     menuIcon: {
         position: 'absolute',
-        left: 20,
+        left: 15,
+        marginTop: hp(3.5),
     },
     container: {
         flexGrow: 1, 
@@ -230,9 +231,9 @@ const styles = StyleSheet.create({
         
     },
     screenTitle: {
-        fontSize: 28,
+        fontSize: 27,
         fontWeight: 'bold',
-        textAlign: 'center',
+        textAlign: 'left',
         color: '#075eec',
     },
     formContainer: {

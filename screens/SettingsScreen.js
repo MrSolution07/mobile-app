@@ -1,13 +1,5 @@
 import React, { useContext, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  ScrollView,
-  Alert,
-  Switch,
-} from 'react-native';
+import {View,Text,StyleSheet,SafeAreaView,ScrollView,Alert,Switch} from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Pressable } from 'react-native';
 import SettingsSection from '../components/SettingsSection';
@@ -16,6 +8,8 @@ import { auth, db } from '../config/firebaseConfig';
 import { signOut } from 'firebase/auth';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { useTheme } from '@react-navigation/native'; 
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
+
 
 const SettingsScreen = () => {
   
@@ -199,7 +193,7 @@ const styles = StyleSheet.create({
   },
   menuButton: {
     // position: 'absolute',
-    marginTop: 45,
+    marginTop: hp(4),
     left: 15,
     zIndex: 10,
   },

@@ -445,8 +445,8 @@ const styles = StyleSheet.create({
   },
   container: {
     paddingHorizontal: wp('4%'),
-    marginTop: hp('5%'),
-    paddingVertical: hp('2%'), 
+    marginTop: hp('2%'),
+    paddingVertical: hp('4%'), 
   },
   header: {
     flexDirection: 'row',
