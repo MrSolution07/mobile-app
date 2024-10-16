@@ -13,7 +13,7 @@ const cardIcons = {
 
 const TopUpScreen = () => {
   const [amount, setAmount] = useState('');
-  const [bankName, setBankName] = useState('');
+  // const [bankName, setBankName] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [accountHolder, setAccountHolder] = useState('');
   const [cardNumber, setCardNumber] = useState('');
@@ -84,7 +84,7 @@ const TopUpScreen = () => {
     setErrorMessage(''); // Reset error message
 
     // Basic validation
-    if (!amount || !bankName || !accountNumber || !accountHolder || !cardNumber || !cvv || !expiryDate) {
+    if (!amount || !accountNumber || !accountHolder || !cardNumber || !cvv || !expiryDate) {
       setErrorMessage('Please fill in all fields.');
       return;
     }
@@ -133,7 +133,6 @@ const TopUpScreen = () => {
 
        
         setAmount('');
-        setBankName('');
         setAccountNumber('');
         setAccountHolder('');
         setCardNumber('');
