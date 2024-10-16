@@ -3,16 +3,18 @@ import React, { useState } from 'react';
 import { StyleSheet, Image, ScrollView, View, Text, KeyboardAvoidingView, Platform, Pressable, ActivityIndicator } from 'react-native';
 import { Input } from 'react-native-elements';
 import * as ImagePicker from 'expo-image-picker';
-import { useForm, Controller } from 'react-hook-form';
+import * as ImageManipulator from 'expo-image-manipulator';
+import { useForm, Controller, set } from 'react-hook-form';
 import { setDoc, doc } from '../../config/firebaseConfig'; 
-import { db } from '../../config/firebaseConfig'; 
+import { db, storage, auth } from '../../config/firebaseConfig'; 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
-
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { getAuth } from 'firebase/auth';  
 
 const UploadNFTScreen = () => {
     const navigation = useNavigation();
-    const { control, handleSubmit, formState: { errors } } = useForm();
+    const { control, handleSubmit, formState: { errors }, reset } = useForm();
     const [imageUri, setImageUri] = useState(null);
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
@@ -30,23 +32,48 @@ const UploadNFTScreen = () => {
         });
 
         if (!result.canceled) {
-            setImageUri(result.assets[0].uri);
-            setMessage('');
+            const resizedImage = await ImageManipulator.manipulateAsync(
+                result.assets[0].uri,
+                [{ resize: { width: 800 } }],
+                { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+            );
+            setImageUri(resizedImage.uri);
+            
         } else {
             setMessage('Image selection was cancelled.');
         }
     };
 
     const generateTokenId = () => {
-        return Math.random().toString(36).substring(2, 8); // random token id
+        return Math.random().toString(36).substring(2, 200);
+    };
+
+    const uploadImageToFirebase = async (imageUri, tokenId) => {
+        const response = await fetch(imageUri);
+        const blob = await response.blob();
+
+        const storageRef = ref(storage, `nfts/${tokenId}.jpg`);
+        const uploadTask = uploadBytesResumable(storageRef, blob);
+
+        return new Promise((resolve, reject) => {
+            uploadTask.on(
+                'state_changed',
+                null,
+                (error) => {
+                    reject(error);
+                },
+                async () => {
+                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                    resolve(downloadURL);
+                }
+            );
+        });
     };
 
     const uploadNFTToFirestore = async (nftData) => {
         try {
-            const nftDocRef = doc(db, 'nfts', nftData.tokenId); // Create reference with tokenId
-            await setDoc(nftDocRef, nftData); // Upload data to Firestore
-            setImageUri(null); // Clear image after upload
-            setMessage('NFT uploaded successfully!');
+            const nftDocRef = doc(db, 'nfts', nftData.tokenId);
+            await setDoc(nftDocRef, nftData);
         } catch (error) {
             console.error('Error saving NFT to Firestore:', error);
             throw new Error('Failed to upload NFT to Firestore');
@@ -62,18 +89,35 @@ const UploadNFTScreen = () => {
         setLoading(true);
 
         try {
-            const tokenId = generateTokenId(); 
+            const auth = getAuth();
+            const user = auth.currentUser;
+
+            if (!user) {
+                throw new Error('User not authenticated');
+            }
+
+            const tokenId = generateTokenId();
+            const imageUrl = await uploadImageToFirebase(imageUri, tokenId);
+
             const nftData = {
                 ...data,
-                imageUri,
+                imageUrl,  
                 tokenId,
                 price: data.price,
-                bids: [], // Initialize bids as an empty array
-                createdAt: new Date().toISOString() // Add a timestamp
+                bids: [], 
+                createdAt: new Date().toISOString(),
+                userId: user.uid,
+                uploadedBy: user.displayName || user.email,
+                status: 'minted',  
             };
 
-            await uploadNFTToFirestore(nftData); // Upload to Firestore
+            await uploadNFTToFirestore(nftData);
+            setImageUri(null);
+            reset();
             setMessage('NFT uploaded successfully!');
+            setMessage('');
+            navigation.navigate('items');
+            
         } catch (error) {
             setMessage('Error uploading NFT: ' + error.message);
         } finally {
@@ -87,17 +131,18 @@ const UploadNFTScreen = () => {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={100}
         >
-                <Ionicons 
-                    name="menu-sharp" 
-                    size={29} 
-                    onPress={handleMenuPress} 
-                    style={styles.menuIcon}
-                />
-                <View style={styles.header}>
+            <Ionicons 
+                name="menu-sharp" 
+                size={29} 
+                onPress={handleMenuPress} 
+                style={styles.menuIcon}
+            />
+            <View style={styles.header}>
                 <Text style={styles.screenTitle}>Upload Your NFT</Text>
             </View>
             <ScrollView contentContainerStyle={styles.container}>
                 <View style={styles.formContainer}>
+                    {/* Form inputs */}
                     <Controller
                         control={control}
                         rules={{ required: 'Title is required' }}

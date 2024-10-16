@@ -1,24 +1,18 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, Pressable, Image, Alert, ScrollView } from 'react-native';
-import DataContext from './Context/Context'; 
-import tw from 'twrnc';
 import { useNavigation } from '@react-navigation/native';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
-
-
+import { db, auth } from '../config/firebaseConfig'; // Firebase config
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const cardIcons = {
   visa: require('../assets/images/visa.png'), 
   mastercard: require('../assets/images/mastercard.png'),
-  // Add more card types as needed
+  // Add a error image to indicate invalid card number cause for visa is 4 and mastercard is 5 the fucntion is determineCardType
 };
 
 const TopUpScreen = () => {
-  const {
-    amount, setAmount,
-    referenceNumber, setReferenceNumber
-  } = useContext(DataContext);
-  
+  const [amount, setAmount] = useState('');
   const [bankName, setBankName] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [accountHolder, setAccountHolder] = useState('');
@@ -26,52 +20,70 @@ const TopUpScreen = () => {
   const [cvv, setCvv] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cardType, setCardType] = useState(null);
+  const [referenceNumber, setReferenceNumber] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigation = useNavigation();
+  const currentUser = auth.currentUser; 
+  
+  const fetchOrGenerateReferenceNumber = async () => {
+    if (!currentUser) return;
+    try {
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      const userDocSnapshot = await getDoc(userDocRef);
 
-  // Function to generate a random reference number
-  const generateReferenceNumber = () => {
-    const randomNumber = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
-    const refNumber = `#${randomNumber}`;
-    setReferenceNumber(refNumber);
+      if (userDocSnapshot.exists()) {
+        const existingRefNumber = userDocSnapshot.data().lastTopUpReference;
+        if (existingRefNumber) {
+          setReferenceNumber(existingRefNumber); 
+        } else {
+          generateReferenceNumber(userDocRef); 
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching reference number:', error);
+    }
   };
 
-  // Function to determine card type based on card number prefix
+  // so the user will just have one attributed to him cause that thing of generating might create a logivcal issue
+  const generateReferenceNumber = async (userDocRef) => {
+    const randomNumber = Math.floor(100000 + Math.random() * 900000);
+    const newRefNumber = `#${randomNumber}`;
+    setReferenceNumber(newRefNumber);
+
+    // Save the reference number in the Firestore
+    try {
+      await updateDoc(userDocRef, { lastTopUpReference: newRefNumber });
+    } catch (error) {
+      console.error('Error saving reference number:', error);
+    }
+  };
+
+  // Function to determine card type based on the first digit of card number
   const determineCardType = (number) => {
-    const cleanedNumber = number.replace(/\s+/g, ''); // Remove spaces
+    const cleanedNumber = number.replace(/\s+/g, '');
     if (cleanedNumber.startsWith('4')) {
       return 'visa';
     } else if (cleanedNumber.startsWith('5')) {
       return 'mastercard';
     }
-    // Add other card types as needed
-    return null;
+    return 'error';
   };
 
   // Handler for card number input change with formatting
   const handleCardNumberChange = (number) => {
-    // Remove all non-digit characters
-    const cleaned = number.replace(/\D+/g, '');
-
-    // Limit to 16 digits
-    const limited = cleaned.slice(0, 16);
-
-    // Add spaces after every 4 digits
-    const formatted = limited.replace(/(.{4})/g, '$1 ').trim();
+    const cleaned = number.replace(/\D+/g, ''); // Remove all non-digit characters
+    const limited = cleaned.slice(0, 16); // Limit to 16 digits
+    const formatted = limited.replace(/(.{4})/g, '$1 ').trim(); // Add spaces after every 4 digits
 
     setCardNumber(formatted);
-
-    // Determine card type
-    const type = determineCardType(formatted);
-    setCardType(type);
+    setCardType(determineCardType(formatted)); // Determine card type
   };
 
-  // Handler for top-up process
-  const handleTopUp = () => {
-    // Reset error message
-    setErrorMessage('');
+  // Handler for confirming the top-up
+  const handleTopUp = async () => {
+    setErrorMessage(''); // Reset error message
 
-    // Validation Checks
+    // Basic validation
     if (!amount || !bankName || !accountNumber || !accountHolder || !cardNumber || !cvv || !expiryDate) {
       setErrorMessage('Please fill in all fields.');
       return;
@@ -90,6 +102,7 @@ const TopUpScreen = () => {
       return;
     }
 
+    // Validate expiry date (MM/YY format)
     if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiryDate)) {
       setErrorMessage('Expiry date must be in MM/YY format.');
       return;
@@ -97,38 +110,56 @@ const TopUpScreen = () => {
 
     const [inputMonth, inputYear] = expiryDate.split('/').map(Number);
     const currentDate = new Date();
-    const currentMonth = currentDate.getMonth() + 1; 
-    const currentYear = currentDate.getFullYear() % 100; 
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = currentDate.getFullYear() % 100;
 
     if (inputYear < currentYear || (inputYear === currentYear && inputMonth < currentMonth)) {
       setErrorMessage('Expiry date cannot be in the past.');
       return;
     }
 
-    // Generate a random reference number if not already generated
-    if (!referenceNumber) {
-      generateReferenceNumber();
+  
+    try {
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      const userDocSnapshot = await getDoc(userDocRef);
+
+      if (userDocSnapshot.exists()) {
+        const currentBalance = userDocSnapshot.data().balanceInZar || 0;
+
+        await updateDoc(userDocRef, {
+          balanceInZar: currentBalance + parseFloat(amount), // Update balance
+          lastTopUpReference: referenceNumber, 
+        });
+
+       
+        setAmount('');
+        setBankName('');
+        setAccountNumber('');
+        setAccountHolder('');
+        setCardNumber('');
+        setCvv('');
+        setExpiryDate('');
+        setCardType(null);
+
+        Alert.alert('Success', `Top-Up of ${amount} ZAR was successful!`, [
+          { text: 'OK', onPress: () => navigation.goBack() },
+        ]);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'There was an error processing your top-up. Please try again.');
     }
-
-    // Clear input fields
-    setAmount((prevAmount) => parseFloat(prevAmount) + parseFloat(amount || 0));
-    setBankName('');
-    setAccountNumber('');
-    setAccountHolder('');
-    setCardNumber('');
-    setCvv('');
-    setExpiryDate('');
-    setCardType(null);
-
-    Alert.alert('Success', `Top-Up of ${amount} ZAR was successful!`, [
-      { text: 'OK', onPress: () => navigation.goBack() },
-    ]);
   };
+
+  // Load the reference number when the component mounts this prevents to have many ref number i used the altcoin trader's logic 
+  useEffect(() => {
+    fetchOrGenerateReferenceNumber();
+  }, []);
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
         <Text style={styles.title}>Top-Up Your Account</Text>
+
         <TextInput
           style={styles.input}
           placeholder="Amount to Top-Up (ZAR)"
@@ -137,24 +168,13 @@ const TopUpScreen = () => {
           onChangeText={(text) => setAmount(text.replace(/[^0-9.]/g, ''))}
         />
 
-        <Pressable onPress={generateReferenceNumber} style={styles.button}>
-          <Text numberOfLines={1} style={styles.buttonText}>Generate Reference Number</Text>
-        </Pressable>
-
-        {referenceNumber ? (
+        {referenceNumber && (
           <View style={styles.instructions}>
             <Text style={styles.referenceText}>Reference Number: {referenceNumber}</Text>
           </View>
-        ) : null}
+        )}
 
-        <Text style={styles.bankDetailsTitle}>Bank Details</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Bank Name"
-          value={bankName}
-          onChangeText={setBankName}
-        />
+        <Text style={styles.bankDetailsTitle}>Card Details</Text>
 
         <View style={styles.cardInputContainer}>
           <TextInput
@@ -163,7 +183,7 @@ const TopUpScreen = () => {
             keyboardType="numeric"
             value={cardNumber}
             onChangeText={handleCardNumberChange}
-            maxLength={19} 
+            maxLength={19}
           />
           {cardType && (
             <Image
@@ -202,9 +222,8 @@ const TopUpScreen = () => {
         <TextInput
           style={styles.input}
           placeholder="Expiry Date (MM/YY)"
-          keyboardType="default"
           value={expiryDate}
-          onChangeText={(text) => setExpiryDate(text.replace(/[^0-9/]/g, ''))}
+          onChangeText={setExpiryDate}
           maxLength={5}
         />
 

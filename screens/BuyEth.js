@@ -1,25 +1,54 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert, ActivityIndicator } from 'react-native';
-import DataContext from './Context/Context';
 import tw from 'twrnc';
 import { useNavigation } from '@react-navigation/native';
+import { doc, getDoc, updateDoc } from 'firebase/firestore'; // Firestore imports
+import { db, auth } from '../config/firebaseConfig'; // Firebase config
 
 const BuyETHPage = () => {
-  const {
-    ethAmount, setEthAmount,
-    zarAmount, setZarAmount,
-    amount, setAmount,
-    updateEthAmount // Ensure this function is available in your context
-  } = useContext(DataContext);
-
+  const [ethAmount, setEthAmount] = useState('');
+  const [zarAmount, setZarAmount] = useState('');
+  const [userBalance, setUserBalance] = useState(null);
+  const [userEthAmount, setUserEthAmount] = useState(0);
   const [ethStats, setEthStats] = useState(null);
-  const [gasFee, setGasFee] = useState(null); // To store gas fee in ZAR
+  const [gasFee, setGasFee] = useState(null);
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(true); // To handle loading state
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
   const ETHERSCAN_API_KEY = '2AKWGIEU2PKUVFSBCN8P11RDZ92ZGRAT36'; // Your Etherscan API key
   const GAS_LIMIT = 21000; // Standard gas limit for ETH transfer
+
+  // Fetch user data from Firestore
+  const fetchUserData = async () => {
+    try {
+      const currentUser = auth.currentUser;
+
+      if (currentUser) {
+        const userId = currentUser.uid;
+        console.log('Fetching data for user:', userId);
+
+        const userDocRef = doc(db, 'users', userId);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          setUserBalance(userData.balanceInZar);
+          setUserEthAmount(userData.ethAmount);
+          console.log('User data loaded:', userData);
+        } else {
+          throw new Error('User not found');
+        }
+      } else {
+        throw new Error('User is not authenticated');
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setMessage('Failed to load user data.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Fetch ETH stats from CoinGecko API
   useEffect(() => {
@@ -49,6 +78,7 @@ const BuyETHPage = () => {
     };
 
     fetchETHStats();
+    fetchUserData(); // Fetch the user data when the component loads
   }, []);
 
   // Fetch Gas Fees from Etherscan API once ETH price is available
@@ -81,7 +111,7 @@ const BuyETHPage = () => {
     };
 
     fetchGasFee();
-  }, [ethStats]); // Dependency on ethStats
+  }, [ethStats]);
 
   // Function to handle ETH to ZAR conversion as user types
   const handleETHAmountChange = (ethInput) => {
@@ -95,7 +125,7 @@ const BuyETHPage = () => {
     }
   };
 
-  const handleConfirmPurchase = () => {
+  const handleConfirmPurchase = async () => {
     if (!ethStats || !ethAmount) {
       setMessage('Please enter the amount of ETH to buy.');
       return;
@@ -109,23 +139,40 @@ const BuyETHPage = () => {
     const transactionFee = 0.02; // Static transaction fee in ZAR
     const totalCost = parseFloat(ethAmount) * ethStats.price + parseFloat(gasFee) + transactionFee;
 
-    if (totalCost > amount) {
+    if (totalCost > userBalance) {
       setMessage('Insufficient funds to purchase ETH.');
       return;
     }
 
-    // Update ETH amount in context
-    updateEthAmount(parseFloat(ethAmount));
+    try {
+      // Update the user's ETH balance in Firestore
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const userId = currentUser.uid;
+        const userDocRef = doc(db, 'users', userId);
+        
+        const newEthAmount = (parseFloat(userEthAmount) + parseFloat(ethAmount)).toFixed(8);
+        const newZarBalance = (userBalance - totalCost).toFixed(2);
 
-    // Deduct the cost from the user's ZAR balance
-    setAmount((prevAmount) => (parseFloat(prevAmount) - totalCost).toFixed(2));
+        await updateDoc(userDocRef, {
+          ethAmount: newEthAmount,
+          balanceInZar: newZarBalance,
+        });
+
+        setUserBalance(newZarBalance);
+        setUserEthAmount(newEthAmount);
+        
+        Alert.alert('Success', `You have successfully purchased ${ethAmount} ETH!`, [
+          { text: 'OK', onPress: () => navigation.goBack() },
+        ]);
+      }
+    } catch (error) {
+      console.error('Error updating user data:', error);
+      setMessage('Failed to complete the purchase.');
+    }
 
     setEthAmount('');
     setZarAmount('');
-
-    Alert.alert('Success', `You have successfully purchased ${ethAmount} ETH!`, [
-      { text: 'OK', onPress: () => navigation.goBack() },
-    ]);
   };
 
   if (loading) {
@@ -159,10 +206,6 @@ const BuyETHPage = () => {
               <Text style={styles.statValue}>{ethStats.low} ZAR</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statLabel}>24h Volume:</Text>
-              <Text style={styles.statValue}>{ethStats.volume}</Text>
-            </View>
-            <View style={styles.statItem}>
               <Text style={styles.statLabel}>Gas Fee:</Text>
               <Text style={styles.statValue}>{gasFee ? `${gasFee} ZAR` : 'Calculating...'}</Text>
             </View>
@@ -186,20 +229,18 @@ const BuyETHPage = () => {
         <View style={styles.summary}>
           <Text style={styles.subtitle}>Transaction Summary</Text>
           <Text>ETH Amount: {ethAmount} ETH</Text>
-          <Text>Total Cost (ETH): {zarAmount} ZAR</Text>
+          <Text>Total in ZAR: {zarAmount} ZAR</Text>
           <Text>Gas Fee: {gasFee} ZAR</Text>
-          <Text style={styles.grandTotal}>Grand Total: {(parseFloat(zarAmount) + parseFloat(gasFee)).toFixed(2)} ZAR</Text>
         </View>
       ) : null}
 
-      {message ? <Text style={styles.errorMessage}>{message}</Text> : null}
+      {/* Purchase Button */}
+      <Pressable style={styles.button} onPress={handleConfirmPurchase}>
+        <Text style={styles.buttonText}>Confirm Purchase</Text>
+      </Pressable>
 
-      <View style={tw`m-3`} />
-      <View style={tw`justify-center items-center`}>
-        <Pressable onPress={handleConfirmPurchase} style={styles.button}>
-          <Text style={styles.buttonText}>Confirm Purchase</Text>
-        </Pressable>
-      </View>
+      {/* Error or Success Messages */}
+      {message ? <Text style={styles.errorMessage}>{message}</Text> : null}
     </View>
   );
 };

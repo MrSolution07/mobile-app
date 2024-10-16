@@ -1,44 +1,91 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, SafeAreaView, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Image, SafeAreaView, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { BlurView } from 'expo-blur';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator'; // Import the image manipulator
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'; // Firebase Storage
 import { db, auth } from '../config/firebaseConfig'; 
-import DataContext from '../screens/Context/Context'; 
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const EditProfile = ({ navigation }) => {
-  const { name, email, phoneNo, location } = useContext(DataContext); 
-
-  // State variables
   const [avatar, setAvatar] = useState(null);
-  const [username, setUsername] = useState(name);
-  const [userEmail, setUserEmail] = useState(email);
-  const [userPhoneNo, setUserPhoneNo] = useState(phoneNo || ''); 
-  const [userLocation, setUserLocation] = useState(location || ''); 
+  const [username, setUsername] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [userPhoneNo, setUserPhoneNo] = useState('');
+  const [userLocation, setUserLocation] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false); // Loading state
 
+  // Fetch user data and profile image
   useEffect(() => {
-    const fetchProfileImage = async () => {
+    const fetchUserData = async () => {
+      setLoading(true); // Start loading
       const currentUser = auth.currentUser;
 
       if (currentUser) {
         const userRef = doc(db, 'users', currentUser.uid);
         const userDoc = await getDoc(userRef);
-        
+
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          setAvatar(userData.ProfilleImage ? { uri: userData.ProfilleImage } : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"); 
+          setAvatar(userData.ProfileImage ? { uri: userData.ProfileImage } : 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y');
+          setUsername(userData.name || '');
+          setUserEmail(userData.email || '');
+          setUserPhoneNo(userData.phoneNo || '');
+          setUserLocation(userData.location || '');
         } else {
           console.log("No such document!");
         }
       }
+      setLoading(false); // Stop loading
     };
 
-    fetchProfileImage();
+    fetchUserData();
   }, []);
 
+  // Ask for camera and media library permissions
+  const askForPermissions = async () => {
+    const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
+    const mediaLibraryPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (cameraPermission.status !== 'granted' || mediaLibraryPermission.status !== 'granted') {
+      Alert.alert('Permissions required', 'You need to grant camera and media library permissions to use this feature.');
+      return false;
+    }
+    return true;
+  };
+
+  // Resize and upload image to Firebase
+  const uploadImage = async (uri) => {
+    try {
+      const manipResult = await ImageManipulator.manipulateAsync(
+        uri,
+        [{ resize: { width: 300 } }],
+        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+      );
+
+      const currentUser = auth.currentUser;
+      const storage = getStorage();
+      const storageRef = ref(storage, `profile_pictures/${currentUser.uid}.jpg`);
+
+      const response = await fetch(manipResult.uri);
+      const blob = await response.blob();
+
+      await uploadBytes(storageRef, blob);
+      const downloadURL = await getDownloadURL(storageRef);
+      return downloadURL;
+    } catch (error) {
+      console.error("Error uploading image: ", error);
+      Alert.alert('Error', 'Failed to upload image.');
+    }
+  };
+
+  // Pick image from gallery
   const handlePickImage = async () => {
+    const hasPermissions = await askForPermissions();
+    if (!hasPermissions) return;
+
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -47,8 +94,40 @@ const EditProfile = ({ navigation }) => {
     });
 
     if (!result.canceled) {
-      setAvatar({ uri: result.assets[0].uri });
+      const downloadURL = await uploadImage(result.assets[0].uri);
+      setAvatar({ uri: downloadURL });
     }
+  };
+
+  // Take a photo
+  const handleTakePhoto = async () => {
+    const hasPermissions = await askForPermissions();
+    if (!hasPermissions) return;
+
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const downloadURL = await uploadImage(result.assets[0].uri);
+      setAvatar({ uri: downloadURL });
+    }
+  };
+
+  // Show options to pick image from gallery or take a photo
+  const handleImageOptions = () => {
+    Alert.alert(
+      'Profile Picture',
+      'Choose an option',
+      [
+        { text: 'Pick from Gallery', onPress: handlePickImage },
+        { text: 'Take a Photo', onPress: handleTakePhoto },
+        { text: 'Cancel', style: 'cancel' }
+      ],
+      { cancelable: true }
+    );
   };
 
   const handleSave = async () => {
@@ -62,14 +141,12 @@ const EditProfile = ({ navigation }) => {
 
       if (currentUser) {
         const userRef = doc(db, 'users', currentUser.uid);
-        
-        // Prepare update data
         const updateData = {
-          name: username || name,
-          email: userEmail || email,
-          phoneNo: userPhoneNo || phoneNo, 
-          location: userLocation || location, 
-          ProfilleImage: avatar?.uri || '', 
+          name: username,
+          email: userEmail,
+          phoneNo: userPhoneNo,
+          location: userLocation,
+          ProfileImage: avatar?.uri || '',
         };
 
         await updateDoc(userRef, updateData);
@@ -100,7 +177,7 @@ const EditProfile = ({ navigation }) => {
         <ScrollView contentContainerStyle={styles.contentContainer}>
           <View style={styles.formContainer}>
             
-            <TouchableOpacity onPress={handlePickImage}>
+            <TouchableOpacity onPress={handleImageOptions}>
               <Image 
                 source={avatar ? avatar : { uri: 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }} 
                 style={styles.avatar} 
@@ -110,13 +187,12 @@ const EditProfile = ({ navigation }) => {
             <Text>Username</Text>
             <TextInput
               style={styles.input}
-              placeholder="username"
+              value= {username}
               onChangeText={setUsername}
             />
             <Text>Email</Text>
             <TextInput
               style={styles.input}
-              placeholder="Email"
               value={userEmail}
               onChangeText={setUserEmail}
               keyboardType="email-address"
@@ -124,27 +200,19 @@ const EditProfile = ({ navigation }) => {
             <Text>Phone No</Text>
             <TextInput
               style={styles.input}
-              placeholder="Phone Number"
+              value={userPhoneNo}
               onChangeText={setUserPhoneNo} 
               keyboardType="phone-pad"
             />
             <Text>Location</Text>
             <TextInput
               style={styles.input}
-              placeholder="Location"
               value={userLocation}
               onChangeText={setUserLocation} 
             />
-            {/* <Text>New Password (leave blank to keep current)</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="New Password (leave blank to keep current)"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            /> */}
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.saveButtonText}>Save Changes</Text>
+
+            <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={loading}>
+              {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveButtonText}>Save Changes</Text>}
             </TouchableOpacity>
             </View>
           </View>

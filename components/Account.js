@@ -1,22 +1,51 @@
-import React, { useContext } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import DataContext from '../screens/Context/Context';
+import { db, auth } from '../config/firebaseConfig'; // Firebase config
+import { doc, getDoc } from 'firebase/firestore';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import tw from 'twrnc';
 
 const Account = () => {
   const navigation = useNavigation();
-  const { amount, ethAmount, zarAmount, withdrawAmount } = useContext(DataContext);
+  const [zarAmount, setZarAmount] = useState(0);
+  const [ethAmount, setEthAmount] = useState(0);
+  const [withdrawAmount, setWithdrawAmount] = useState(0);
+  const currentUser = auth.currentUser;
 
-  const currentZarBalance = parseFloat(amount || 0) - (withdrawAmount ? parseFloat(withdrawAmount) + 0.02 : 0);
+  // Fetch ZAR and ETH amounts from Firestore
+  const fetchAmounts = async () => {
+    if (!currentUser) return;
+
+    try {
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      const userDocSnapshot = await getDoc(userDocRef);
+
+      if (userDocSnapshot.exists()) {
+        const userData = userDocSnapshot.data();
+        setZarAmount(userData.balanceInZar || 0); 
+        setEthAmount(userData.ethAmount || 0);
+        setWithdrawAmount(userData.withdrawAmount || 0); // Set withdrawal amount (if applicable)
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to fetch account balance.');
+      console.error('Error fetching account balance:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAmounts();
+  }, []);
+
+  // Calculate current ZAR balance with withdrawal taken into account
+  const currentZarBalance = parseFloat(zarAmount || 0) - (withdrawAmount ? parseFloat(withdrawAmount) + 0.02 : 0);
 
   return (
-    <View style={styles.accountContainer}>    
-      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>      
+    <View style={styles.accountContainer}>
+      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.balanceContainer}>
-          <Text style={styles.balanceTitle}>BALANCE </Text>
+          <Text style={styles.balanceTitle}>BALANCE</Text>
           <Text style={styles.balanceAmount}>
             {currentZarBalance.toFixed(2)} ZAR
           </Text>

@@ -4,42 +4,33 @@ import DataContext from '../Context/Context';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
 
 const Gemini = () => {
-  const { onSent, recentPrompt, showResult, loading, resultData, setInput, input, setShowResult, name } = useContext(DataContext);
+  const { onSent, recentPrompt, showResult, loading, resultData, setInput, input, setShowResult, name, suggestedPrompts } = useContext(DataContext);
 
-  const suggestedPrompts = [
-    "What is an NFT and how does it work?",
-    "How can I create and sell my own NFT?",
-    "What are the benefits of owning an NFT?",
-    "What is the environmental impact of NFTs?",
-    "How do NFTs impact the art and gaming industries?",
-    "What are gas fees in the context of NFTs?",
-    "Can NFTs be resold, and how does that process work?",
-    "How are NFTs different from cryptocurrencies?",
-    "What makes an NFT valuable?",
-    "Are NFTs a good investment?"
-];
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // i honeslty dont know how to prevent the styling with Geminu sometiems it's okay some other...      //
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // Handle when a suggested prompt is clicked
   const handleSuggestedPrompt = (prompt) => {
-    setInput(prompt); // Set the input to the suggested prompt
-    setTimeout(() => onSent(), 3); // Call onSent after the input is updated
+    setInput(prompt); 
+    onSent(prompt);   
   };
 
   // Handle Back button to return to greeting
   const handleBack = () => {
     setShowResult(false);
-    setInput(''); // Clear input when going back
+    setInput(''); 
   };
 
   // Prevent sending empty prompt
   const handleSend = () => {
     if (input.trim()) {
-      onSent();
+      onSent(input); 
     }
   };
 
   return (
-    <SafeAreaView style={{flex:1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <View style={styles.mainContainer}>
@@ -102,7 +93,6 @@ const Gemini = () => {
     </SafeAreaView>
   );
 };
-
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,

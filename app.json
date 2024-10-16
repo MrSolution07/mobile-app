@@ -14,9 +14,11 @@
     },
     "ios": {
       "bundleIdentifier": "com.mrsolution.mobileapp",
-      "scheme": "mobileapp" 
+      "scheme": "mobileapp",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "This app uses Face ID to authenticate the user.",
+        "NSBiometricUsageDescription": "This app uses biometric authentication to secure your account."
+      }
     }
   }
 }
-
-
