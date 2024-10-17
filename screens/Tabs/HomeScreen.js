@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Animated, Pressable, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 import * as LocalAuthentication from 'expo-local-authentication'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { db, auth } from '../../config/firebaseConfig'; 
@@ -17,6 +18,26 @@ const HomeScreen = () => {
   const scrollX = new Animated.Value(0);
   const [profileImage, setProfileImage] = useState(null);
   const [loginPromptShown, setLoginPromptShown] = useState(false);  // Track if the login prompt has been shown
+
+
+
+
+  useEffect(() => {
+    const options = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        'x-api-key': '73b5488d384f4be88dab537a9276bd0f',
+      },
+    };
+
+    axios
+      .get('https://api.opensea.io/api/v2/collections', options)
+      .then(response => {
+      })
+      .catch(err => console.error(err));
+  }, []);
+
 
   // Function to ask for login method choice unfortunately, this will not work i will try after a build on the testing env it works well !
   const askLoginPreference = async () => {
