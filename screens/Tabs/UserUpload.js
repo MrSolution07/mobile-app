@@ -18,12 +18,14 @@ const UploadNFTScreen = () => {
     const [imageUri, setImageUri] = useState(null);
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
+    const [imageloading, setImageLoading] = useState(false);
 
     const handleMenuPress = () => {
         navigation.toggleDrawer();
     };
 
     const handlePickImage = async () => {
+        setImageLoading(true);
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
@@ -42,6 +44,8 @@ const UploadNFTScreen = () => {
         } else {
             setMessage('Image selection was cancelled.');
         }
+        setImageLoading(false);
+        
     };
 
     const generateTokenId = () => {
@@ -116,7 +120,7 @@ const UploadNFTScreen = () => {
             reset();
             setMessage('NFT uploaded successfully!');
             setMessage('');
-            navigation.navigate('items');
+            navigation.navigate('Wallet', {screen:'Wallet', tab:'Items'} );
             
         } catch (error) {
             setMessage('Error uploading NFT: ' + error.message);
@@ -142,7 +146,6 @@ const UploadNFTScreen = () => {
             </View>
             <ScrollView contentContainerStyle={styles.container}>
                 <View style={styles.formContainer}>
-                    {/* Form inputs */}
                     <Controller
                         control={control}
                         rules={{ required: 'Title is required' }}
@@ -222,7 +225,11 @@ const UploadNFTScreen = () => {
                         onPress={handlePickImage}
                         style={styles.imageButton}
                     >
-                        <Text style={styles.buttonText}>Select Image</Text>
+                        {imageloading ? (
+                            <ActivityIndicator color="white" />
+                        ) : (
+                            <Text style={styles.buttonText}>Select Image</Text>
+                        )}
                     </Pressable>
                     {imageUri && (
                         <Image source={{ uri: imageUri }} style={styles.image} />
@@ -259,10 +266,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         padding: 15,
         marginTop: hp('8.5%'),
-        // backgroundColor: '#fff',
-        // elevation: 5, 
-        // borderBottomLeftRadius: 15,
-        // borderBottomRightRadius: 15,
+       
     },
     menuIcon: {
         position: 'absolute',

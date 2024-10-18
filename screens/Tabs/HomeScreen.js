@@ -22,8 +22,6 @@ const HomeScreen = () => {
   const [collectionData, setCollectionData] = useState([]);
 
 
-
-
   useEffect(() => {
     const options = {
       method: 'GET',

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import tw from 'twrnc';
 
 const Bids = () => {
   const [feedbackMessage, setFeedbackMessage] = useState('');
@@ -91,6 +92,7 @@ const Bids = () => {
 
   return (
     <ScrollView style={styles.container}>
+      <View style={tw`mt-4`}>
       <Text style={styles.title}>Bids on Your NFTs</Text>
 
       {feedbackMessage ? (
@@ -111,6 +113,7 @@ const Bids = () => {
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
       />
+      </View>
     </ScrollView>
   );
 };

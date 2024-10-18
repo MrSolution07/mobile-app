@@ -89,7 +89,7 @@ export default function RegistrationScreen({ navigation }) {
         />
         <ScrollView
           contentContainerStyle={tw`flex-grow`}
-          style={{ flex: 1, maxHeight: '100vh' }}
+          le={{ flex: 1, maxHeight: '100vh' }}sty
           showsVerticalScrollIndicator={false}
           bounces={false}
           keyboardShouldPersistTaps="handled"

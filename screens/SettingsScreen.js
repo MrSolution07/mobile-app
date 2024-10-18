@@ -188,7 +188,7 @@ const SettingsScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#fff',
   },
   menuButton: {
     marginTop: hp(4),

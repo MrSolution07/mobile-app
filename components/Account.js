@@ -42,8 +42,8 @@ const Account = () => {
   const currentZarBalance = parseFloat(zarAmount || 0) - (withdrawAmount ? parseFloat(withdrawAmount) + 0.02 : 0);
 
   return (
+    <ScrollView contentContainerStyle={styles.scrollContainer} >
     <View style={styles.accountContainer}>
-      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.balanceContainer}>
           <Text style={styles.balanceTitle}>BALANCE</Text>
           <Text style={styles.balanceAmount}>
@@ -74,8 +74,9 @@ const Account = () => {
             </Pressable>
           </View>
         </View>
-      </ScrollView>
     </View>
+  </ScrollView>
+
   );
 };
 
@@ -87,9 +88,7 @@ const styles = StyleSheet.create({
     paddingTop: hp('5.5%'),
   },
   scrollContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 30,
+    flexGrow: 1,
   },
   balanceContainer: {
     width: wp('90%'),

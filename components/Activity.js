@@ -12,8 +12,8 @@ const Activity = () => {
   const { amount, ethAmount, zarAmount, withdrawAmount } = useContext(DataContext);
 
   return (
+    <ScrollView contentContainerStyle={tw`flex-grow`}>
     <SafeAreaView style={tw`top-5 p-4`}>
-      <ScrollView contentContainerStyle={tw`flex-row flex-wrap justify-between`}>
         <View style={styles.activityContainer}>
           <View style={styles.iconRow}>
             <View style={styles.iconCircle}>
@@ -58,8 +58,9 @@ const Activity = () => {
             </View>
           </View>
         </View>
-      </ScrollView>
     </SafeAreaView>
+    </ScrollView>
+
   );
 };
 

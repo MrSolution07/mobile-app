@@ -1,17 +1,23 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef,useEffect } from 'react';
 import { View, Text, Pressable, Animated, Dimensions, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'; 
 import Account from '../../components/Account';
 import Items from '../../components/Items';
 import Activity from '../../components/Activity';
 import Bids from '../../components/Bids'; 
+import { useRoute,useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
 import tw from 'twrnc';
+
 
 const Wallet = () => {
   const [activeTab, setActiveTab] = useState('Account');
   const animationValue = useRef(new Animated.Value(0)).current;
   const screenWidth = Dimensions.get('window').width;
+
+  const route = useRoute();
+  const navigation = useNavigation();
+
 
   const handleTabSwitch = (tab) => {
     setActiveTab(tab);
@@ -22,6 +28,10 @@ const Wallet = () => {
       useNativeDriver: true,
     }).start();
   };
+  useEffect(() => {
+    const tab = route.params?.tab || 'Account'; 
+    handleTabSwitch(tab);
+  }, [route.params?.tab]);
 
   return (
     <View style={[tw`flex-1`, styles.walletContainer]}>
