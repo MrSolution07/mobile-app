@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, Alert, Switch } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, Alert, Switch, Linking } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Pressable } from 'react-native';
 import SettingsSection from '../components/SettingsSection';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../config/firebaseConfig'; 
 import { signOut } from 'firebase/auth';
-import { deleteDoc, doc } from 'firebase/firestore';
 import { useTheme } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
@@ -61,16 +60,11 @@ const SettingsScreen = () => {
         {
           text: 'Delete',
           style: 'destructive',
-          onPress: async () => {
-            try {
-              const user = auth.currentUser;
-              if (user) {
-                await deleteDoc(doc(db, 'users', user.uid));
-                await user.delete();
-                navigation.navigate('Login'); 
-              }
-            } catch (error) {
-              Alert.alert('Error', 'Failed to delete account. Please try again.');
+          onPress: () => {
+            const user = auth.currentUser;
+            if (user) {
+              // Redirect to the specified link to finalize the deletion process
+              Linking.openURL('https://meta-way-sa.vercel.app');
             }
           },
         },
