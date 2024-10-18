@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Animated, Pressable, Alert, Platform} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import * as LocalAuthentication from 'expo-local-authentication';
+import axios from 'axios';
+import * as LocalAuthentication from 'expo-local-authentication'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { db, auth } from '../../config/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
@@ -19,6 +20,26 @@ const HomeScreen = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [loginPromptShown, setLoginPromptShown] = useState(false);
   const [collectionData, setCollectionData] = useState([]);
+
+
+
+
+  useEffect(() => {
+    const options = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        'x-api-key': '73b5488d384f4be88dab537a9276bd0f',
+      },
+    };
+
+    axios
+      .get('https://api.opensea.io/api/v2/collections', options)
+      .then(response => {
+      })
+      .catch(err => console.error(err));
+  }, []);
+
 
   const askLoginPreference = async () => {
     Alert.alert(
