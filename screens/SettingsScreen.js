@@ -141,15 +141,6 @@ const SettingsScreen = () => {
               onValueChange={() => handleAppearanceChange('light')}
             />
           </View>
-
-          <View style={styles.optionContainer}>
-            <Ionicons name="color-palette-outline" size={24} color="#333" style={styles.icon} />
-            <Text style={styles.label}>Default Mode</Text>
-            <Switch
-              value={isDefaultMode}
-              onValueChange={() => handleAppearanceChange('default')}
-            />
-          </View>
         </View>
 
         <SettingsSection
