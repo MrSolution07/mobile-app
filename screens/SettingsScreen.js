@@ -15,7 +15,6 @@ const SettingsScreen = () => {
 
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isLightMode, setIsLightMode] = useState(true);
-  const [isDefaultMode, setIsDefaultMode] = useState(false);
 
   const toggleDrawer = () => {
     navigation.toggleDrawer();
@@ -88,15 +87,9 @@ const SettingsScreen = () => {
     if (mode === 'dark') {
       setIsDarkMode(true);
       setIsLightMode(false);
-      setIsDefaultMode(false);
     } else if (mode === 'light') {
       setIsDarkMode(false);
       setIsLightMode(true);
-      setIsDefaultMode(false);
-    } else {
-      setIsDarkMode(false);
-      setIsLightMode(false);
-      setIsDefaultMode(true);
     }
   };
 
