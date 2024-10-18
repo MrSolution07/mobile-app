@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import { db, auth } from '../config/firebaseConfig'; // Firebase config
+import { db, auth } from '../config/firebaseConfig'; 
 import { doc, getDoc } from 'firebase/firestore';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import tw from 'twrnc';
@@ -26,7 +26,7 @@ const Account = () => {
         const userData = userDocSnapshot.data();
         setZarAmount(userData.balanceInZar || 0); 
         setEthAmount(userData.ethAmount || 0);
-        setWithdrawAmount(userData.withdrawAmount || 0); // Set withdrawal amount (if applicable)
+        setWithdrawAmount(userData.withdrawAmount || 0);
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to fetch account balance.');

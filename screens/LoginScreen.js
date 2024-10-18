@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Alert, SafeAreaView, View, Image, Text, TextInput, Pressable, StatusBar, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { Alert, SafeAreaView, View, Image, Text, TextInput, Pressable, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard,ActivityIndicator } from 'react-native';
 import CheckBox from 'expo-checkbox';
 import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
@@ -34,6 +34,8 @@ const LoginScreen = ({ navigation }) => {
     iosClientId,
     androidClientId
   };
+
+  const [isLogggingIn, setIsLoggingIn] = useState(false);
   
   const [request, response, promptAsync] = Google.useAuthRequest(config);
 
@@ -65,6 +67,7 @@ const LoginScreen = ({ navigation }) => {
   }, [response]);
 
   const handleLogin = async () => {
+    setIsLoggingIn(true);
     try {
       const auth = getAuth();
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -73,6 +76,8 @@ const LoginScreen = ({ navigation }) => {
     } catch (error) {
       // Alert.alert('Login Error', error.message); 
       Alert.alert('Invalid Credentials');
+    }finally{
+      setIsLoggingIn(false);
     }
   };
 
@@ -108,7 +113,6 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="default" translucent />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <Image
@@ -123,7 +127,6 @@ const LoginScreen = ({ navigation }) => {
           />
 
           <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.keyboardAvoidingView}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
           >
@@ -190,8 +193,13 @@ const LoginScreen = ({ navigation }) => {
                   style={styles.loginButton}
                   android_ripple={{ color: 'lightgray' }}
                   onPress={handleLogin}
+                  disabled = {isLogggingIn}
                 >
+                  {isLogggingIn ? 
+                  ( 
+                  <Text style={styles.loginButtonText}>Logging in...</Text> ) : ( 
                   <Text style={styles.loginButtonText}>Login</Text>
+                  )}
                 </Pressable>
 
                 <Pressable 
@@ -306,7 +314,8 @@ const styles = StyleSheet.create({
   signUpContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 20
+    alignItems:'center',
+    // marginTop: 20,
   },
   signUpText: {
     fontSize: 16,

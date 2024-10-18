@@ -106,10 +106,14 @@ const Onboarding = ({ navigation }) => {
       (3 * Math.PI) / 2,   
       (9 * Math.PI) / 4.7, 
     ];
+
+    useEffect(() => {
+      StatusBar.setHidden(true);
+      return () => StatusBar.setHidden(false);
+    }, []);
   
     return (
       <View style={{ height: height * 0.25, justifyContent: 'flex-end', alignItems: 'center' }}>
-        {/* Outer gray circle, now only showing the top half */}
         <View
           style={{
             width: circleRadius * 2,
@@ -196,7 +200,6 @@ const Onboarding = ({ navigation }) => {
 
   return (
     <SafeAreaView style={tw`flex-1 bg-white`}>
-      <StatusBar barStyle="light-content" translucent />
       <Text style={styles.Header}>MetawaySA</Text>
       <Animated.FlatList
         ref={ref}

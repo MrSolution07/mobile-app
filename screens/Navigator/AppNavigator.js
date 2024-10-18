@@ -206,8 +206,8 @@ import ArtDetailsScreen from '../ArtDetailsScreen';
 import EditProfile from '../EditProfile';
 import ChangePassword from '../ChangePassword';
 import UserProfile from '../ProfileScreen';
-import Tabs from '../Tabs/Tabs';
 import ProfileScreen from '../ProfileScreen';
+import SubmitOffer from '../SubmitOffer';
 
 const Stack = createStackNavigator();
 
@@ -423,6 +423,17 @@ export default function AppNavigator() {
           <Stack.Screen
             name="ArtDetailsScreen"
             component={ArtDetailsScreen}
+            options={{
+              headerTitle: "",
+              headerTransparent: true,
+              headerBackground: () => (
+                <View style={{ backgroundColor: 'transparent', flex: 1 }} />
+              ),
+            }}
+          />
+          <Stack.Screen
+            name="SubmitOffer"
+            component={SubmitOffer}
             options={{
               headerTitle: "",
               headerTransparent: true,

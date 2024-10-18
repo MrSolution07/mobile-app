@@ -1,14 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useRoute,useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import tw from 'twrnc';
+
 
 const { width } = Dimensions.get('window'); // Get screen width for dynamic positioning
 
 const ArtDetailsScreen = () => {
   const route = useRoute();
   const { nft } = route.params; // Receiving NFT data from the previous screen
+
+  const navigation = useNavigation();
 
   const [activeTab, setActiveTab] = useState('Details'); // State to track the active tab
   const underlinePosition = useRef(new Animated.Value(0)).current; // Animated value for underline position
@@ -90,10 +95,8 @@ const ArtDetailsScreen = () => {
   };
 
   return (
+    <SafeAreaView style={tw`flex-1`}>
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        {/* Back button and menu icons could go here */}
-      </View>
 
       <Image 
         source={nft.image}  // Dynamically loading the NFT image from passed data
@@ -129,12 +132,13 @@ const ArtDetailsScreen = () => {
           <Text style={styles.currentBid}>
             {nft.price} ETH <FontAwesome5 name="ethereum" size={16} color="black" />
           </Text>
-          <TouchableOpacity style={styles.offerButton}>
+          <TouchableOpacity style={styles.offerButton} onPress={() => navigation.navigate('SubmitOffer',{nft})}>
             <Text style={styles.offerButtonText}>Make Offer</Text>
           </TouchableOpacity>
         </View>
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -144,13 +148,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     paddingBottom: hp('2%'),
   },
-  header: {
-    height: hp('7%'),
-    // Add styles for header (back button, menu, etc.)
-  },
   artImage: {
     width: '100%',
-    height: hp('40%'), // Adjust for responsiveness
+    height: hp('45%'), // Adjust for responsiveness
     resizeMode: 'cover',
   },
   detailsContainer: {

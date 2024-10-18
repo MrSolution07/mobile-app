@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, SafeAreaView, View, Text, Pressable, StatusBar, StyleSheet, Alert } from 'react-native';
+import { TextInput, SafeAreaView, View, Text, Pressable, StyleSheet, Alert } from 'react-native';
 import tw from 'twrnc';
 import { getAuth, sendPasswordResetEmail } from 'firebase/auth'; // Import the required method from Firebase
 
@@ -24,7 +24,6 @@ const ForgotPassword = ({navigation}) => {
 
   return (
     <SafeAreaView style={[tw`flex-1`, styles.Container]}>
-      <StatusBar barStyle="default" />
       <View style={tw`flex-1 justify-center items-center`}>
         <View style={[tw`absolute w-full h-full p-6 mt-5`]}>
           <View style={tw`w-full`}>

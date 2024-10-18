@@ -1,30 +1,28 @@
-import React, { useContext, useState } from 'react';
-import {View,Text,StyleSheet,SafeAreaView,ScrollView,Alert,Switch} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, Alert, Switch } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Pressable } from 'react-native';
 import SettingsSection from '../components/SettingsSection';
 import { useNavigation } from '@react-navigation/native';
-import { auth, db } from '../config/firebaseConfig';
+import { auth } from '../config/firebaseConfig'; 
 import { signOut } from 'firebase/auth';
 import { deleteDoc, doc } from 'firebase/firestore';
-import { useTheme } from '@react-navigation/native'; 
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
-
+import { useTheme } from '@react-navigation/native';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const SettingsScreen = () => {
-  
   const navigation = useNavigation();
   const { colors } = useTheme();
 
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isLightMode, setIsLightMode] = useState(true); 
+  const [isLightMode, setIsLightMode] = useState(true);
   const [isDefaultMode, setIsDefaultMode] = useState(false);
 
   const toggleDrawer = () => {
     navigation.toggleDrawer();
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     Alert.alert(
       'Logout Confirmation',
       'Are you sure you want to logout?',
@@ -38,8 +36,12 @@ const SettingsScreen = () => {
           style: 'destructive',
           onPress: async () => {
             try {
-              await signOut(auth);
-              navigation.navigate('Login');
+              await signOut(auth); 
+              
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+              });
             } catch (error) {
               Alert.alert('Error', 'Failed to logout. Please try again.');
             }
@@ -65,7 +67,7 @@ const SettingsScreen = () => {
               if (user) {
                 await deleteDoc(doc(db, 'users', user.uid));
                 await user.delete();
-                navigation.navigate('Login');
+                navigation.navigate('Login'); 
               }
             } catch (error) {
               Alert.alert('Error', 'Failed to delete account. Please try again.');
@@ -77,18 +79,16 @@ const SettingsScreen = () => {
   };
 
   const handleChangePassword = () => {
-    navigation.navigate('ChangePassword'); 
+    navigation.navigate('ChangePassword');
   };
 
   const handleProfile = () => {
-    navigation.navigate('UserProfile'); 
+    navigation.navigate('UserProfile');
   };
 
   const handleEditProfile = () => {
     navigation.navigate('EditProfile');
   };
-
-  // Implement theme change 
 
   const handleAppearanceChange = (mode) => {
     if (mode === 'dark') {
@@ -99,7 +99,6 @@ const SettingsScreen = () => {
       setIsDarkMode(false);
       setIsLightMode(true);
       setIsDefaultMode(false);
-    
     } else {
       setIsDarkMode(false);
       setIsLightMode(false);
@@ -137,7 +136,7 @@ const SettingsScreen = () => {
 
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>Appearance Settings</Text>
-          
+
           <View style={styles.optionContainer}>
             <Ionicons name="moon-outline" size={24} color="#333" style={styles.icon} />
             <Text style={styles.label}>Dark Mode</Text>
@@ -192,13 +191,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#f2f2f2',
   },
   menuButton: {
-    // position: 'absolute',
     marginTop: hp(4),
     left: 15,
     zIndex: 10,
   },
   scrollContainer: {
-    paddingTop: 25, 
+    paddingTop: 25,
     paddingBottom: 20,
   },
   sectionContainer: {
@@ -208,10 +206,9 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color:'#075eec',
+    color: '#075eec',
     marginBottom: 10,
   },
-  
   optionContainer: {
     flexDirection: 'row',
     alignItems: 'center',

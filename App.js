@@ -1,11 +1,10 @@
 import 'react-native-reanimated';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View,StatusBar } from 'react-native';
 import { useCustomFonts } from './assets/fonts/fonts.js'; 
 import * as SplashScreen from 'expo-splash-screen';
 import AppNavigator from './screens/Navigator/AppNavigator.js'; 
-import AsyncStorage from '@react-native-async-storage/async-storage'; 
-import Onboarding from './screens/Onboarding.js';
+
 
 
 export default function App() {
@@ -21,8 +20,8 @@ export default function App() {
     return null; 
   }
   return (
-    
     <View style={styles.container}>
+      <StatusBar barStyle="default" />
       <AppNavigator />
     </View>
     

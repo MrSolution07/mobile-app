@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, Alert, ActivityIndicator,KeyboardAvoidingView,Platform,ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import tw from 'twrnc';
 import { useNavigation } from '@react-navigation/native';
 import { doc, getDoc, updateDoc } from 'firebase/firestore'; // Firestore imports
 import { db, auth } from '../config/firebaseConfig'; // Firebase config
+
 
 const BuyETHPage = () => {
   const [ethAmount, setEthAmount] = useState('');
@@ -14,10 +16,12 @@ const BuyETHPage = () => {
   const [gasFee, setGasFee] = useState(null);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [isConfirming, setIsConfirming] = useState(false);
+
   const navigation = useNavigation();
 
-  const ETHERSCAN_API_KEY = '2AKWGIEU2PKUVFSBCN8P11RDZ92ZGRAT36'; // Your Etherscan API key
-  const GAS_LIMIT = 21000; // Standard gas limit for ETH transfer
+  const ETHERSCAN_API_KEY = '2AKWGIEU2PKUVFSBCN8P11RDZ92ZGRAT36'; // Etherscan API key
+  const GAS_LIMIT = 21000; // Gas limit for ETH transfer
 
   // Fetch user data from Firestore
   const fetchUserData = async () => {
@@ -126,6 +130,7 @@ const BuyETHPage = () => {
   };
 
   const handleConfirmPurchase = async () => {
+    setIsConfirming(true);
     if (!ethStats || !ethAmount) {
       setMessage('Please enter the amount of ETH to buy.');
       return;
@@ -170,6 +175,9 @@ const BuyETHPage = () => {
       console.error('Error updating user data:', error);
       setMessage('Failed to complete the purchase.');
     }
+    finally{
+      setIsConfirming(false);
+    }
 
     setEthAmount('');
     setZarAmount('');
@@ -185,8 +193,13 @@ const BuyETHPage = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Buy ETH</Text>
+    <SafeAreaView style={tw`flex-1`}>
+      <View style={styles.container}>
+        <ScrollView  contentContainerStyle={tw`flex-grow`}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+        keyboardShouldPersistTaps="handled">
+          <Text style={styles.title}>Buy ETH</Text>
 
       {/* ETH Stats Section */}
       <View style={styles.ethStats}>
@@ -215,7 +228,7 @@ const BuyETHPage = () => {
         )}
       </View>
 
-      {/* Input for ETH Amount */}
+
       <TextInput
         style={styles.input}
         placeholder="Amount of ETH to Buy"
@@ -224,7 +237,6 @@ const BuyETHPage = () => {
         onChangeText={handleETHAmountChange}  // Automatic conversion as user types
       />
 
-      {/* Show Converted ZAR Amount */}
       {zarAmount ? (
         <View style={styles.summary}>
           <Text style={styles.subtitle}>Transaction Summary</Text>
@@ -234,14 +246,20 @@ const BuyETHPage = () => {
         </View>
       ) : null}
 
-      {/* Purchase Button */}
       <Pressable style={styles.button} onPress={handleConfirmPurchase}>
-        <Text style={styles.buttonText}>Confirm Purchase</Text>
+        {isConfirming ? (
+          <Text style={styles.buttonText}>Confirming...</Text>
+        ): (
+          <Text style={styles.buttonText}>Confirm Purchase</Text>
+        )}
+        
       </Pressable>
-
-      {/* Error or Success Messages */}
+ 
       {message ? <Text style={styles.errorMessage}>{message}</Text> : null}
+      </ScrollView>
     </View>
+    </SafeAreaView>
+    
   );
 };
 

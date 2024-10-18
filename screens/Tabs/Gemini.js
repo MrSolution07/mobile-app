@@ -34,7 +34,6 @@ const Gemini = () => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <View style={styles.mainContainer}>
-            {/* Display Greeting or Results */}
             {!showResult ? (
               <>
                 <View style={styles.greet}>
@@ -42,7 +41,6 @@ const Gemini = () => {
                   <Text style={styles.subText}>How can I help you today?</Text>
                 </View>
 
-                {/* Horizontal ScrollView for Suggested Prompts */}
                 <ScrollView horizontal={true} style={styles.cardsContainer}>
                   {suggestedPrompts.map((prompt, index) => (
                     <TouchableOpacity key={index} style={styles.card} onPress={() => handleSuggestedPrompt(prompt)}>
@@ -69,7 +67,6 @@ const Gemini = () => {
               </View>
             )}
 
-            {/* Bottom Input Area */}
             <View style={styles.bottomContainer}>
               <View style={styles.searchBox}>
                 <TextInput
@@ -144,7 +141,6 @@ const styles = StyleSheet.create({
   },
   resultContainer: {
     flex: 1,
-    // backgroundColor:'rgba(0,0,0,0.1)',
   },
   resultTitle: {
     marginBottom: 16,

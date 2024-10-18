@@ -1,5 +1,5 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { SafeAreaView, View, Image, Text, TouchableOpacity, TextInput, Pressable, StatusBar, StyleSheet, ScrollView,Alert} from 'react-native';
+import React, { useContext, useState } from 'react';
+import { SafeAreaView, View, Image, Text, TouchableOpacity, TextInput, Pressable, StyleSheet, ScrollView,Alert} from 'react-native';
 import CheckBox from 'expo-checkbox';
 import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
@@ -76,7 +76,6 @@ export default function RegistrationScreen({ navigation }) {
 
   return (
     <SafeAreaView style={tw`flex-1 bg-transparent`}>
-      <StatusBar barStyle="default" translucent />
       <View style={tw`flex-1`}>
         <Image
           source={{ uri: 'https://i.pinimg.com/originals/6b/f8/48/6bf848ae5afdb77782a1ff14067b194a.jpg' }}

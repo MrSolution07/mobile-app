@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, StyleSheet, Pressable, Image, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Pressable, Image, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import DataContext from './Context/Context';
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const cardIcons = {
   visa: require('../assets/images/visa.png'), 
@@ -18,7 +19,6 @@ const Withdraw = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const navigation = useNavigation();
 
-  // Function to determine card type based on card number prefix
   const determineCardType = (number) => {
     if (number.startsWith('4')) {
       return 'visa';
@@ -28,33 +28,23 @@ const Withdraw = () => {
     return null;
   };
 
-  // function for card number input change
   const handleCardNumberChange = (number) => {
     const cleaned = number.replace(/\D+/g, '');
-
     const limited = cleaned.slice(0, 16);
-
-    // Insert space after every 4 digits
     const formatted = limited.replace(/(.{4})/g, '$1 ').trim();
-
     setCardNumber(formatted);
-
     const type = determineCardType(limited);
     setCardType(type);
   };
 
   const handleWithdraw = () => {
     setErrorMessage('');
-
-    // Validation Checks
     if (!withdrawAmount || !accountNumber || !cardNumber || !cvv || !expiryDate) {
       setErrorMessage('Please fill in all fields.');
       return;
     }
 
-    // Remove spaces from card number for validation
     const rawCardNumber = cardNumber.replace(/\s+/g, '');
-
     if (!/^\d{16}$/.test(rawCardNumber)) {
       setErrorMessage('Card number must be exactly 16 digits.');
       return;
@@ -73,22 +63,20 @@ const Withdraw = () => {
     const [inputMonth, inputYear] = expiryDate.split('/').map(Number);
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth() + 1;
-    const currentYear = currentDate.getFullYear() % 100; 
+    const currentYear = currentDate.getFullYear() % 100;
 
     if (inputYear < currentYear || (inputYear === currentYear && inputMonth < currentMonth)) {
       setErrorMessage('Expiry date cannot be in the past.');
       return;
     }
 
-    // Checks for sufficient funds
-    const totalWithdrawal = parseFloat(withdrawAmount) + 0.02; 
+    const totalWithdrawal = parseFloat(withdrawAmount) + 0.02;
     if (totalWithdrawal > amount) {
       setErrorMessage('Insufficient funds for withdrawal.');
       return;
     }
 
     setAmount((prevAmount) => (prevAmount - totalWithdrawal).toFixed(2));
-
     setWithdrawAmount('');
     setAccountNumber('');
     setCardNumber('');
@@ -96,79 +84,87 @@ const Withdraw = () => {
     setExpiryDate('');
     setCardType(null);
 
-    // Shows success alert and navigates back
     Alert.alert('Success', `Withdrawal of ${withdrawAmount} ZAR was successful!`, [
       { text: 'OK', onPress: () => navigation.goBack() },
     ]);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Withdraw Funds</Text>
-      
-      <TextInput
-        style={styles.input}
-        placeholder="Amount to Withdraw (ZAR)"
-        keyboardType="numeric"
-        value={withdrawAmount}
-        onChangeText={setWithdrawAmount}
-      />
+    <SafeAreaView style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // Adjust this value as necessary
+      >
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <View style={styles.container}>
+            <Text style={styles.title}>Withdraw Funds</Text>
+            
+            <TextInput
+              style={styles.input}
+              placeholder="Amount to Withdraw (ZAR)"
+              keyboardType="numeric"
+              value={withdrawAmount}
+              onChangeText={setWithdrawAmount}
+            />
 
-      <Text style={styles.bankDetailsTitle}>Bank Details</Text>
+            <Text style={styles.bankDetailsTitle}>Bank Details</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Account Number"
-        keyboardType="numeric"
-        value={accountNumber}
-        onChangeText={setAccountNumber}
-      />
+            <TextInput
+              style={styles.input}
+              placeholder="Account Number"
+              keyboardType="numeric"
+              value={accountNumber}
+              onChangeText={setAccountNumber}
+            />
 
-      <View style={styles.cardInputContainer}>
-        <TextInput
-          style={styles.inputWithIcon}
-          placeholder="Card Number"
-          keyboardType="numeric"
-          value={cardNumber}
-          onChangeText={handleCardNumberChange}
-          maxLength={19}
+            <View style={styles.cardInputContainer}>
+              <TextInput
+                style={styles.inputWithIcon}
+                placeholder="Card Number"
+                keyboardType="numeric"
+                value={cardNumber}
+                onChangeText={handleCardNumberChange}
+                maxLength={19}
+              />
+              {cardType && (
+                <Image
+                  source={cardIcons[cardType]}
+                  style={styles.cardIcon}
+                  resizeMode="contain"
+                />
+              )}
+            </View>
 
-        />
-        {cardType && (
-          <Image
-            source={cardIcons[cardType]}
-            style={styles.cardIcon}
-            resizeMode="contain"
-          />
-        )}
-      </View>
+            <TextInput
+              style={styles.input}
+              placeholder="CVV"
+              keyboardType="numeric"
+              value={cvv}
+              onChangeText={setCvv}
+              maxLength={3}
+            />
 
-      <TextInput
-        style={styles.input}
-        placeholder="CVV"
-        keyboardType="numeric"
-        value={cvv}
-        onChangeText={setCvv}
-        maxLength={3}
-      />
+            <TextInput
+              style={styles.input}
+              placeholder="Expiry Date (MM/YY)"
+              keyboardType="phone-pad"
+              value={expiryDate}
+              onChangeText={setExpiryDate}
+              maxLength={5}
+            />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Expiry Date (MM/YY)"
-        keyboardType="phone-pad"
-        value={expiryDate}
-        onChangeText={setExpiryDate}
-        maxLength={5}
-      />
+            {errorMessage ? (
+              <Text style={styles.errorMessage}>{errorMessage}</Text>
+            ) : null}
 
-      {errorMessage ? (
-        <Text style={styles.errorMessage}>{errorMessage}</Text>
-      ) : null}
-
-      <Pressable onPress={handleWithdraw} style={styles.button}>
-        <Text style={styles.buttonText}>Confirm Withdrawal</Text>
-      </Pressable>
-    </View>
+            <Pressable onPress={handleWithdraw} style={styles.button}>
+              <Text style={styles.buttonText}>Confirm Withdrawal</Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 

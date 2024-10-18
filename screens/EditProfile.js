@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, Image, SafeAreaView, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { BlurView } from 'expo-blur';
 import * as ImagePicker from 'expo-image-picker';
@@ -277,17 +277,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   saveButton: {
-    backgroundColor: '#47ABCE',
+    backgroundColor: '#2563eb',
     paddingVertical: hp(2.5), 
-    borderRadius: 15,
+    borderRadius: 8,
     alignItems: 'center',
     width: '100%',
-    top: hp(10),
+    top: hp('5%'),
   },
   saveButtonText: {
-    color: 'white',
+    color: '#fff',
     fontSize: hp(2.5), 
-    fontWeight: '600',
+    // fontWeight: '600',
+    fontFamily:'Roboto_700Bold',
   },
 });
 

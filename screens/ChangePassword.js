@@ -66,13 +66,11 @@ const ChangePassword = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#fff',
   },
   container: {
-    // flex: 1,
     padding: 20,
     marginTop: hp('10%'),
-    // justifyContent: 'center',
   },
   title: {
     fontSize: 24,
@@ -94,7 +92,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4, 
   },
   button: {
-    backgroundColor: '#47ABCE',
+    backgroundColor: '#2563eb',
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',

@@ -6,7 +6,6 @@ import CustomTabIcon from './CustomTabIcon';
 import Home from './HomeScreen';
 import Wallet from './Wallet';
 import Gemini from './Gemini';
-// import UserUpload from './UserUpload';
 import Explore from './Explore';
 
 const Tab = createBottomTabNavigator();
@@ -39,7 +38,7 @@ export default function Tabs() {
             options={{title:""}}
           />
           <Tab.Screen
-            name="name_B"
+            name="Explore"
             component={Explore}
             options={{title:""}}
           />
@@ -48,13 +47,9 @@ export default function Tabs() {
             component={Wallet}
             options={{title: ""}}
           />
-          {/* <Tab.Screen
-            name="name_D"
-            component={UserUpload}
-            options={{title:""}}
-          /> */}
+         
            <Tab.Screen
-            name="name_E"
+            name="Gemini"
             component={Gemini}
             options={{title:""}}
           />
@@ -65,15 +60,13 @@ export default function Tabs() {
 
 const getIconName = (routeName) => {
   switch (routeName) {
-    case 'name_A':
+    case 'Home':
       return 'home'; 
-    case 'name_B':
+    case 'Explore':
       return 'compass';
       case 'Wallet':
       return 'wallet'; 
-    // case 'name_D':
-    //   return 'upload';
-      case 'name_E':
+      case 'Gemini':
         return 'chat';
     default:
       return 'home';

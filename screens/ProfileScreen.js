@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, SafeAreaView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image, SafeAreaView, Pressable,ActivityIndicator,ScrollView } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebaseConfig'; 
 import { useFocusEffect } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { useRoute } from '@react-navigation/native';
+import tw from 'twrnc';
+
 
 const UserProfile = ({ navigation }) => {
+  const route = useRoute();
+  const showButton = route.params?.showButton || false;  
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -65,6 +70,11 @@ const UserProfile = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+     <ScrollView contentContainerStyle={tw`flex-grow`}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+        keyboardShouldPersistTaps="handled">
+
       <View style={styles.container}>
         <Image
           source={{ uri: 'https://i.pinimg.com/originals/6b/f8/48/6bf848ae5afdb77782a1ff14067b194a.jpg' }}
@@ -103,9 +113,18 @@ const UserProfile = ({ navigation }) => {
                 <InfoItem icon="📍" value={location} />
               </View>
             </View>
+            {showButton && (
+              <View style={tw`items-center justify-center`}>
+            <Pressable onPress={() => navigation.navigate('EditProfile')} style={styles.editButton}>
+              <Text style={styles.buttonText}>Edit Profile</Text>
+            </Pressable>
+            </View>
+
+          )}
           </View>
         </View>
       </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -161,6 +180,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingBottom: 20,
     width: '100%',
+  },
+  editButton:{
+  borderRadius: 8,
+  backgroundColor:'#2563eb',
+  height: hp('7%'),
+  width:wp('80%'),
+  justifyContent:'center',
+  alignItems:'center',
+  },
+  buttonText:{
+    fontSize: 16,
+    fontFamily: 'Roboto_700Bold',
+    textAlign:'center',
+    color: '#fff',
+    letterSpacing: 1,
   },
   avatarCard: {
     backgroundColor: 'white',

@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Account from '../../components/Account';
 import Items from '../../components/Items';
 import Activity from '../../components/Activity';
+import Bids from '../../components/Bids'; 
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
 import tw from 'twrnc';
 
@@ -16,7 +17,7 @@ const Wallet = () => {
     setActiveTab(tab);
 
     Animated.timing(animationValue, {
-      toValue: tab === 'Account' ? 0 : tab === 'Items' ? -screenWidth : -2 * screenWidth,
+      toValue: tab === 'Account' ? 0 : tab === 'Items' ? -screenWidth : tab === 'Bids' ? -2 * screenWidth : -3 * screenWidth,
       duration: 200,
       useNativeDriver: true,
     }).start();
@@ -26,20 +27,15 @@ const Wallet = () => {
     <View style={[tw`flex-1`, styles.walletContainer]}>
       <LinearGradient
         colors={['rgba(255, 255, 255, 0.5)', 'rgba(7, 94, 236, 0.5)', 'rgba(128, 0, 128, 0.5)']}
-        // start={[0.2, 0.2]}
-        // end={[0.8, 0.8]}
         style={styles.gradientBackground}
       />
-      <View style={tw`items-center top-40 justify-center`}> 
+      <View style={tw`items-center top-30 justify-center`}>
         <View style={styles.tabsContainer}>
-          {['Account', 'Items', 'Activity'].map((tab) => (
+          {['Account', 'Items', 'Bids', 'Activity'].map((tab) => ( 
             <Pressable
               key={tab}
               onPress={() => handleTabSwitch(tab)}
-              style={[
-                styles.tabButton,
-                { backgroundColor: activeTab === tab ? 'black' : 'slategrey' },
-              ]}
+              style={[styles.tabButton, { backgroundColor: activeTab === tab ? 'black' : 'slategrey' }]}
             >
               <Text style={styles.tabText}>{tab}</Text>
             </Pressable>
@@ -51,7 +47,7 @@ const Wallet = () => {
         <Animated.View
           style={{
             flexDirection: 'row',
-            width: screenWidth * 3,
+            width: screenWidth * 4, 
             transform: [{ translateX: animationValue }],
           }}
         >
@@ -60,6 +56,9 @@ const Wallet = () => {
           </View>
           <View style={{ width: screenWidth }}>
             <Items />
+          </View>
+          <View style={{ width: screenWidth }}>
+            <Bids /> 
           </View>
           <View style={{ width: screenWidth }}>
             <Activity />
@@ -93,18 +92,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'slategray', 
     borderRadius: 22,
-    
   },
   tabButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 12, 
     borderRadius: 22,
     justifyContent: 'center',
-    padding: 1,
     alignItems: 'center',
-    width: wp('24%'),
-    height: hp('7%'),
-    margin:0,
+    width: wp('22%'), 
+    height: hp('8%'), 
   },
   tabText: {
     color: 'white',
