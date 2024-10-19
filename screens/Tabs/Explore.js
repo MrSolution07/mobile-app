@@ -1,64 +1,106 @@
+
+
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, View, Image, FlatList, StyleSheet, Text, TextInput, Pressable, TouchableOpacity, Platform } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+
+import {
+  SafeAreaView,
+  View,
+  Image,
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  Pressable,
+  TouchableOpacity,
+  ActivityIndicator,
+  Platform,
+} from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Svg, { Polygon } from 'react-native-svg';
-import { Collection1, Collection2, Collection3, Collection4, Collection5, Collection6, Collection7, Collection8, Collection9, Collection10 } from '../NFT/dummy';
+import { db } from '../../config/firebaseConfig';
+import { collection, getDocs } from 'firebase/firestore';
+import debounce from 'lodash.debounce'; // Install lodash.debounce if not already installed
 
 const Hexagon = ({ price }) => (
   <View style={styles.hexagonContainer}>
     <Svg height={hp('15%')} width={150} viewBox="0 0 100 100" style={styles.svg}>
-      <Polygon
-        points="50,5 100,25 100,75 50,95 0,75 0,25"
-        fill="white"
-      />
+      <Polygon points="50,5 100,25 100,75 50,95 0,75 0,25" fill="white" />
     </Svg>
     <Text style={styles.priceText}>{price} ETH</Text>
   </View>
 );
 
-const Explore = ({ navigation, route }) => {
+const Explore = ({ navigation }) => {
+  const [nfts, setNfts] = useState([]);
   const [activeTab, setActiveTab] = useState('NFTs');
   const [searchQuery, setSearchQuery] = useState('');
-  const collections = [Collection1, Collection2, Collection3, Collection4, Collection5, Collection6, Collection7, Collection8, Collection9, Collection10];
-  const allNFTs = collections.flatMap(collection => collection.nfts);
-  const [filteredData, setFilteredData] = useState(allNFTs);
+  const [loading, setLoading] = useState(true);
+  const [filteredData, setFilteredData] = useState([]);
+
+
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchCards = async () => {
+        const querySnapshot = await getDocs(collection(db, 'nfts'));
+        const fetchedNfts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setNfts(fetchedNfts);
+      };
+      fetchCards();
+    }, [])
+  );
 
   useEffect(() => {
-    if (activeTab === 'NFTs') {
-      const filteredNFTs = allNFTs.filter(nft => nft.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    const fetchNfts = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'nfts'));
+        const fetchedNfts = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          imageUrl: { uri: doc.data().imageUrl }, // Ensure imageUrl is in the right format
+        }));
+        setNfts(fetchedNfts);
+        setFilteredData(fetchedNfts); // Set initial filteredData to fetched NFTs
+      } catch (error) {
+        console.error("Error fetching NFTs: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchNfts();
+  }, []);
+
+  useEffect(() => {
+    const updateFilteredData = () => {
+      const filteredNFTs = nfts.filter(nft => nft.title.toLowerCase().includes(searchQuery.toLowerCase()));
       setFilteredData(filteredNFTs);
-    } else if (activeTab === 'Collections') {
-      const filteredCollections = collections.filter(collection => collection.name.toLowerCase().includes(searchQuery.toLowerCase()));
-      setFilteredData(filteredCollections);
-    }
-  }, [searchQuery, activeTab]);
+    };
 
-  useEffect(() => {
-    const initialTab = route.params?.initialTab || 'NFTs';
-    setActiveTab(initialTab);
-  }, [route.params?.initialTab]);
+    updateFilteredData();
+  }, [searchQuery, nfts]); // Removed activeTab since we're only filtering NFTs
+
+  const debouncedSearch = debounce((text) => setSearchQuery(text), 300);
 
   const renderItem = ({ item }) => (
     <Pressable
       style={styles.itemContainer}
-      onPress={() => activeTab === 'NFTs'
-        ? navigation.navigate('ArtDetailsScreen', { nft: item })
-        : navigation.navigate('CollectionDetailScreen', { collection: item })
-      }
+      onPress={() => navigation.navigate('ArtDetailsScreen', { nft: item })}
+      accessibilityLabel={`Navigate to ${item.title}`}
+      accessibilityHint={`View details of ${item.title}`}
     >
-      {activeTab === 'NFTs' && <Hexagon price={item.price} />}
-      <Image source={item.image} style={activeTab === 'NFTs' ? styles.nftImage : styles.collectionImage} />
-      {activeTab === 'NFTs' ? (
-        <View style={styles.nftNameContainer}>
-          <Text style={styles.nftName}>{item.name}</Text>
-        </View>
-      ) : (
-        <View style={styles.CollectionNameContainer}>
-          <Text style={styles.collectionName}>{item.name}</Text>
-        </View>
-      )}
+      <Hexagon price={item.price} />
+      <Image source={item.imageUrl} style={styles.nftImage} />
+      <View style={styles.nftNameContainer}>
+        <Text style={styles.nftName}>{item.title}</Text>
+      </View>
     </Pressable>
   );
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -66,12 +108,15 @@ const Explore = ({ navigation, route }) => {
         <TextInput
           style={styles.searchBar}
           placeholder="Search"
-          value={searchQuery}
-          onChangeText={(text) => setSearchQuery(text)}
+          onChangeText={debouncedSearch}
         />
         <View style={styles.tabs}>
           {['NFTs', 'Collections', 'Recent'].map((tab) => (
-            <TouchableOpacity key={tab} onPress={() => setActiveTab(tab)} style={[styles.tabButton, activeTab === tab && styles.activeTab]}>
+            <TouchableOpacity
+              key={tab}
+              onPress={() => setActiveTab(tab)}
+              style={[styles.tabButton, activeTab === tab && styles.activeTab]}
+            >
               <Text style={[styles.tabText, activeTab === tab ? styles.activeTabText : styles.inactiveTabText]}>{tab}</Text>
             </TouchableOpacity>
           ))}
@@ -80,7 +125,7 @@ const Explore = ({ navigation, route }) => {
         <FlatList
           data={filteredData}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id || item.name}
+          keyExtractor={(item) => item.id} // Ensure unique keys using item.id
           numColumns={2}
           columnWrapperStyle={styles.columnWrapper}
         />
@@ -88,6 +133,8 @@ const Explore = ({ navigation, route }) => {
     </SafeAreaView>
   );
 };
+
+// styles remain unchanged
 
 const styles = StyleSheet.create({
   container: {
@@ -121,12 +168,6 @@ const styles = StyleSheet.create({
     borderRadius: wp('2%'),
     overflow: 'hidden',
   },
-  collectionImage: {
-    width: wp('40%'),
-    height: hp('25%'),
-    borderRadius: wp('2%'),
-    overflow: 'hidden',
-  },
   nftNameContainer: {
     position: 'absolute',
     top: hp('15%'),
@@ -140,15 +181,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
     fontFamily: 'VarelaRound_400Regular', 
-  },
-  CollectionNameContainer: {
-    marginTop: hp('2%'),
-  },
-  collectionName: {
-    textAlign: 'center',
-    color: '#333333',
-    fontWeight: '600',
-    fontFamily: 'VarelaRound_400Regular',
   },
   hexagonContainer: {
     alignItems: 'center',
@@ -202,3 +234,4 @@ const styles = StyleSheet.create({
 });
 
 export default Explore;
+
