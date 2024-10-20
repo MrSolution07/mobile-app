@@ -10,7 +10,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Collection1, Collection2, Collection3, Collection4 } from '../NFT/dummy';
 import tw from 'twrnc';
-import {EXPO_PUBLIC_OPENSEA_API_KE} from '@env';
+import {EXPO_PUBLIC_OPENSEA_API_KEY} from '@env';
+
+
 
 const collections = [Collection1, Collection2, Collection3, Collection4];
 
@@ -21,22 +23,32 @@ const HomeScreen = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [loginPromptShown, setLoginPromptShown] = useState(false);
   const [collectionData, setCollectionData] = useState([]);
+  
 
-
+  
+ 
   useEffect(() => {
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        'x-api-key': EXPO_PUBLIC_OPENSEA_API_KE,
-      },
+    const fetchCollections = async () => {
+      
+      try {
+        const Key = EXPO_PUBLIC_OPENSEA_API_KEY;
+        console.log(Key)
+        const options = {
+          method: 'GET',
+          headers: {
+            accept: 
+            'application/json',
+            'x-api-key': Key ,
+          },
+        };
+        const response = await axios.get('https://api.opensea.io/api/v2/collections?chain=ethereum', options);
+        console.log(response.data); // Log the data for debugging
+      } catch (error) {
+        console.error('Error fetching collections:', error.response?.data || error.message);
+      }
     };
-
-    axios
-      .get('https://api.opensea.io/api/v2/collections', options)
-      .then(response => {
-      })
-      .catch(err => console.error(err));
+  
+    fetchCollections();
   }, []);
 
 
