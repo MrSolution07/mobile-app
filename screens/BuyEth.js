@@ -5,6 +5,7 @@ import tw from 'twrnc';
 import { useNavigation } from '@react-navigation/native';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../config/firebaseConfig';
+import {EXPO_PUBLIC_ETHERSCAN_API_KEY} from '@env';
 
 const BuyETHPage = () => {
   const [ethAmount, setEthAmount] = useState('');
@@ -20,7 +21,7 @@ const BuyETHPage = () => {
 
   const navigation = useNavigation();
 
-  const ETHERSCAN_API_KEY = '2AKWGIEU2PKUVFSBCN8P11RDZ92ZGRAT36';
+  const ETHERSCAN_API_KEY = EXPO_PUBLIC_ETHERSCAN_API_KEY;
   const GAS_LIMIT = 21000;
 
   const fetchUserData = async () => {

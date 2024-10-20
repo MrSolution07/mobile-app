@@ -1,1 +1,4 @@
 //https://com.mrsolution.mobileapp/expo-development-client
+
+#cmd to build for a simulator 
+eas build --profile development-simulator --platform ios

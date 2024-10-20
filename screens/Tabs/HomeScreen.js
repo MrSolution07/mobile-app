@@ -10,6 +10,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Collection1, Collection2, Collection3, Collection4 } from '../NFT/dummy';
 import tw from 'twrnc';
+import {EXPO_PUBLIC_OPENSEA_API_KE} from '@env';
 
 const collections = [Collection1, Collection2, Collection3, Collection4];
 
@@ -27,7 +28,7 @@ const HomeScreen = () => {
       method: 'GET',
       headers: {
         accept: 'application/json',
-        'x-api-key': '73b5488d384f4be88dab537a9276bd0f',
+        'x-api-key': EXPO_PUBLIC_OPENSEA_API_KE,
       },
     };
 
