@@ -14,22 +14,16 @@ prepare_react_native_project!
 
 target 'mobileapp' do
   use_expo_modules!
-
-  # Use native modules
   config = use_native_modules!
-
-  # Global modular headers
   use_modular_headers!
+  
+  # Firebase/Auth version explicitly set to match RNFBAuth requirements
+  pod 'Firebase/Auth', '10.7.0'
 
-  use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
-  use_frameworks! :linkage => ENV['USE_FRAMEWORKS'].to_sym if ENV['USE_FRAMEWORKS']
-
-  # Set up React Native
   use_react_native!(
-    :path => config[:reactNativePath], # Use the defined config variable
+    :path => config[:reactNativePath],
     :hermes_enabled => podfile_properties['expo.jsEngine'] == nil || podfile_properties['expo.jsEngine'] == 'hermes',
-    :app_path => "#{Pod::Config.instance.installation_root}/..",
-    :privacy_file_aggregation_enabled => podfile_properties['apple.privacyManifestAggregationEnabled'] != 'false',
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
   post_install do |installer|
@@ -39,14 +33,8 @@ target 'mobileapp' do
       end
     end
 
-    react_native_post_install(
-      installer,
-      config[:reactNativePath],
-      :mac_catalyst_enabled => false,
-      :ccache_enabled => podfile_properties['apple.ccacheEnabled'] == 'true',
-    )
+    react_native_post_install(installer, config[:reactNativePath])
 
-    # Disable code signing for resource bundles in Xcode 14
     installer.target_installation_results.pod_target_installation_results.each do |pod_name, target_installation_result|
       target_installation_result.resource_bundle_targets.each do |resource_bundle_target|
         resource_bundle_target.build_configurations.each do |config|

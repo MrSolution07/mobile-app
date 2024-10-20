@@ -38,9 +38,3 @@ yarn-error.*
 yarn.lock
 
 testing.json
-
-#ios
-ios/
-
-#android
-android/

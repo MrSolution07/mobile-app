@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';  
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { db, auth } from '../config/firebaseConfig'; 
 import { doc, getDoc } from 'firebase/firestore';
@@ -21,7 +21,7 @@ const Account = () => {
     try {
       const userDocRef = doc(db, 'users', currentUser.uid);
       const userDocSnapshot = await getDoc(userDocRef);
-
+      
       if (userDocSnapshot.exists()) {
         const userData = userDocSnapshot.data();
         setZarAmount(userData.balanceInZar || 0); 
@@ -34,11 +34,13 @@ const Account = () => {
     }
   };
 
-  useEffect(() => {
-    fetchAmounts();
-  }, []);
+  // Use useFocusEffect to fetch data when the screen is focused (i.e., when the user navigates back to it)
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchAmounts();
+    }, [])
+  );
 
-  // Calculate current ZAR balance with withdrawal taken into account
   const currentZarBalance = parseFloat(zarAmount || 0) - (withdrawAmount ? parseFloat(withdrawAmount) + 0.02 : 0);
 
   return (

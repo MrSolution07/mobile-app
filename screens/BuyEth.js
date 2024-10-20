@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, Alert, ActivityIndicator,KeyboardAvoidingView,Platform,ScrollView } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, Alert, ActivityIndicator, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import tw from 'twrnc';
 import { useNavigation } from '@react-navigation/native';
-import { doc, getDoc, updateDoc } from 'firebase/firestore'; // Firestore imports
-import { db, auth } from '../config/firebaseConfig'; // Firebase config
-
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db, auth } from '../config/firebaseConfig';
 
 const BuyETHPage = () => {
   const [ethAmount, setEthAmount] = useState('');
@@ -15,23 +14,20 @@ const BuyETHPage = () => {
   const [ethStats, setEthStats] = useState(null);
   const [gasFee, setGasFee] = useState(null);
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loadingUserData, setLoadingUserData] = useState(true);
+  const [loadingEthStats, setLoadingEthStats] = useState(true);
   const [isConfirming, setIsConfirming] = useState(false);
 
   const navigation = useNavigation();
 
-  const ETHERSCAN_API_KEY = '2AKWGIEU2PKUVFSBCN8P11RDZ92ZGRAT36'; // Etherscan API key
-  const GAS_LIMIT = 21000; // Gas limit for ETH transfer
+  const ETHERSCAN_API_KEY = '2AKWGIEU2PKUVFSBCN8P11RDZ92ZGRAT36';
+  const GAS_LIMIT = 21000;
 
-  // Fetch user data from Firestore
   const fetchUserData = async () => {
     try {
       const currentUser = auth.currentUser;
-
       if (currentUser) {
         const userId = currentUser.uid;
-        console.log('Fetching data for user:', userId);
-
         const userDocRef = doc(db, 'users', userId);
         const userDocSnap = await getDoc(userDocRef);
 
@@ -39,7 +35,6 @@ const BuyETHPage = () => {
           const userData = userDocSnap.data();
           setUserBalance(userData.balanceInZar);
           setUserEthAmount(userData.ethAmount);
-          console.log('User data loaded:', userData);
         } else {
           throw new Error('User not found');
         }
@@ -50,79 +45,79 @@ const BuyETHPage = () => {
       console.error('Error fetching user data:', error);
       setMessage('Failed to load user data.');
     } finally {
-      setLoading(false);
+      setLoadingUserData(false);
     }
   };
 
-  // Fetch ETH stats from CoinGecko API
-  useEffect(() => {
-    const fetchETHStats = async () => {
-      try {
-        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=zar&include_24hr_high=true&include_24hr_low=true&include_24hr_vol=true');
+  const fetchETHStats = async () => {
+    try {
+      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=zar&include_24hr_high=true&include_24hr_low=true&include_24hr_vol=true');
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        console.log('CoinGecko API Response Data:', data);
-
-        // Update ETH stats using the CoinGecko response
-        setEthStats({
-          price: data.ethereum.zar,
-          high: data.ethereum.zar_24h_high,
-          low: data.ethereum.zar_24h_low,
-          volume: data.ethereum.zar_24h_vol,
-        });
-      } catch (error) {
-        console.error('Error fetching ETH stats:', error.message);
-        setMessage(`Unable to fetch ETH stats. Error: ${error.message}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
-    };
 
+      const data = await response.json();
+      setEthStats({
+        price: data.ethereum.zar,
+        high: data.ethereum.zar_24h_high,
+        low: data.ethereum.zar_24h_low,
+        volume: data.ethereum.zar_24h_vol,
+      });
+    } catch (error) {
+      console.error('Error fetching ETH stats:', error);
+      setMessage(`Unable to fetch ETH stats. Error: ${error.message}`);
+    } finally {
+      setLoadingEthStats(false);
+    }
+  };
+
+  useEffect(() => {
     fetchETHStats();
-    fetchUserData(); // Fetch the user data when the component loads
+    fetchUserData();
   }, []);
 
-  // Fetch Gas Fees from Etherscan API once ETH price is available
+  const fetchGasFee = async () => {
+    if (!ethStats || !ethStats.price) return;
+
+    try {
+      const response = await fetch(`https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${ETHERSCAN_API_KEY}`);
+      const data = await response.json();
+
+      if (data.status === '1') {
+        const gasPriceInGwei = parseFloat(data.result.ProposeGasPrice);
+        const gasPriceInEth = gasPriceInGwei * 1e-9;
+        const gasFeeInEth = gasPriceInEth * GAS_LIMIT;
+        const gasFeeInZar = gasFeeInEth * ethStats.price;
+
+        setGasFee(gasFeeInZar.toFixed(2));
+      } else {
+        throw new Error('Failed to fetch gas fees');
+      }
+    } catch (error) {
+      console.error('Error fetching gas fee:', error.message);
+      setMessage(`Unable to fetch gas fees. Error: ${error.message}`);
+    }
+  };
+
   useEffect(() => {
-    const fetchGasFee = async () => {
-      if (!ethStats || !ethStats.price) {
-        return; // Wait until ethStats is available
-      }
-
-      try {
-        const response = await fetch(`https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${ETHERSCAN_API_KEY}`);
-        const data = await response.json();
-
-        if (data.status === '1') {
-          const gasPriceInGwei = parseFloat(data.result.ProposeGasPrice); // ProposeGasPrice in Gwei
-          const gasPriceInEth = gasPriceInGwei * 1e-9; // Convert Gwei to ETH
-          const gasFeeInEth = gasPriceInEth * GAS_LIMIT; // Total Gas Fee in ETH
-          const gasFeeInZar = gasFeeInEth * ethStats.price; // Convert ETH to ZAR
-
-          setGasFee(gasFeeInZar.toFixed(2)); // Store the gas fee in ZAR
-        } else {
-          throw new Error('Failed to fetch gas fees');
-        }
-      } catch (error) {
-        console.error('Error fetching gas fee:', error.message);
-        setMessage(`Unable to fetch gas fees. Error: ${error.message}`);
-      } finally {
-        setLoading(false); // Stop loading once gas fee fetch attempt is done
-      }
-    };
-
-    fetchGasFee();
+    if (ethStats) {
+      fetchGasFee();
+    }
   }, [ethStats]);
 
-  // Function to handle ETH to ZAR conversion as user types
   const handleETHAmountChange = (ethInput) => {
+    const parsedInput = parseFloat(ethInput);
+    if (isNaN(parsedInput)) {
+      setEthAmount('');
+      setZarAmount('');
+      return;
+    }
+
     setEthAmount(ethInput);
 
-    if (ethStats && ethStats.price && ethInput) {
-      const totalZar = (parseFloat(ethInput) * ethStats.price).toFixed(2);
+    if (ethStats && ethStats.price) {
+      const totalZar = (parsedInput * ethStats.price).toFixed(2);
       setZarAmount(totalZar);
     } else {
       setZarAmount('');
@@ -131,31 +126,29 @@ const BuyETHPage = () => {
 
   const handleConfirmPurchase = async () => {
     setIsConfirming(true);
-    if (!ethStats || !ethAmount) {
-      setMessage('Please enter the amount of ETH to buy.');
+    setMessage('');
+    
+    if (!ethStats || !ethAmount || !gasFee) {
+      setMessage('Please complete all fields.');
+      setIsConfirming(false);
       return;
     }
 
-    if (!gasFee) {
-      setMessage('Gas fee is not available yet. Please try again later.');
-      return;
-    }
-
-    const transactionFee = 0.02; // Static transaction fee in ZAR
+    const transactionFee = 0.02;
     const totalCost = parseFloat(ethAmount) * ethStats.price + parseFloat(gasFee) + transactionFee;
 
     if (totalCost > userBalance) {
       setMessage('Insufficient funds to purchase ETH.');
+      setIsConfirming(false);
       return;
     }
 
     try {
-      // Update the user's ETH balance in Firestore
       const currentUser = auth.currentUser;
       if (currentUser) {
         const userId = currentUser.uid;
         const userDocRef = doc(db, 'users', userId);
-        
+
         const newEthAmount = (parseFloat(userEthAmount) + parseFloat(ethAmount)).toFixed(8);
         const newZarBalance = (userBalance - totalCost).toFixed(2);
 
@@ -166,7 +159,7 @@ const BuyETHPage = () => {
 
         setUserBalance(newZarBalance);
         setUserEthAmount(newEthAmount);
-        
+
         Alert.alert('Success', `You have successfully purchased ${ethAmount} ETH!`, [
           { text: 'OK', onPress: () => navigation.goBack() },
         ]);
@@ -174,8 +167,7 @@ const BuyETHPage = () => {
     } catch (error) {
       console.error('Error updating user data:', error);
       setMessage('Failed to complete the purchase.');
-    }
-    finally{
+    } finally {
       setIsConfirming(false);
     }
 
@@ -183,11 +175,11 @@ const BuyETHPage = () => {
     setZarAmount('');
   };
 
-  if (loading) {
+  if (loadingUserData || loadingEthStats) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#075eec" />
-        <Text style={styles.loadingText}>Fetching gas fees...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
   }
