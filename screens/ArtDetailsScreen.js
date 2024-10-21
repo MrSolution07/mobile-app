@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions,Platform } from 'react-native';
 import { useRoute,useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
@@ -18,12 +18,12 @@ const ArtDetailsScreen = () => {
   const [activeTab, setActiveTab] = useState('Details'); // State to track the active tab
   const underlinePosition = useRef(new Animated.Value(0)).current; // Animated value for underline position
 
-  const underlineWidth = 50;
+  const underlineWidth = wp('18%');
   const tabOffsetMap = {
-    Details: 15,
-    Owners: 100,
-    Bids: 180,
-    History: 255,
+    Details: Platform.OS === 'ios'? wp('3.5%') : wp('3%'),
+    Owners:  Platform.OS === 'ios'? wp('27%'): wp('26%'),
+    Bids:  Platform.OS === 'ios'? wp('48%') : wp('48%'),
+    History: Platform.OS ==='ios'? wp('68.5%') : wp('69%'),
   };
 
   useEffect(() => {

@@ -91,7 +91,7 @@ const Bids = () => {
   );
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <View style={tw`mt-4`}>
       <Text style={styles.title}>Bids on Your NFTs</Text>
 
@@ -104,6 +104,8 @@ const Bids = () => {
         renderItem={renderBidItem}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.flatListContent}
+
       />
 
       <Text style={styles.title}>Your Bids</Text>
@@ -112,21 +114,25 @@ const Bids = () => {
         renderItem={renderUserBidItem}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.flatListContent}
+
       />
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: wp('5%'),
     backgroundColor: '#fff',
+    height: wp('100%'),
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     fontSize: hp('3%'),
-    marginBottom: hp('2%'),
+    marginBottom: hp('1%'),
     fontFamily: 'NotoSansJP_700Bold',
   },
   feedbackMessage: {
@@ -152,6 +158,9 @@ const styles = StyleSheet.create({
   bidderName: {
     fontSize: hp('2%'),
     fontWeight: 'bold',
+  },
+  flatListContent: {
+    paddingBottom: 70,
   },
   bidPrice: {
     fontSize: hp('1.8%'),

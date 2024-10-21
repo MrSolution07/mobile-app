@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -139,7 +137,7 @@ const Explore = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: wp('4%'),
+    padding: wp('5%'),
     backgroundColor: '#fff',
   },
   pageContainer: {
@@ -147,11 +145,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchBar: {
-    height: hp('6%'),
+    height: hp('7%'),
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: wp('2%'),
-    paddingHorizontal: wp('4%'),
+    paddingHorizontal: wp('3%'),
     marginBottom: hp('2%'),
     fontSize: hp('2%'),
   },

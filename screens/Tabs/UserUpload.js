@@ -1,6 +1,7 @@
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import React, { useState } from 'react';
 import { StyleSheet, Image, ScrollView, View, Text, KeyboardAvoidingView, Platform, Pressable, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Input } from 'react-native-elements';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -10,7 +11,8 @@ import { db, storage, auth } from '../../config/firebaseConfig';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { getAuth } from 'firebase/auth';  
+import { getAuth } from 'firebase/auth';
+import tw from 'twrnc';  
 
 const UploadNFTScreen = () => {
     const navigation = useNavigation();
@@ -130,10 +132,11 @@ const UploadNFTScreen = () => {
     };
 
     return (
+        <SafeAreaView style={tw`flex-1`}>
         <KeyboardAvoidingView
             style={styles.keyboardAvoidingContainer}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={100}
+            keyboardVerticalOffset={10}
         >
             <Ionicons 
                 name="menu-sharp" 
@@ -251,27 +254,28 @@ const UploadNFTScreen = () => {
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
     keyboardAvoidingContainer: {
         flex: 1,
-        backgroundColor: '#f7f9fc', 
+        // backgroundColor: '#f7f9fc', 
     },
     header: {
         flexDirection: 'row',
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
-        marginBottom: 20,
+        // marginBottom: 10,
         padding: 15,
-        marginTop: hp('8.5%'),
+        marginTop: Platform.OS ==='ios'? hp('8%'): hp('10%'),
        
     },
     menuIcon: {
         position: 'absolute',
         left: 15,
-        marginTop: hp(3.5),
+        marginTop: Platform.OS ==='ios' ? hp('4%') : hp('5%') ,
     },
     container: {
         flexGrow: 1, 

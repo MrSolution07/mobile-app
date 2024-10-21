@@ -4,6 +4,7 @@ import CheckBox from 'expo-checkbox';
 import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Feather from '@expo/vector-icons/Feather';
 import DataContext from '../screens/Context/Context'; 
 import * as Google from "expo-auth-session/providers/google";
@@ -128,7 +129,7 @@ const LoginScreen = ({ navigation }) => {
 
           <KeyboardAvoidingView
             style={styles.keyboardAvoidingView}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 50 : 0}
           >
             <ScrollView
               contentContainerStyle={styles.scrollViewContent}
@@ -211,11 +212,9 @@ const LoginScreen = ({ navigation }) => {
                   <Text style={styles.socialButtonText}>Login with Google</Text>
                 </Pressable>
 
-                <Pressable style={styles.socialButton} 
-                  onPress={() => promptFacebookLogin()}
-                >
-                  <FontAwesome name="facebook" size={20} color="black" style={tw`right-3`} />
-                  <Text style={styles.socialButtonText}>Login with Facebook</Text>
+                <Pressable style={styles.socialButton} >
+                  <FontAwesome5 name="phone-alt" size={20} color="black" style={tw`right-3`} />
+                  <Text style={styles.socialButtonText}>Login with Number</Text>
                 </Pressable>
 
                 <View style={styles.signUpContainer}>
@@ -258,7 +257,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 24,
     backgroundColor: 'rgba(255, 255, 255, 0.85)',
-    borderRadius: 8
+    // borderRadius: 8
   },
   header: {
     fontSize: 22,

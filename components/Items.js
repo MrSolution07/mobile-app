@@ -77,7 +77,7 @@ const Items = () => {
   };
 
   return (
-    <ScrollView style={tw`bg-white flex-1 p-3`}>
+    <View style={tw`bg-white flex-1 p-3`}>
       <View style={tw`m-1 mt-4`}>
         <Text style={tw`text-xl font-bold text-[#075eec]`}>Recently Minted NFTs</Text>
         {loading ? (
@@ -123,7 +123,7 @@ const Items = () => {
           <Text style={tw`text-center mt-4 text-gray-500`}>No NFTs sold yet.</Text>
         )}
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
