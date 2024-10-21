@@ -33,9 +33,9 @@ const DataProvider = ({ children }) => {
 
     // Suggested prompts
     const suggestedPrompts = [
-        "What is an NFT and how does it work?",
-        "How can I create and sell my own NFT?",
-        "What are the benefits of owning an NFT?",
+        "What is an NFT and how does it work? Explain in few line and as if you were talking to a begineer",
+        "How can I create and sell my own NFT? Explain in few line and as if you were talking to a begineer",
+        "What are the benefits of owning an NFT? Explain in few line and as if you were talking to a begineer",
         "What is the environmental impact of NFTs?",
         "How do NFTs impact the art and gaming industries?",
         "What are gas fees in the context of NFTs?",
@@ -111,7 +111,7 @@ const DataProvider = ({ children }) => {
         recentPrompt, showResult, setShowResult,
         loading, resultData,
         input, setInput,
-        suggestedPrompts // Export the suggested prompts
+        suggestedPrompts,
     };
 
     return (

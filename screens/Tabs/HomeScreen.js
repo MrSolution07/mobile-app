@@ -10,7 +10,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Collection1, Collection2, Collection3, Collection4 } from '../NFT/dummy';
 import tw from 'twrnc';
-import {EXPO_PUBLIC_OPENSEA_API_KEY} from '@env';
+// import {EXPO_PUBLIC_OPENSEA_API_KEY} from '@env';
 
 
 
@@ -31,18 +31,16 @@ const HomeScreen = () => {
     const fetchCollections = async () => {
       
       try {
-        const Key = EXPO_PUBLIC_OPENSEA_API_KEY;
-        console.log(Key)
         const options = {
           method: 'GET',
           headers: {
             accept: 
             'application/json',
-            'x-api-key': Key ,
+            'x-api-key': '73b5488d384f4be88dab537a9276bd0f',
           },
         };
         const response = await axios.get('https://api.opensea.io/api/v2/collections?chain=ethereum', options);
-        console.log(response.data); // Log the data for debugging
+        //console.log(response.data); // Log the data for debugging
       } catch (error) {
         console.error('Error fetching collections:', error.response?.data || error.message);
       }

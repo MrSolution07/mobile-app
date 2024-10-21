@@ -7,7 +7,7 @@ const Gemini = () => {
   const { onSent, recentPrompt, showResult, loading, resultData, setInput, input, setShowResult, name, suggestedPrompts } = useContext(DataContext);
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // i honeslty dont know how to prevent the styling with Geminu sometiems it's okay some other...      //
+  // i honeslty dont know how to prevent the styling with Gemini sometimes it's okay some other...      //
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // Handle when a suggested prompt is clicked
