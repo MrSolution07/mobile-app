@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../config/firebaseConfig';
 import {EXPO_PUBLIC_ETHERSCAN_API_KEY} from '@env';
+import { arrayUnion } from 'firebase/firestore';
 
 const BuyETHPage = () => {
   const [ethAmount, setEthAmount] = useState('');
@@ -128,39 +129,48 @@ const BuyETHPage = () => {
   const handleConfirmPurchase = async () => {
     setIsConfirming(true);
     setMessage('');
-    
+  
     if (!ethStats || !ethAmount || !gasFee) {
       setMessage('Please complete all fields.');
       setIsConfirming(false);
       return;
     }
-
+  
     const transactionFee = 0.02;
     const totalCost = parseFloat(ethAmount) * ethStats.price + parseFloat(gasFee) + transactionFee;
-
+  
     if (totalCost > userBalance) {
       setMessage('Insufficient funds to purchase ETH.');
       setIsConfirming(false);
       return;
     }
-
+  
     try {
       const currentUser = auth.currentUser;
       if (currentUser) {
         const userId = currentUser.uid;
         const userDocRef = doc(db, 'users', userId);
-
+  
         const newEthAmount = (parseFloat(userEthAmount) + parseFloat(ethAmount)).toFixed(8);
         const newZarBalance = (userBalance - totalCost).toFixed(2);
-
+  
+        // Log the transaction
+        const transactionLog = {
+          ethAmount: parseFloat(ethAmount),
+          totalCostInZar: totalCost.toFixed(2),
+          gasFeeInZar: gasFee,
+          date: new Date().toISOString().split('T')[0],
+        };
+  
         await updateDoc(userDocRef, {
           ethAmount: newEthAmount,
           balanceInZar: newZarBalance,
+          BuyETH: arrayUnion(transactionLog), // Append the transaction to the BuyETH field
         });
-
+  
         setUserBalance(newZarBalance);
         setUserEthAmount(newEthAmount);
-
+  
         Alert.alert('Success', `You have successfully purchased ${ethAmount} ETH!`, [
           { text: 'OK', onPress: () => navigation.goBack() },
         ]);
@@ -171,7 +181,7 @@ const BuyETHPage = () => {
     } finally {
       setIsConfirming(false);
     }
-
+  
     setEthAmount('');
     setZarAmount('');
   };

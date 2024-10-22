@@ -148,7 +148,6 @@ const Withdraw = () => {
             <TextInput
               style={styles.input}
               placeholder="Expiry Date (MM/YY)"
-              keyboardType="phone-pad"
               value={expiryDate}
               onChangeText={setExpiryDate}
               maxLength={5}

@@ -6,6 +6,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+
 const cardIcons = {
   visa: require('../assets/images/visa.png'), 
   mastercard: require('../assets/images/mastercard.png'),
@@ -98,62 +99,71 @@ const TopUpScreen = () => {
     setErrorMessage(''); 
     setIsConfirming(true);
     startPulsating(); 
-
+  
     if (!amount || !accountHolder || !cardNumber || !cvv || !expiryDate) {
       setErrorMessage('Please fill in all fields.');
       setIsConfirming(false);
       return;
     }
-
+  
     const cleanedCardNumber = cardNumber.replace(/\s+/g, '');
     if (!/^\d{16}$/.test(cleanedCardNumber)) {
       setErrorMessage('Card number must be exactly 16 digits.');
       setIsConfirming(false);
       return;
     }
-
+  
     if (!/^\d{3}$/.test(cvv)) {
       setErrorMessage('CVV must be exactly 3 digits.');
       setIsConfirming(false);
       return;
     }
-
+  
     if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiryDate)) {
       setErrorMessage('Expiry date must be in MM/YY format.');
       setIsConfirming(false);
       return;
     }
-
+  
     const [inputMonth, inputYear] = expiryDate.split('/').map(Number);
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth() + 1;
     const currentYear = currentDate.getFullYear() % 100;
-
+  
     if (inputYear < currentYear || (inputYear === currentYear && inputMonth < currentMonth)) {
       setErrorMessage('Expiry date cannot be in the past.');
       setIsConfirming(false);
       return;
     }
-
+  
     try {
       const userDocRef = doc(db, 'users', currentUser.uid);
       const userDocSnapshot = await getDoc(userDocRef);
-
+  
       if (userDocSnapshot.exists()) {
         const currentBalance = userDocSnapshot.data().balanceInZar || 0;
-
+  
+        const newBalance = currentBalance + parseFloat(amount);
+  
+        const transferEntry = {
+          type: 'Transfer',
+          amount: parseFloat(amount),
+          date: new Date().toISOString().split('T')[0], // Date format: YYYY-MM-DD
+        };
+  
         await updateDoc(userDocRef, {
-          balanceInZar: currentBalance + parseFloat(amount),
+          balanceInZar: newBalance,
           lastTopUpReference: referenceNumber,
+          transfers: [...(userDocSnapshot.data().transfers || []), transferEntry], // Add new transfer
         });
-
+  
         setAmount('');
         setAccountHolder('');
         setCardNumber('');
         setCvv('');
         setExpiryDate('');
         setCardType(null);
-
+  
         Alert.alert('Success', `Top-Up of ${amount} ZAR was successful!`, [
           { text: 'OK', onPress: () => navigation.goBack() },
         ]);
