@@ -19,6 +19,7 @@ import Svg, { Polygon } from 'react-native-svg';
 import { db } from '../../config/firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
 import debounce from 'lodash.debounce'; 
+import { Collection1, Collection2, Collection3, Collection4, Collection5, Collection6, Collection7, Collection8 } from '../NFT/dummy';
 
 const Hexagon = ({ price }) => (
   <View style={styles.hexagonContainer}>
@@ -29,12 +30,14 @@ const Hexagon = ({ price }) => (
   </View>
 );
 
+const collections = [Collection1, Collection2, Collection3, Collection4, Collection5, Collection6, Collection7, Collection8];
 const Explore = ({ navigation }) => {
   const [nfts, setNfts] = useState([]);
   const [activeTab, setActiveTab] = useState('NFTs');
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [filteredData, setFilteredData] = useState([]);
+  const [collectionData, setCollectionData] = useState([]);
 
 
 
