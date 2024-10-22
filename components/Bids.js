@@ -1,41 +1,48 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
+import { auth,db } from '../config/firebaseConfig'; 
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import tw from 'twrnc';
+import { collection, onSnapshot } from 'firebase/firestore'; 
+
 
 const Bids = () => {
   const [feedbackMessage, setFeedbackMessage] = useState('');
-  const [userBidsData, setUserBidsData] = useState([
-    {
-      id: '3',
-      itemName: 'Another NFT Art #3',
-      itemImage: 'https://via.placeholder.com/100',
-      price: '1.0',
-      date: '2024-10-18',
-      status: 'Pending', 
-    },
-  ]);
+  const [userBidsData, setUserBidsData] = useState([]); // Store user bids here
+  const [bidsData, setBidsData] = useState([]); // Store received bids here 
 
-  const bidsData = [
-    {
-      id: '1',
-      bidderName: 'John Doe',
-      bidderImage: 'https://via.placeholder.com/150',
-      price: '1.5',
-      date: '2024-10-17',
-      itemName: 'Awesome NFT Art #1',
-      itemImage: 'https://via.placeholder.com/100',
-    },
-    {
-      id: '2',
-      bidderName: 'Jane Smith',
-      bidderImage: 'https://via.placeholder.com/150',
-      price: '2.0',
-      date: '2024-10-16',
-      itemName: 'Stunning NFT Art #2',
-      itemImage: 'https://via.placeholder.com/100',
-    },
-  ];
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'nfts'), (snapshot) => {
+      const allBids = [];
+      const userBids = []; // To hold the bids made by the current user
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.bids) {
+          data.bids.forEach(bid => {
+            const bidData = {
+              id: doc.id,
+              ...bid,
+              itemName: data.title, 
+              itemImage: data.imageUrl,
+              itemPrice: bid.offerAmount, 
+              itemDate :bid.timestamp,
+            };
+
+            allBids.push(bidData);
+
+            // Check if the current user's bid
+            if (bid.bidderId === auth.currentUser.uid) {
+              userBids.push(bidData); // Add to user bids
+            }
+          });
+        }
+      });
+      setBidsData(allBids); // Set all bids data
+      setUserBidsData(userBids); // Set user's bids data
+    });
+
+    return () => unsubscribe(); // Cleanup subscription on unmount
+  }, []);
 
   const handleAction = (action, bidId) => {
     const updatedBids = userBidsData.map(bid => {
@@ -59,7 +66,7 @@ const Bids = () => {
           <Image source={{ uri: item.bidderImage }} style={styles.bidderImage} />
           <Text style={styles.bidderName}>{item.bidderName}</Text>
         </View>
-        <Text style={styles.bidPrice}>{item.price} ETH</Text>
+        <Text style={styles.bidPrice}>{item.itemPrice} ETH</Text>
         <Text style={styles.bidDate}>{item.date}</Text>
         <Text style={styles.itemName}>{item.itemName}</Text>
       </View>
@@ -83,7 +90,7 @@ const Bids = () => {
       <Image source={{ uri: item.itemImage }} style={styles.userItemImage} />
       <View style={styles.userBidInfo}>
         <Text style={styles.userItemName}>{item.itemName}</Text>
-        <Text style={styles.userBidPrice}>{item.price} ETH</Text>
+        <Text style={styles.userBidPrice}>{item.itemPrice} ETH</Text>
         <Text style={styles.userBidDate}>{item.date}</Text>
         <Text style={styles.userBidStatus}>{item.status}</Text>
       </View>
@@ -93,30 +100,28 @@ const Bids = () => {
   return (
     <View style={styles.container}>
       <View style={tw`mt-4`}>
-      <Text style={styles.title}>Bids on Your NFTs</Text>
+        <Text style={styles.title}>Bids on Your NFTs</Text>
 
-      {feedbackMessage ? (
-        <Text style={styles.feedbackMessage}>{feedbackMessage}</Text>
-      ) : null}
+        {feedbackMessage ? (
+          <Text style={styles.feedbackMessage}>{feedbackMessage}</Text>
+        ) : null}
 
-      <FlatList
-        data={bidsData}
-        renderItem={renderBidItem}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.flatListContent}
+        <FlatList
+          data={bidsData}
+          renderItem={renderBidItem}
+          keyExtractor={(item, index) => `bid-${item.id}-${index}`} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.flatListContent}
+        />
 
-      />
-
-      <Text style={styles.title}>Your Bids</Text>
-      <FlatList
-        data={userBidsData}
-        renderItem={renderUserBidItem}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.flatListContent}
-
-      />
+        <Text style={styles.title}>Your Bids</Text>
+        <FlatList
+          data={userBidsData}
+          renderItem={renderUserBidItem}
+          keyExtractor={(item, index) => `user-bid-${item.id}-${index}`} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.flatListContent}
+        />
       </View>
     </View>
   );

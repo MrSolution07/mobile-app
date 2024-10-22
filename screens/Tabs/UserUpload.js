@@ -114,7 +114,8 @@ const UploadNFTScreen = () => {
                 createdAt: new Date().toISOString(),
                 userId: user.uid,
                 uploadedBy: user.displayName || user.email,
-                status: 'minted',  
+                status: 'minted', 
+                creatorId: user.uid, 
             };
 
             await uploadNFTToFirestore(nftData);

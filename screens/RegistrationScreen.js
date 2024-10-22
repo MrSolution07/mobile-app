@@ -59,6 +59,7 @@ export default function RegistrationScreen({ navigation }) {
         surname,
         email,
         phoneNo,
+        notifications: [],
       });
   
       Alert.alert('Success', 'Account created successfully!');

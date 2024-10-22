@@ -18,7 +18,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import Svg, { Polygon } from 'react-native-svg';
 import { db } from '../../config/firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
-import debounce from 'lodash.debounce'; // Install lodash.debounce if not already installed
+import debounce from 'lodash.debounce'; 
 
 const Hexagon = ({ price }) => (
   <View style={styles.hexagonContainer}>

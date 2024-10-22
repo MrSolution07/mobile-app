@@ -5,12 +5,13 @@ import axios from 'axios';
 import * as LocalAuthentication from 'expo-local-authentication'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { db, auth } from '../../config/firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc,setDoc } from 'firebase/firestore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Collection1, Collection2, Collection3, Collection4 } from '../NFT/dummy';
 import tw from 'twrnc';
-// import {EXPO_PUBLIC_OPENSEA_API_KEY} from '@env';
+import * as Notifications from 'expo-notifications'; // Import Notifications
+import { getToken } from 'expo-notifications'; 
 
 
 
@@ -25,7 +26,32 @@ const HomeScreen = () => {
   const [collectionData, setCollectionData] = useState([]);
   
 
-  
+  // Request notification permissions
+  const requestNotificationPermissions = async () => {
+    const { status } = await Notifications.getPermissionsAsync();
+    if (status !== 'granted') {
+      const { status: newStatus } = await Notifications.requestPermissionsAsync();
+      if (newStatus !== 'granted') {
+        Alert.alert('Notification permissions not granted');
+        return;
+      }
+    }
+
+    // Get the push token
+    const token = await Notifications.getExpoPushTokenAsync();
+    console.log('Push Token:', token); // Log the push token or save it in your database
+    // Save the token in the database for the current user
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      // Save the token in Firestore under the user document
+      await setDoc(doc(db, 'users', currentUser.uid), { pushToken: token }, { merge: true });
+    }
+  };
+
+  useEffect(() => {
+    requestNotificationPermissions(); // Call the function to request permissions on mount
+  }, []);
+
  
   useEffect(() => {
     const fetchCollections = async () => {
