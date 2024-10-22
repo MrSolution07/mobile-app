@@ -1,6 +1,6 @@
+
 import React, { useEffect, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-
 import {
   SafeAreaView,
   View,
@@ -31,6 +31,7 @@ const Hexagon = ({ price }) => (
 );
 
 const collections = [Collection1, Collection2, Collection3, Collection4, Collection5, Collection6, Collection7, Collection8];
+
 const Explore = ({ navigation }) => {
   const [nfts, setNfts] = useState([]);
   const [activeTab, setActiveTab] = useState('NFTs');
@@ -38,8 +39,6 @@ const Explore = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [filteredData, setFilteredData] = useState([]);
   const [collectionData, setCollectionData] = useState([]);
-
-
 
   useFocusEffect(
     React.useCallback(() => {
@@ -74,30 +73,72 @@ const Explore = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
-    const updateFilteredData = () => {
-      const filteredNFTs = nfts.filter(nft => nft.title.toLowerCase().includes(searchQuery.toLowerCase()));
-      setFilteredData(filteredNFTs);
+    const fetchCollections = () => {
+      const data = collections.map((collection) => {
+        const prices = collection.nfts.map((nft) => nft.price);
+        const floorPrice = Math.min(...prices);
+        const volume = prices.reduce((acc, price) => acc + price, 0);
+        return {
+          ...collection,
+          name: collection.name,
+          floorPrice,
+          volume,
+          image: collection.image,
+        };
+      });
+      setCollectionData(data);
     };
+    
+    fetchCollections();
+  }, []);
 
-    updateFilteredData();
-  }, [searchQuery, nfts]); // Removed activeTab since we're only filtering NFTs
+  useEffect(() => {
+    if (activeTab === 'NFTs') {
+      const filteredNFTs = nfts.filter((nft) =>
+        nft.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredData(filteredNFTs);
+    } else if (activeTab === 'Collections') {
+      const filteredCollections = collectionData.filter((collection) =>
+        collection.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredData(filteredCollections);
+    }
+  }, [searchQuery, nfts, collectionData, activeTab]);
 
   const debouncedSearch = debounce((text) => setSearchQuery(text), 300);
 
-  const renderItem = ({ item }) => (
-    <Pressable
-      style={styles.itemContainer}
-      onPress={() => navigation.navigate('ArtDetailsScreen', { nft: item })}
-      accessibilityLabel={`Navigate to ${item.title}`}
-      accessibilityHint={`View details of ${item.title}`}
-    >
-      <Hexagon price={item.price} />
-      <Image source={item.imageUrl} style={styles.nftImage} />
-      <View style={styles.nftNameContainer}>
-        <Text style={styles.nftName}>{item.title}</Text>
-      </View>
-    </Pressable>
-  );
+  const renderItem = ({ item }) => {
+    if (activeTab === 'NFTs') {
+      return (
+        <Pressable
+          style={styles.itemContainer}
+          onPress={() => navigation.navigate('ArtDetailsScreen', { nft: item })}
+          accessibilityLabel={`Navigate to ${item.title}`}
+          accessibilityHint={`View details of ${item.title}`}
+        >
+          <Hexagon price={item.price} />
+          <Image source={item.imageUrl} style={styles.nftImage} />
+          <View style={styles.nftNameContainer}>
+            <Text style={styles.nftName}>{item.title}</Text>
+          </View>
+        </Pressable>
+      );
+    } else if (activeTab === 'Collections') {
+      return (
+        <Pressable style={styles.itemContainer}
+        onPress={() => navigation.navigate('CollectionDetailScreen', { collection: item })}>
+          
+          <Image source={item.image} style={styles.nftImage} />
+          <View style={styles.nftNameContainer}>
+            <Text style={styles.nftName}>{item.name}</Text>
+           
+           
+          </View>
+        </Pressable>
+      );
+    }
+  };
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
@@ -118,7 +159,14 @@ const Explore = ({ navigation }) => {
               onPress={() => setActiveTab(tab)}
               style={[styles.tabButton, activeTab === tab && styles.activeTab]}
             >
-              <Text style={[styles.tabText, activeTab === tab ? styles.activeTabText : styles.inactiveTabText]}>{tab}</Text>
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === tab ? styles.activeTabText : styles.inactiveTabText,
+                ]}
+              >
+                {tab}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -126,7 +174,7 @@ const Explore = ({ navigation }) => {
         <FlatList
           data={filteredData}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id} // Ensure unique keys using item.id
+          keyExtractor={(item) => item.id || item.name} // Collections use 'name' as key
           numColumns={2}
           columnWrapperStyle={styles.columnWrapper}
         />
@@ -140,19 +188,19 @@ const Explore = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: wp('5%'),
+    padding: wp('4%'),
     backgroundColor: '#fff',
   },
   pageContainer: {
-    marginTop: Platform.OS === 'ios' ? hp('5%') : hp('2%'), 
+    marginTop: Platform.OS === 'ios' ? hp('5%') : hp('2%'),
     flex: 1,
   },
   searchBar: {
-    height: hp('7%'),
+    height: hp('6%'),
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: wp('2%'),
-    paddingHorizontal: wp('3%'),
+    paddingHorizontal: wp('4%'),
     marginBottom: hp('2%'),
     fontSize: hp('2%'),
   },
@@ -181,7 +229,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#fff',
     fontWeight: '600',
-    fontFamily: 'VarelaRound_400Regular', 
+    fontFamily: 'VarelaRound_400Regular',
   },
   hexagonContainer: {
     alignItems: 'center',
@@ -213,7 +261,7 @@ const styles = StyleSheet.create({
     paddingVertical: hp('1%'),
     paddingHorizontal: wp('5%'),
     borderRadius: wp('2%'),
-    backgroundColor: 'rgba(128, 128, 128, 0.1)', 
+    backgroundColor: 'rgba(128, 128, 128, 0.1)',
   },
   activeTab: {
     backgroundColor: '#000',
@@ -221,7 +269,7 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: hp('2%'),
     color: '#666',
-    fontFamily: 'Roboto_400Regular', 
+    fontFamily: 'Roboto_400Regular',
   },
   activeTabText: {
     color: '#fff',
@@ -235,4 +283,3 @@ const styles = StyleSheet.create({
 });
 
 export default Explore;
-
