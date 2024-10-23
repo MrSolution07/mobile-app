@@ -8,8 +8,8 @@ const ThemeToggle = () => {
   const { isDarkMode, toggleTheme } = useTheme(); 
   const colors = useThemeColors();
 
-  console.log("ThemeToggle isDarkMode:", isDarkMode);
-  console.log("ThemeToggle colors:", colors);
+  // console.log("ThemeToggle isDarkMode:", isDarkMode);
+  // console.log("ThemeToggle colors:", colors);
 
   const handleAppearanceChange = () => {
     toggleTheme(); 

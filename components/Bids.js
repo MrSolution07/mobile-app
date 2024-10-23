@@ -1,63 +1,177 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
-import { auth,db } from '../config/firebaseConfig'; 
+import { auth, db } from '../config/firebaseConfig'; 
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import tw from 'twrnc';
 import { collection, onSnapshot } from 'firebase/firestore'; 
-
+import { doc, getDoc, updateDoc, getDocs } from 'firebase/firestore';
+import * as Notifications from 'expo-notifications'; // Import notifications
 
 const Bids = () => {
   const [feedbackMessage, setFeedbackMessage] = useState('');
-  const [userBidsData, setUserBidsData] = useState([]); // Store user bids here
-  const [bidsData, setBidsData] = useState([]); // Store received bids here 
+  const [userBidsData, setUserBidsData] = useState([]); 
+  const [bidsData, setBidsData] = useState([]); 
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'nfts'), (snapshot) => {
-      const allBids = [];
-      const userBids = []; // To hold the bids made by the current user
+      const allBids = []; 
+      const userBids = []; 
+  
       snapshot.forEach(doc => {
         const data = doc.data();
         if (data.bids) {
           data.bids.forEach(bid => {
             const bidData = {
-              id: doc.id,
+              id: doc.id, 
               ...bid,
               itemName: data.title, 
               itemImage: data.imageUrl,
               itemPrice: bid.offerAmount, 
-              itemDate :bid.timestamp,
+              itemDate: bid.timestamp,
             };
-
-            allBids.push(bidData);
-
-            // Check if the current user's bid
+            if (data.creatorId === auth.currentUser.uid) {
+              allBids.push(bidData); 
+            }
             if (bid.bidderId === auth.currentUser.uid) {
-              userBids.push(bidData); // Add to user bids
+              userBids.push(bidData); 
             }
           });
         }
       });
-      setBidsData(allBids); // Set all bids data
-      setUserBidsData(userBids); // Set user's bids data
+  
+      
+      setBidsData(allBids); 
+      setUserBidsData(userBids); 
     });
-
-    return () => unsubscribe(); // Cleanup subscription on unmount
+  
+    return () => unsubscribe(); 
   }, []);
+  
+  
 
-  const handleAction = (action, bidId) => {
-    const updatedBids = userBidsData.map(bid => {
-      if (bid.id === bidId) {
-        return { ...bid, status: action === 'Accept' ? 'Accepted' : action === 'Reject' ? 'Rejected' : 'Counter Offer' };
+  const sendNotification = async (userId, title, message) => {
+    const userRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userRef);
+    
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      const pushToken = userData.pushToken; 
+
+      if (pushToken) {
+        const notificationContent = {
+          to: pushToken,
+          sound: 'default',
+          title: title,
+          body: message,
+          data: { userId: userId }, 
+        };
+
+        await Notifications.scheduleNotificationAsync({
+          content: notificationContent,
+          trigger: null, 
+        });
+      } else {
+        console.error('No push token found for user:', userId);
       }
-      return bid;
-    });
-
-    setUserBidsData(updatedBids);
-    setFeedbackMessage(`You chose to ${action} the bid for "${updatedBids.find(bid => bid.id === bidId).itemName}"`);
-    setTimeout(() => {
-      setFeedbackMessage('');
-    }, 3000);
+    } else {
+      console.error('User document not found:', userId);
+    }
   };
+
+  const handleAction = async (action, bidId) => {
+    try {
+        console.log('Action:', action);
+        console.log('Bid ID:', bidId);
+
+       
+        const nftsRef = collection(db, 'nfts');
+        const nftsSnapshot = await getDocs(nftsRef);
+
+        let nftData = null;
+        let nftDocId = null;
+
+       
+        nftsSnapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.bids) {
+                const bid = data.bids.find(b => b.id === bidId);
+                if (bid) {
+                    nftData = data;
+                    nftDocId = doc.id;
+                }
+            }
+        });
+
+        if (!nftData) {
+            throw new Error("NFT not found for the given bid ID");
+        }
+
+        
+        const bid = nftData.bids.find(b => b.id === bidId);
+
+        if (!bid) {
+            throw new Error("Invalid data: Bid not found");
+        }
+
+        console.log("Bid Data:", bid);
+
+        const bidAmount = bid.offerAmount; 
+        const bidderId = bid.bidderId;
+
+        if (action === 'Accept') {
+            
+            const creatorAmount = bidAmount * 0.95; // ( after 5% fee)
+            const bidderDocRef = doc(db, 'users', bidderId);
+            const bidderSnapshot = await getDoc(bidderDocRef);
+
+            if (bidderSnapshot.exists()) {
+                const bidderData = bidderSnapshot.data();
+                const newBidderBalance = bidderData.ethAmount - bidAmount;
+
+                // Check if bidder has enough balance but this is for debugging 
+                if (newBidderBalance < 0) {
+                    throw new Error("Insufficient balance");
+                }
+
+                await updateDoc(bidderDocRef, { ethAmount: newBidderBalance });
+
+                
+                const creatorDocRef = doc(db, 'users', nftData.creatorId);
+                const creatorSnapshot = await getDoc(creatorDocRef);
+
+                if (creatorSnapshot.exists()) {
+                    const creatorData = creatorSnapshot.data();
+                    const newCreatorBalance = creatorData.ethAmount + creatorAmount;
+
+                    await updateDoc(creatorDocRef, { ethAmount: newCreatorBalance });
+
+                    // Notify the bidder
+                    sendNotification(bidderId, 'Offer Accepted', 'Your offer has been accepted.');
+
+                    // Clear all other bids for this NFT
+                    await updateDoc(doc(db, 'nfts', nftDocId), { bids: [] });
+
+                    // Mark the NFT as sold and update ownership
+                    await updateDoc(doc(db, 'nfts', nftDocId), { status: 'sold', ownerId: bidderId });
+
+                    console.log("Bid accepted and processed");
+                }
+            }
+        } else if (action === 'Reject') {
+            // Remove the rejected bid
+            const updatedBids = nftData.bids.filter(b => b.id !== bidId);
+            await updateDoc(doc(db, 'nfts', nftDocId), { bids: updatedBids });
+            sendNotification(bidderId, 'Offer Rejected', 'Your offer has been rejected.');
+
+            // console.log("Bid rejected and removed");
+        }
+
+    } catch (error) {
+        console.error("Error handling action:", error);
+    }
+};
+
+
 
   const renderBidItem = ({ item }) => (
     <View style={styles.bidItem}>
@@ -106,19 +220,19 @@ const Bids = () => {
           <Text style={styles.feedbackMessage}>{feedbackMessage}</Text>
         ) : null}
 
-        <FlatList
-          data={bidsData}
-          renderItem={renderBidItem}
-          keyExtractor={(item, index) => `bid-${item.id}-${index}`} 
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.flatListContent}
-        />
+            <FlatList
+              data={bidsData} // This is the list for "Bids on Your NFTs"
+              renderItem={renderBidItem}
+              keyExtractor={(item) => `bid-${item.id}`} 
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.flatListContent}
+            />
 
         <Text style={styles.title}>Your Bids</Text>
-        <FlatList
-          data={userBidsData}
+          <FlatList
+          data={userBidsData} // This is the list for "Your Bids"
           renderItem={renderUserBidItem}
-          keyExtractor={(item, index) => `user-bid-${item.id}-${index}`} 
+          keyExtractor={(item) => `user-bid-${item.id}`} 
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.flatListContent}
         />

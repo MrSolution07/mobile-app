@@ -6,11 +6,12 @@ import { Input } from 'react-native-elements';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { useForm, Controller, set } from 'react-hook-form';
-import { setDoc, doc } from '../../config/firebaseConfig'; 
+import { setDoc, doc} from '../../config/firebaseConfig'; 
 import { db, storage, auth } from '../../config/firebaseConfig'; 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import tw from 'twrnc';  
 import { useThemeColors } from '../Context/Theme/useThemeColors';
@@ -52,8 +53,15 @@ const UploadNFTScreen = () => {
         
     };
 
-    const generateTokenId = () => {
-        return Math.random().toString(36).substring(2, 200);
+    const generateTokenId = (length = 20) => {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let tokenId = '';
+    
+        for (let i = 0; i < length; i++) {
+            tokenId += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+    
+        return tokenId;
     };
 
     const uploadImageToFirebase = async (imageUri, tokenId) => {
@@ -80,8 +88,8 @@ const UploadNFTScreen = () => {
 
     const uploadNFTToFirestore = async (nftData) => {
         try {
-            const nftDocRef = doc(db, 'nfts', nftData.tokenId);
-            await setDoc(nftDocRef, nftData);
+            const nftDocRef = await addDoc(collection(db, 'nfts'), nftData);
+            return nftDocRef.id;
         } catch (error) {
             console.error('Error saving NFT to Firestore:', error);
             throw new Error('Failed to upload NFT to Firestore');

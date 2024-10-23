@@ -42,99 +42,108 @@ const SubmitOfferScreen = () => {
 
   const latestBid = nft && nft.bids && nft.bids.length > 0 ? nft.bids[nft.bids.length - 1] : null;
 
-  const handleOfferSubmit = async () => {
-    if (!offerAmount) {
-        Alert.alert('Error', 'Please enter a valid offer amount.');
-        return;
-    }
-
-    try {
-        const currentUser = auth.currentUser;
-
-        if (!currentUser) {
-            Alert.alert('Error', 'You must be logged in to submit an offer.');
-            return;
-        }
-
-        const userRef = doc(db, 'users', currentUser.uid);
-        const userDoc = await getDoc(userRef);
-        const userData = userDoc.exists() ? userDoc.data() : {};
-
-        if (!userData) {
-            Alert.alert('Error', 'User data not found.');
-            return;
-        }
-
-        const userName = userData.name || currentUser.displayName || 'Anonymous';
-        const bidderImage = userData.ProfileImage || 'https://via.placeholder.com/150';
-
-        // Check if nft exists and has required properties
-        if (!nft || !nft.title || !nft.creatorId) {
-            Alert.alert('Error', 'Invalid NFT data.');
-            return;
-        }
-
-        const newBid = {
-            bidderId: currentUser.uid,
-            bidderName: userName,
-            bidderImage: bidderImage,
-            offerAmount: parseFloat(offerAmount),
-            timestamp: new Date(),
-        };
-
-        const nftRef = doc(db, 'nfts', nft.id);
-        const nftDoc = await getDoc(nftRef);
-
-        if (!nftDoc.exists()) {
-            Alert.alert('Error', 'NFT not found.');
-            return;
-        }
-
-        const nftData = nftDoc.data();
-        const existingBids = Array.isArray(nftData.bids) ? nftData.bids : [];
-        const updatedBids = [...existingBids, newBid];
-
-        await updateDoc(nftRef, { bids: updatedBids });
-
-        // Notify the creator of the NFT
-        const creatorRef = doc(db, 'users', nft.creatorId);
-        const creatorDoc = await getDoc(creatorRef);
-
-        if (!creatorDoc.exists()) {
-            Alert.alert('Error', 'Creator not found.');
-            return;
-        }
-
-        const creatorData = creatorDoc.data();
-        const pushToken = creatorData.pushToken;
-
-        // Send notification to the NFT creator
-        if (pushToken) {
-            const notificationContent = {
-                to: pushToken,
-                sound: 'default',
-                title: 'New Offer',
-                body: `You have a new offer of ${offerAmount} ETH on your NFT "${nft.title}" by ${userName}`,
-                data: { nftId: nft.id },
-            };
-
-            await Notifications.scheduleNotificationAsync({
-                content: notificationContent,
-                trigger: null,
-            });
-        } else {
-            Alert.alert('Error', 'Creator does not have a push token.');
-        }
-
-        setOfferAmount('');
-        Alert.alert('Success', `Your offer of ${offerAmount} ETH has been submitted!`);
-        navigation.goBack();
-
-    } catch (error) {
-        console.error('Error submitting offer:', error);
-        Alert.alert('Error', 'There was an issue submitting your offer. Please try again.');
-    }
+  const generateUniqueId = () => {
+    return Math.random().toString(36).substring(2, 15); 
 };
+
+const handleOfferSubmit = async () => {
+  if (!offerAmount || isNaN(offerAmount) || parseFloat(offerAmount) <= 0) {
+      Alert.alert('Error', 'Please enter a valid offer amount.');
+      return;
+  }
+
+  try {
+      const currentUser = auth.currentUser;
+
+      if (!currentUser) {
+          Alert.alert('Error', 'You must be logged in to submit an offer.');
+          return;
+      }
+
+      const userRef = doc(db, 'users', currentUser.uid);
+      const userDoc = await getDoc(userRef);
+      const userData = userDoc.exists() ? userDoc.data() : {};
+
+      if (!userData) {
+          Alert.alert('Error', 'User data not found.');
+          return;
+      }
+
+      const userName = userData.name || currentUser.displayName || 'Anonymous';
+      const bidderImage = userData.ProfileImage || 'https://via.placeholder.com/150';
+
+      // Check if NFT exists and has required properties
+      if (!nft || !nft.title || !nft.creatorId) {
+          Alert.alert('Error', 'Invalid NFT data.');
+          return;
+      }
+
+      const userEthAmount = userData.ethAmount || 0;
+      if (parseFloat(offerAmount) > userEthAmount) {
+          Alert.alert('Unsufficient funds', 'You do not have enough ETH to make this offer.');
+          return;
+      }
+
+      const newBid = {
+          id: generateUniqueId(),
+          bidderId: currentUser.uid,
+          bidderName: userName,
+          bidderImage: bidderImage,
+          offerAmount: parseFloat(offerAmount),
+          timestamp: new Date().toISOString(), 
+      };
+
+      const nftRef = doc(db, 'nfts', nft.id);
+      const nftDoc = await getDoc(nftRef);
+
+      if (!nftDoc.exists()) {
+          Alert.alert('Error', 'NFT not found.');
+          return;
+      }
+
+      const nftData = nftDoc.data();
+      const existingBids = Array.isArray(nftData.bids) ? nftData.bids : [];
+      const updatedBids = [...existingBids, newBid];
+
+      
+      await updateDoc(nftRef, { bids: updatedBids });
+      const creatorRef = doc(db, 'users', nft.creatorId);
+      const creatorDoc = await getDoc(creatorRef);
+
+      if (!creatorDoc.exists()) {
+          Alert.alert('Error', 'Creator not found.');
+          return;
+      }
+
+      const creatorData = creatorDoc.data();
+      const pushToken = creatorData.pushToken;
+      if (pushToken) {
+          const notificationContent = {
+              to: pushToken,
+              sound: 'default',
+              title: 'New Offer',
+              body: `You have a new offer of ${offerAmount} ETH on your NFT "${nft.title}" by ${userName}`,
+              data: { nftId: nft.id },
+          };
+
+          await Notifications.scheduleNotificationAsync({
+              content: notificationContent,
+              trigger: null,
+          });
+      } else {
+          Alert.alert('Error', 'Creator does not have a push token.');
+      }
+
+      setOfferAmount('');
+      Alert.alert('Success', `Your offer of ${offerAmount} ETH has been submitted!`);
+      navigation.goBack();
+
+  } catch (error) {
+      console.error('Error submitting offer:', error);
+      Alert.alert('Error', 'There was an issue submitting your offer. Please try again.');
+  }
+};
+
 
   return (
     <SafeAreaView style={styles.safeArea}>

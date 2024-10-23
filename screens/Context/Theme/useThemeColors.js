@@ -3,6 +3,6 @@ import { lightColors, darkColors } from './colors';
 
 export const useThemeColors = () => {
   const { isDarkMode } = useTheme();
-  console.log("useThemeColors - isDarkMode:", isDarkMode)
+  // console.log("useThemeColors - isDarkMode:", isDarkMode)
   return isDarkMode ? darkColors : lightColors; 
 };

@@ -11,12 +11,12 @@ import {useThemeColors} from './Context/Theme/useThemeColors';
 
 const BuyETHPage = () => {
   const colors = useThemeColors();
-  const [ethAmount, setEthAmount] = useState('');
-  const [zarAmount, setZarAmount] = useState('');
-  const [userBalance, setUserBalance] = useState(null);
+  const [ethAmount, setEthAmount] = useState(0);
+  const [zarAmount, setZarAmount] = useState(0);
+  const [userBalance, setUserBalance] = useState(0);
   const [userEthAmount, setUserEthAmount] = useState(0);
   const [ethStats, setEthStats] = useState(null);
-  const [gasFee, setGasFee] = useState(null);
+  const [gasFee, setGasFee] = useState(0);
   const [message, setMessage] = useState('');
   const [loadingUserData, setLoadingUserData] = useState(true);
   const [loadingEthStats, setLoadingEthStats] = useState(true);
