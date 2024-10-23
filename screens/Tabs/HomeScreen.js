@@ -43,7 +43,7 @@ const HomeScreen = () => {
 
     // Get the push token
     const token = await Notifications.getExpoPushTokenAsync();
-    console.log('Push Token:', token); // Log the push token or save it in your database
+    // console.log('Push Token:', token); // Log the push token or save it in your database
     // Save the token in the database for the current user
     const currentUser = auth.currentUser;
     if (currentUser) {
@@ -163,17 +163,15 @@ const HomeScreen = () => {
         
         if (userDoc.exists()) {
           const userData = userDoc.data();
+          console.log('User Data:', userData);
           setName(userData.name);
-          setProfileImage(userData.ProfileImage ? { uri: userData.ProfileImage } : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y");
+          setProfileImage(userData.ProfileImage ? { uri: userData.ProfileImage } : {uri:"https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"});
         
           if (!userData.country) {
             requestLocationPermission();
           } else {
             setLocation(userData.country); // Set location from the database
           }
-        
-        } else {
-          setProfileImage(require('../../assets/images/NoImg.jpg'));
         }
       }
     };
