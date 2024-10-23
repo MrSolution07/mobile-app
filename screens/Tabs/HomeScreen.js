@@ -23,11 +23,13 @@ const HomeScreen = () => {
   const {isDarkMode} = useTheme();
   const navigation = useNavigation();
   const [name, setName] = useState('');
+  const [surname, setSurname] = useState('');
   const scrollX = new Animated.Value(0);
   const [profileImage, setProfileImage] = useState(null);
   const [loginPromptShown, setLoginPromptShown] = useState(false);
   const [collectionData, setCollectionData] = useState([]);
   const [location, setLocation] = useState(null); 
+  
   
 
   // Request notification permissions
@@ -43,8 +45,7 @@ const HomeScreen = () => {
 
     // Get the push token
     const token = await Notifications.getExpoPushTokenAsync();
-    console.log('Push Token:', token); // Log the push token or save it in your database
-    // Save the token in the database for the current user
+    // console.log('Push Token:', token); // Log the push token or save it in your database
     const currentUser = auth.currentUser;
     if (currentUser) {
       // Save the token in Firestore under the user document
@@ -127,6 +128,7 @@ const HomeScreen = () => {
       return {
         ...collection,
         name: collection.name,
+        surname: collection.surname,
         floorPrice,
         volume,
         image: collection.image,
@@ -153,33 +155,54 @@ const HomeScreen = () => {
     checkLoginPreference();
   }, []);
 
+
   useEffect(() => {
     const fetchProfileImage = async () => {
-      const currentUser = auth.currentUser;
-
-      if (currentUser) {
-        const userRef = doc(db, 'users', currentUser.uid);
-        const userDoc = await getDoc(userRef);
-        
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setName(userData.name);
-          setProfileImage(userData.ProfileImage ? { uri: userData.ProfileImage } : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y");
-        
-          if (!userData.country) {
-            requestLocationPermission();
+      try {
+        const currentUser = auth.currentUser;
+    
+        if (currentUser) {
+          const userRef = doc(db, 'users', currentUser.uid);
+          const userDoc = await getDoc(userRef, { source: 'server' });  // Force server fetch
+          
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            console.log('User Document Data:', userData);
+            setName(userData.name || '');  // Handle undefined values
+            setProfileImage(userData.ProfileImage ? { uri: userData.ProfileImage } : {uri:"https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"});
           } else {
-            setLocation(userData.country); // Set location from the database
+            console.log('No such user document!');
           }
-        
         } else {
-          setProfileImage(require('../../assets/images/NoImg.jpg'));
+          console.log('No user is currently authenticated.');
         }
+      } catch (error) {
+        console.error('Error fetching user document:', error);
+        // Optionally retry or notify the user
       }
     };
-
-    fetchProfileImage();
+    
+    
+  
+    // Retry logic in case the user is not immediately available
+    const retryFetchProfileImage = async (retryCount = 5) => {
+      const intervalId = setInterval(async () => {
+        if (auth.currentUser) {
+          clearInterval(intervalId);  // Stop retrying when the user is available
+          await fetchProfileImage();  // Fetch profile image and name
+        } else if (retryCount === 0) {
+          clearInterval(intervalId);  // Stop retrying after a few attempts
+          console.log("Failed to fetch user after multiple attempts.");
+        }
+        retryCount -= 1;
+      }, 1000);  // Retry every second
+    };
+  
+    retryFetchProfileImage();  // Initiate the retry process
   }, []);
+  
+
+
 
 
     // Request Location Permission
