@@ -19,6 +19,7 @@ import Svg, { Polygon } from 'react-native-svg';
 import { db } from '../../config/firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
 import debounce from 'lodash.debounce'; 
+import {useThemeColors} from '../Context/Theme/useThemeColors';
 
 const Hexagon = ({ price }) => (
   <View style={styles.hexagonContainer}>
@@ -30,6 +31,7 @@ const Hexagon = ({ price }) => (
 );
 
 const Explore = ({ navigation }) => {
+  const colors = useThemeColors();
   const [nfts, setNfts] = useState([]);
   const [activeTab, setActiveTab] = useState('NFTs');
   const [searchQuery, setSearchQuery] = useState('');
@@ -97,11 +99,15 @@ const Explore = ({ navigation }) => {
   );
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (
+    <View style={{backgroundColor: colors.background, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <ActivityIndicator size="large" color={colors.text} />
+    </View>
+    )
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container,{backgroundColor: colors.background}]}>
       <View style={styles.pageContainer}>
         <TextInput
           style={styles.searchBar}
@@ -123,7 +129,7 @@ const Explore = ({ navigation }) => {
         <FlatList
           data={filteredData}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id} // Ensure unique keys using item.id
+          keyExtractor={(item) => item.id} 
           numColumns={2}
           columnWrapperStyle={styles.columnWrapper}
         />
@@ -132,13 +138,12 @@ const Explore = ({ navigation }) => {
   );
 };
 
-// styles remain unchanged
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: wp('5%'),
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
   },
   pageContainer: {
     marginTop: Platform.OS === 'ios' ? hp('5%') : hp('2%'), 

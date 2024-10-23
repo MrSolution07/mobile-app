@@ -4,10 +4,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Entypo from '@expo/vector-icons/Entypo';
 import { BlurView } from 'expo-blur';
 import { Dimensions } from 'react-native';
+import { useThemeColors } from '../Context/Theme/useThemeColors';
 
 const { width } = Dimensions.get('window');
 
 const CustomTabIcon = ({ focused, name }) => {
+
     return (
         <View style={styles.container}>
             {focused && (

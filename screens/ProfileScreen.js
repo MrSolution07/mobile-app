@@ -8,6 +8,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useRoute } from '@react-navigation/native';
 import tw from 'twrnc';
+import { useThemeColors } from './Context/Theme/useThemeColors';
 
 
 const UserProfile = ({ navigation }) => {
@@ -69,7 +70,7 @@ const UserProfile = ({ navigation }) => {
   const { name, balance, email, phoneNo, location, ProfileImage } = userData;
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor:colors.background}]}>
      <ScrollView contentContainerStyle={tw`flex-grow`}
         showsVerticalScrollIndicator={false}
         bounces={false}

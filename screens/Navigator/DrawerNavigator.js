@@ -16,10 +16,13 @@ import Tabs from '../Tabs/Tabs';
 // import ProfileScreen from '../ProfileScreen';
 import SettingsScreen from '../SettingsScreen';
 import UploadNFTScreen from '../Tabs/UserUpload';
+import { useThemeColors } from '../Context/Theme/useThemeColors';
 
 const Drawer = createDrawerNavigator();
 
 export default function DrawerNavigator() {
+  const colors = useThemeColors();
+
   return (
     <Drawer.Navigator
       initialRouteName="HomeTabs"
@@ -28,21 +31,17 @@ export default function DrawerNavigator() {
         <CustomDrawerContent {...props} />
       )}
       screenOptions={{
-        headerShown: false, // Hide the default header
-        // Active item styling
-        drawerActiveBackgroundColor: '#075eec', // Active item background color
-        drawerActiveTintColor: '#ffffff', // Active item text color
-        // Inactive item styling
-        drawerInactiveTintColor: '#333333', // Inactive item text color
-        // Label styling
+        headerShown: false, 
+        drawerActiveBackgroundColor: '#075eec', 
+        drawerActiveTintColor: '#ffffff', 
+        drawerInactiveTintColor: colors.text,
         drawerLabelStyle: {
-          marginLeft: -20, // Adjust label position
-          fontSize: 16, // Label font size
+          marginLeft: -20, 
+          fontSize: 16, 
         },
-        // Drawer width and background
         drawerStyle: {
-          backgroundColor: '#ffffff', // Drawer background color
-          width: 240, // Drawer width
+          backgroundColor:'#ffffff', 
+          width: 240,
         },
       }}
     >
@@ -51,10 +50,10 @@ export default function DrawerNavigator() {
         name="HomeTabs"
         component={Tabs}
         options={{
-          drawerLabel: 'Home', // Label for the drawer item
+          drawerLabel: 'Home',
           drawerIcon: ({ color }) => (
             <Ionicons name="home-outline" size={22} color={color} />
-          ), // Icon for the drawer item
+          ), 
         }}
       />
       {/* 
@@ -80,7 +79,6 @@ export default function DrawerNavigator() {
           ),
         }}
       />
-      {/* Upload NFT Screen */}
       <Drawer.Screen
         name="UploadNFT"
         component={UploadNFTScreen}
@@ -96,8 +94,10 @@ export default function DrawerNavigator() {
 }
 
 const CustomDrawerContent = (props) => {
+  const colors = useThemeColors();
+
     return (
-        <DrawerContentScrollView {...props} contentContainerStyle={styles.drawerContainer}>
+        <DrawerContentScrollView {...props} contentContainerStyle={[styles.drawerContainer,{backgroundColor:colors.background, color: colors.text}]}>
             <View style={styles.header}>
                 {/* <Text style={styles.headerText}>MetawaySA</Text> */}
             </View>

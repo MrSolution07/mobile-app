@@ -8,9 +8,13 @@ import Bids from '../../components/Bids';
 import { useRoute,useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
 import tw from 'twrnc';
+import { useTheme } from '../Context/Theme/ThemeContext';
+import { useThemeColors } from '../Context/Theme/useThemeColors';
 
 
 const Wallet = () => {
+  const colors = useThemeColors();
+  const { isDarkMode } = useTheme()
   const [activeTab, setActiveTab] = useState('Account');
   const animationValue = useRef(new Animated.Value(0)).current;
   const screenWidth = Dimensions.get('window').width;
@@ -34,9 +38,9 @@ const Wallet = () => {
   }, [route.params?.tab]);
 
   return (
-    <View style={[tw`flex-1`, styles.walletContainer]}>
+    <View style={[tw`flex-1`, styles.walletContainer,{backgroundColor: colors.background}]}>
       <LinearGradient
-        colors={['rgba(255, 255, 255, 0.5)', 'rgba(7, 94, 236, 0.5)', 'rgba(128, 0, 128, 0.5)']}
+        colors={isDarkMode ? colors.walletGradient : ['rgba(255, 255, 255, 0.5)', 'rgba(7, 94, 236, 0.5)', 'rgba(128, 0, 128, 0.5)']}
         style={styles.gradientBackground}
       />
       <View style={tw`items-center top-30 justify-center`}>

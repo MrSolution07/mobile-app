@@ -190,7 +190,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 import * as LocalAuthentication from 'expo-local-authentication'; // Import Expo Local Authentication
 import { View, Alert } from 'react-native';
-import { DataProvider } from '../Context/Context'; 
+import { DataProvider } from '../Context/Context';
+import { useThemeColors } from '../Context/Theme/useThemeColors'; 
 
 // Import screens here
 import LoginScreen from '../LoginScreen';
@@ -212,6 +213,7 @@ import SubmitOffer from '../SubmitOffer';
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
+  const colors = useThemeColors();
   const [initialRoute, setInitialRoute] = useState(null); // State to manage the initial route
   const [isBiometricSupported, setIsBiometricSupported] = useState(false); // State for biometric support
 
@@ -271,7 +273,7 @@ export default function AppNavigator() {
 
   return (
     <DataProvider>
-      <NavigationContainer>
+      <NavigationContainer >
         <Stack.Navigator initialRouteName={initialRoute}>
           <Stack.Screen
             name="Login"

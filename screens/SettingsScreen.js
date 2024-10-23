@@ -6,15 +6,16 @@ import SettingsSection from '../components/SettingsSection';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../config/firebaseConfig'; 
 import { signOut } from 'firebase/auth';
-import { useTheme } from '@react-navigation/native';
+import { useThemeColors } from './Context/Theme/useThemeColors';
+import { useTheme } from './Context/Theme/ThemeContext';
+import ThemeToggle from '../components/ThemeToggle';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const SettingsScreen = () => {
   const navigation = useNavigation();
-  const { colors } = useTheme();
+  const colors  = useThemeColors();
+  const {isDarkMode} = useTheme();
 
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isLightMode, setIsLightMode] = useState(true);
 
   const toggleDrawer = () => {
     navigation.toggleDrawer();
@@ -83,20 +84,20 @@ const SettingsScreen = () => {
     navigation.navigate('EditProfile');
   };
 
-  const handleAppearanceChange = (mode) => {
-    if (mode === 'dark') {
-      setIsDarkMode(true);
-      setIsLightMode(false);
-    } else if (mode === 'light') {
-      setIsDarkMode(false);
-      setIsLightMode(true);
-    }
-  };
+  // const handleAppearanceChange = (mode) => {
+  //   if (mode === 'dark') {
+  //     setIsDarkMode(true);
+  //     setIsLightMode(false);
+  //   } else if (mode === 'light') {
+  //     setIsDarkMode(false);
+  //     setIsLightMode(true);
+  //   }
+  // };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea,{ backgroundColor: colors.background }]}>
       <Pressable style={styles.menuButton} onPress={toggleDrawer}>
-        <Ionicons name="menu-sharp" size={28} color="#333" />
+        <Ionicons name="menu-sharp" size={28} color={isDarkMode ? colors.text: "#333"} />
       </Pressable>
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -123,7 +124,7 @@ const SettingsScreen = () => {
 
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>Appearance Settings</Text>
-
+{/* 
           <View style={styles.optionContainer}>
             <Ionicons name="moon-outline" size={24} color="#333" style={styles.icon} />
             <Text style={styles.label}>Dark Mode</Text>
@@ -131,16 +132,18 @@ const SettingsScreen = () => {
               value={isDarkMode}
               onValueChange={() => handleAppearanceChange('dark')}
             />
-          </View>
+          </View> */}
 
-          <View style={styles.optionContainer}>
+          <ThemeToggle/>
+
+          {/* <View style={styles.optionContainer}>
             <Ionicons name="sunny-outline" size={24} color="#333" style={styles.icon} />
             <Text style={styles.label}>Light Mode</Text>
             <Switch
               value={isLightMode}
               onValueChange={() => handleAppearanceChange('light')}
             />
-          </View>
+          </View> */}
         </View>
 
         <SettingsSection
@@ -166,7 +169,7 @@ const SettingsScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
   },
   menuButton: {
     marginTop: hp(4),

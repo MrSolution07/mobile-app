@@ -13,8 +13,10 @@ import { useNavigation } from '@react-navigation/native';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
 import tw from 'twrnc';  
+import { useThemeColors } from '../Context/Theme/useThemeColors';
 
 const UploadNFTScreen = () => {
+    const colors = useThemeColors();
     const navigation = useNavigation();
     const { control, handleSubmit, formState: { errors }, reset } = useForm();
     const [imageUri, setImageUri] = useState(null);
@@ -133,7 +135,7 @@ const UploadNFTScreen = () => {
     };
 
     return (
-        <SafeAreaView style={tw`flex-1`}>
+        <SafeAreaView style={[tw`flex-1`,{backgroundColor: colors.background}]}>
         <KeyboardAvoidingView
             style={styles.keyboardAvoidingContainer}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -143,13 +145,13 @@ const UploadNFTScreen = () => {
                 name="menu-sharp" 
                 size={29} 
                 onPress={handleMenuPress} 
-                style={styles.menuIcon}
+                style={[styles.menuIcon, {color :colors.text}]}
             />
             <View style={styles.header}>
                 <Text style={styles.screenTitle}>Upload Your NFT</Text>
             </View>
             <ScrollView contentContainerStyle={styles.container}>
-                <View style={styles.formContainer}>
+                <View style={[styles.formContainer, { backgroundColor : colors.uploadFormContainer}]}>
                     <Controller
                         control={control}
                         rules={{ required: 'Title is required' }}

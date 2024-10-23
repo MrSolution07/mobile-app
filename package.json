@@ -43,7 +43,7 @@
     "expo-linear-gradient": "~13.0.2",
     "expo-local-authentication": "~14.0.1",
     "expo-modules-autolinking": "^1.11.2",
-    "expo-notifications": "~0.28.18",
+    "expo-notifications": "^0.28.18",
     "expo-permissions": "^14.4.0",
     "expo-random": "~14.0.1",
     "expo-splash-screen": "~0.27.6",

@@ -7,10 +7,12 @@ import Home from './HomeScreen';
 import Wallet from './Wallet';
 import Gemini from './Gemini';
 import Explore from './Explore';
+import { useThemeColors } from '../Context/Theme/useThemeColors';
 
 const Tab = createBottomTabNavigator();
 
 export default function Tabs() {
+  const colors = useThemeColors();
   return (
       <Tab.Navigator
         initialRouteName="Home"
@@ -18,7 +20,10 @@ export default function Tabs() {
           tabBarActiveTintColor: 'white',
           tabBarInactiveTintColor: 'white',
           headerShown: false,
-          tabBarStyle:styles.tabBarStyle,
+          tabBarStyle: {
+            ...styles.tabBarStyle,
+            backgroundColor: colors.tabbackground
+          },
           tabBarIcon: ({ focused }) => <CustomTabIcon focused={focused} name={getIconName(route.name)} />,
           tabBarBackground:() =>{
             <BlurView intensity={80}
@@ -26,7 +31,7 @@ export default function Tabs() {
               borderTopLeftRadius:20,
               borderTopRightRadius:20,
               overflow:"hidden",
-              backgroundColor:"transparent"
+              // backgroundColor:"transparent"
             }}
             />
           }
