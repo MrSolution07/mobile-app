@@ -48,7 +48,7 @@ const ArtDetailsScreen = () => {
         return (
           <View style={styles.ownersContainer}>
             <Text style={styles.ownersTitle}>Owner</Text>
-            <Text style={styles.ownerName}>Creator: {nft.creator}</Text>
+            <Text style={styles.ownerName}>Creator: {nft.uploadedBy}</Text>
           </View>
         );
       case 'Bids':
@@ -99,12 +99,12 @@ const ArtDetailsScreen = () => {
     <ScrollView contentContainerStyle={styles.container}>
 
       <Image 
-        source={nft.image}  // Dynamically loading the NFT image from passed data
+        source={nft.imageUrl}  // Dynamically loading the NFT image from passed data
         style={styles.artImage}
       />
 
       <View style={styles.detailsContainer}>
-        <Text style={styles.creatorName}>{nft.creator}</Text>
+        <Text style={styles.creatorName}>{nft.uploadedBy}</Text>
         <Text style={styles.artNumber}>{nft.name}</Text>
 
         {/* Tabs for Details, Owners, Bids, History */}

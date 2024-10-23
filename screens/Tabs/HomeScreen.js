@@ -5,13 +5,14 @@ import axios from 'axios';
 import * as LocalAuthentication from 'expo-local-authentication'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { db, auth } from '../../config/firebaseConfig';
-import { doc, getDoc,setDoc } from 'firebase/firestore';
+import { doc, getDoc,setDoc, updateDoc } from 'firebase/firestore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Collection1, Collection2, Collection3, Collection4 } from '../NFT/dummy';
 import tw from 'twrnc';
 import * as Notifications from 'expo-notifications'; // Import Notifications
 import { getToken } from 'expo-notifications'; 
+import * as Location from 'expo-location';
 
 
 
@@ -24,6 +25,7 @@ const HomeScreen = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [loginPromptShown, setLoginPromptShown] = useState(false);
   const [collectionData, setCollectionData] = useState([]);
+  const [location, setLocation] = useState(null); 
   
 
   // Request notification permissions
@@ -161,6 +163,13 @@ const HomeScreen = () => {
           const userData = userDoc.data();
           setName(userData.name);
           setProfileImage(userData.ProfileImage ? { uri: userData.ProfileImage } : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y");
+        
+          if (!userData.country) {
+            requestLocationPermission();
+          } else {
+            setLocation(userData.country); // Set location from the database
+          }
+        
         } else {
           setProfileImage(require('../../assets/images/NoImg.jpg'));
         }
@@ -169,6 +178,44 @@ const HomeScreen = () => {
 
     fetchProfileImage();
   }, []);
+
+
+    // Request Location Permission
+    const requestLocationPermission = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Location permission is required to fetch your country.');
+        return;
+      }
+  
+      const location = await Location.getCurrentPositionAsync({});
+      fetchCountryFromCoordinates(location.coords.latitude, location.coords.longitude);
+    };
+  
+    // Fetch country from coordinates using reverse geocoding (OpenCage or Google Maps API)
+    const fetchCountryFromCoordinates = async (latitude, longitude) => {
+      try {
+        const reverseGeocode = await Location.reverseGeocodeAsync({ latitude, longitude });
+        const country = reverseGeocode[0]?.country;
+        if (country) {
+          setLocation(country);
+          storeLocationInFirestore(country); // Store in Firestore
+        }
+      } catch (error) {
+        console.error('Error fetching country:', error);
+      }
+    };
+  
+    // Store country in Firestore
+    const storeLocationInFirestore = async (country) => {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const userRef = doc(db, 'users', currentUser.uid);
+        await updateDoc(userRef, {
+          location: country,
+        });
+      }
+    };
 
   const toggleDrawer = () => {
     navigation.getParent()?.toggleDrawer();
