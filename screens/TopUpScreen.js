@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, Pressable, Image, Alert, ScrollView, Animated } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Pressable, Image, Alert, ScrollView, Animated,Platform,KeyboardAvoidingView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { db, auth } from '../config/firebaseConfig'; 
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import { useThemeColors } from './Context/Theme/useThemeColors';
+import {useTheme} from './Context/Theme/ThemeContext';
 
 const cardIcons = {
   visa: require('../assets/images/visa.png'), 
@@ -13,6 +14,8 @@ const cardIcons = {
 };
 
 const TopUpScreen = () => {
+  const colors = useThemeColors();
+  const {isDarkMode} = useTheme();
   const [amount, setAmount] = useState('');
   const [accountHolder, setAccountHolder] = useState('');
   const [cardNumber, setCardNumber] = useState('');
@@ -180,10 +183,15 @@ const TopUpScreen = () => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.pageContainer}>
+    <SafeAreaView style={[styles.pageContainer, {backgroundColor: colors.background}]}         keyboardShouldPersistTaps="handled">
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} 
+      >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
-          <Text style={styles.title}>Top-Up Your Account</Text>
+          <Text style={[styles.title , {color :colors.text}]}>Top-Up Your Account</Text>
 
           <TextInput
             style={styles.input}
@@ -191,16 +199,18 @@ const TopUpScreen = () => {
             keyboardType="numeric"
             value={amount}
             onChangeText={(text) => setAmount(text.replace(/[^0-9.]/g, ''))}
+            // placeholderTextColor={colors.placeholderText}
+
           />
 
-          <Text style={styles.label}>Reference Number:</Text>
+          <Text style={[styles.label,{color :colors.text}]}>Reference Number:</Text>
           <TextInput
-            style={styles.referenceInput}
+            style={[styles.referenceInput, {color : colors.placeholderText}]}
             value={referenceNumber}
             editable={false}
           />
 
-          <Text style={styles.bankDetailsTitle}>Card Details</Text>
+          <Text style={[styles.bankDetailsTitle,{color :colors.text}]}>Card Details</Text>
 
           <View style={styles.cardInputContainer}>
             <TextInput
@@ -210,6 +220,7 @@ const TopUpScreen = () => {
               value={cardNumber}
               onChangeText={handleCardNumberChange}
               maxLength={19}
+              // placeholderTextColor={colors.placeholderText}
             />
             {cardType && (
               <Image
@@ -225,6 +236,8 @@ const TopUpScreen = () => {
             placeholder="Account Holder"
             value={accountHolder}
             onChangeText={setAccountHolder}
+            placeholderTextColor={colors.placeholderText}
+
           />
 
           <TextInput
@@ -232,8 +245,11 @@ const TopUpScreen = () => {
             placeholder="CVV"
             keyboardType="numeric"
             value={cvv}
+            
             onChangeText={(text) => setCvv(text.replace(/[^0-9]/g, ''))}
             maxLength={3}
+            placeholderTextColor={colors.placeholderText}
+
           />
 
           <TextInput
@@ -242,6 +258,8 @@ const TopUpScreen = () => {
             value={expiryDate}
             onChangeText={setExpiryDate}
             maxLength={5}
+            placeholderTextColor={colors.placeholderText}
+
           />
 
           {errorMessage ? (
@@ -260,6 +278,7 @@ const TopUpScreen = () => {
           </Pressable>
         </View>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -283,34 +302,40 @@ const styles = StyleSheet.create({
     marginBottom: wp(4),
   },
   input: {
-    height: wp(12),
-    borderColor: '#ccc',
+    height: 48,
+    borderColor: '#dcdcdc', 
     borderWidth: 1,
-    paddingHorizontal: wp(3),
-    marginBottom: wp(3),
-    borderRadius: 6,
+    borderRadius: 10,
+    marginBottom: 20,
+    paddingHorizontal: 15,
+    backgroundColor: '#ffffff',
+    fontSize: 16,
+    // color:'black',
   },
   referenceInput: {
-    height: wp(10),
-    borderColor: '#ccc',
+    height: 48,
+    borderColor: '#dcdcdc', 
     borderWidth: 1,
-    paddingHorizontal: wp(3),
-    marginBottom: wp(3),
-    fontSize: wp(3.5), 
-    color: '#555',
-    borderRadius: 6,
+    borderRadius: 10,
+    marginBottom: 20,
+    paddingHorizontal: 15,
+    backgroundColor: '#ffffff',
+    fontSize: 16,
   },
   cardInputContainer: {
     position: 'relative',
-    marginBottom: wp(3),
+    width: '100%',
+    marginBottom: 20,
   },
   inputWithIcon: {
-    height: wp(12),
-    borderColor: '#ccc',
+    height: 50,
+    borderColor: '#dcdcdc', 
     borderWidth: 1,
-    paddingHorizontal: wp(3),
-    borderRadius: 6,
-    paddingRight: wp(12), // Add padding for the card icon
+    borderRadius: 10, 
+    paddingHorizontal: 15,
+    paddingRight: 50, 
+    backgroundColor: '#ffffff', 
+    fontSize: 16,
   },
   cardIcon: {
     position: 'absolute',

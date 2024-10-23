@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import {
@@ -21,6 +20,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import debounce from 'lodash.debounce'; 
 import { Collection1, Collection2, Collection3, Collection4, Collection5, Collection6, Collection7, Collection8 } from '../NFT/dummy';
 import {useThemeColors} from '../Context/Theme/useThemeColors';
+import tw from 'twrnc';
 
 const Hexagon = ({ price }) => (
   <View style={styles.hexagonContainer}>
@@ -151,25 +151,31 @@ const Explore = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView style={[styles.container,{backgroundColor: colors.background}]}>
+    <SafeAreaView style={[styles.container,{backgroundColor: colors.background}]} >
       <View style={styles.pageContainer}>
+        <View style={tw`items-center justify-center`} >
         <TextInput
-          style={styles.searchBar}
+          style={[styles.searchBar,{color:colors.text}]}
           placeholder="Search"
           onChangeText={debouncedSearch}
+          placeholderTextColor={colors.text}
         />
+        </View>
         <View style={styles.tabs}>
           {['NFTs', 'Collections', 'Recent'].map((tab) => (
             <TouchableOpacity
               key={tab}
               onPress={() => setActiveTab(tab)}
-              style={[styles.tabButton, activeTab === tab && styles.activeTab]}
+              style={[
+                styles.tabButton,
+                { backgroundColor: activeTab === tab ? colors.activeTabBackground : colors.inactiveTabBackground },
+              ]}
             >
               <Text
                 style={[
                   styles.tabText,
                   activeTab === tab ? styles.activeTabText : styles.inactiveTabText,
-                ]}
+                {color: colors.text}]}
               >
                 {tab}
               </Text>
@@ -208,6 +214,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp('4%'),
     marginBottom: hp('2%'),
     fontSize: hp('2%'),
+    width : wp('90%'),
   },
   itemContainer: {
     flex: 1,

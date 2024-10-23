@@ -7,8 +7,13 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, auth } from '../config/firebaseConfig'; 
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { useThemeColors } from './Context/Theme/useThemeColors';
+import {useTheme} from './Context/Theme/ThemeContext';
+
 
 const EditProfile = ({ navigation }) => {
+  const colors = useThemeColors();
+  const {isDarkMode} = useTheme();
   const [avatar, setAvatar] = useState(null);
   const [username, setUsername] = useState('');
   const [userEmail, setUserEmail] = useState('');
@@ -169,13 +174,13 @@ const EditProfile = ({ navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <Image
-          source={{ uri: 'https://i.pinimg.com/originals/6b/f8/48/6bf848ae5afdb77782a1ff14067b194a.jpg' }}
+          source={{ uri: isDarkMode ?'https://i.pinimg.com/564x/c6/04/60/c60460f2e96140732fdf9a79b6432f3e.jpg' :'https://i.pinimg.com/originals/6b/f8/48/6bf848ae5afdb77782a1ff14067b194a.jpg' }}
           style={styles.backgroundImage}
           resizeMode='cover'
         />
         <BlurView style={styles.blurView} intensity={1} tint="dark" />
         <ScrollView contentContainerStyle={styles.contentContainer}>
-          <View style={styles.formContainer}>
+          <View style={[styles.formContainer,{backgroundColor:colors.background}]}>
             
             <TouchableOpacity onPress={handleImageOptions}>
               <Image 
@@ -184,27 +189,28 @@ const EditProfile = ({ navigation }) => {
               />
             </TouchableOpacity>
             <View style={styles.fieldContainer}>
-            <Text>Username</Text>
+            <Text style={{color: colors.text}}>Username</Text>
             <TextInput
               style={styles.input}
               value= {username}
               onChangeText={setUsername}
+              
             />
-            <Text>Email</Text>
+            <Text style={{color: colors.text}}>Email</Text>
             <TextInput
               style={styles.input}
               value={userEmail}
               onChangeText={setUserEmail}
               keyboardType="email-address"
             />
-            <Text>Phone No</Text>
+            <Text style={{color: colors.text}}>Phone No</Text>
             <TextInput
               style={styles.input}
               value={userPhoneNo}
               onChangeText={setUserPhoneNo} 
               keyboardType="phone-pad"
             />
-            <Text>Location</Text>
+            <Text style={{color: colors.text}}>Location</Text>
             <TextInput
               style={styles.input}
               value={userLocation}
@@ -225,7 +231,7 @@ const EditProfile = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor:'transparent',
   },
   container: {
     flex: 1,

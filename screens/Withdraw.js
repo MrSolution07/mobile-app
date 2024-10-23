@@ -3,6 +3,8 @@ import { View, Text, TextInput, StyleSheet, Pressable, Image, Alert, ScrollView,
 import DataContext from './Context/Context';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import {useThemeColors} from './Context/Theme/useThemeColors';
+
 
 const cardIcons = {
   visa: require('../assets/images/visa.png'), 
@@ -10,6 +12,7 @@ const cardIcons = {
 };
 
 const Withdraw = () => {
+  const colors = useThemeColors();
   const { withdrawAmount, setWithdrawAmount, amount, setAmount } = useContext(DataContext);
   const [cardNumber, setCardNumber] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
@@ -97,8 +100,8 @@ const Withdraw = () => {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // Adjust this value as necessary
       >
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <View style={styles.container}>
-            <Text style={styles.title}>Withdraw Funds</Text>
+          <View style={[styles.container, {backgroundColor:colors.background}]}>
+            <Text style={[styles.title,{color :colors.text}]}>Withdraw Funds</Text>
             
             <TextInput
               style={styles.input}
@@ -106,9 +109,10 @@ const Withdraw = () => {
               keyboardType="numeric"
               value={withdrawAmount}
               onChangeText={setWithdrawAmount}
+              
             />
 
-            <Text style={styles.bankDetailsTitle}>Bank Details</Text>
+            <Text style={[styles.bankDetailsTitle,{color :colors.text}]}>Bank Details</Text>
 
             <TextInput
               style={styles.input}
@@ -171,7 +175,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    marginTop: '10%',
     backgroundColor: '#f5f5f5',
   },
   title: {
@@ -180,6 +183,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: '#333',
     textAlign: 'center',
+    marginTop: '10%',
+
   },
   bankDetailsTitle: {
     fontSize: 18,

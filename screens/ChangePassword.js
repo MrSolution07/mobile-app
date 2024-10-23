@@ -3,9 +3,10 @@ import {View,Text,StyleSheet,SafeAreaView,TextInput,TouchableOpacity,Alert} from
 import { auth } from '../config/firebaseConfig';
 import { updatePassword } from 'firebase/auth';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
-
+import { useThemeColors } from './Context/Theme/useThemeColors';
 
 const ChangePassword = ({ navigation }) => {
+  const colors = useThemeColors();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
@@ -35,9 +36,9 @@ const ChangePassword = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, {backgroundColor:colors.background}]}>
       <View style={styles.container}>
-        <Text style={styles.title}>Change Password</Text>
+        <Text style={[styles.title,{color: colors.text}]}>Change Password</Text>
 
         <TextInput
           style={styles.input}
@@ -55,7 +56,7 @@ const ChangePassword = ({ navigation }) => {
           value={newPassword}
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
+        <TouchableOpacity style={[styles.button, {backgroundColor: colors.tabbackground}]} onPress={handleChangePassword}>
           <Text style={styles.buttonText}>Update Password</Text>
         </TouchableOpacity>
       </View>

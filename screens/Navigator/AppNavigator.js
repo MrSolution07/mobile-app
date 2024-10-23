@@ -209,11 +209,13 @@ import ChangePassword from '../ChangePassword';
 import UserProfile from '../ProfileScreen';
 import ProfileScreen from '../ProfileScreen';
 import SubmitOffer from '../SubmitOffer';
+import { useTheme } from '../Context/Theme/ThemeContext';
 
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
   const colors = useThemeColors();
+  const {isDarkMode} = useTheme();
   const [initialRoute, setInitialRoute] = useState(null); // State to manage the initial route
   const [isBiometricSupported, setIsBiometricSupported] = useState(false); // State for biometric support
 
@@ -452,7 +454,9 @@ export default function AppNavigator() {
               headerTransparent: true,
               headerBackground: () => (
                 <View style={{ backgroundColor: 'transparent', flex: 1 }} />
-              ),
+              ),     
+              headerTintColor: isDarkMode ? 'white' : 'black',
+              headerBackTitleVisible: false,
             }}
           />
         </Stack.Navigator>

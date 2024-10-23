@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ScrollView,KeyboardAvoidingView,Platform } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -138,14 +138,16 @@ const SubmitOfferScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} style={tw`flex-1`}>
       <ScrollView
         contentContainerStyle={tw`flex-grow`}
         showsVerticalScrollIndicator={false}
         bounces={false}
-        keyboardShouldPersistTaps="handled"
-      >
+        keyboardShouldPersistTaps="handled">
+
         <View style={styles.container}>
-          <Image source={{ uri: nft.imageUrl }} style={styles.backgroundImage} />
+          <Image source={nft.imageUrl } style={styles.backgroundImage} />
           <View style={styles.card}>
             <Text style={styles.title}>Make an Offer on {nft.title}</Text>
             <Text style={styles.nftPrice}>
@@ -174,6 +176,7 @@ const SubmitOfferScreen = () => {
           </View>
         </View>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

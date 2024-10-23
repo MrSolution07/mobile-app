@@ -9,9 +9,13 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { useRoute } from '@react-navigation/native';
 import tw from 'twrnc';
 import { useThemeColors } from './Context/Theme/useThemeColors';
+import { useTheme } from './Context/Theme/ThemeContext';
+
 
 
 const UserProfile = ({ navigation }) => {
+  const colors = useThemeColors();
+  const {isDarkMode} = useTheme();
   const route = useRoute();
   const showButton = route.params?.showButton || false;  
   const [userData, setUserData] = useState(null);
@@ -52,8 +56,8 @@ const UserProfile = ({ navigation }) => {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+      <SafeAreaView style={[styles.loaderContainer, {backgroundColor: colors.background}]}>
+        <ActivityIndicator size="large" color={isDarkMode? colors.text :"#0000ff"} />
       </SafeAreaView>
     );
   }
@@ -131,12 +135,17 @@ const UserProfile = ({ navigation }) => {
 };
 
 // Helper component to render info items
-const InfoItem = ({ icon, value }) => (
-  <View style={styles.infoItem}>
-    <Text style={styles.infoIcon}>{icon}</Text>
-    <Text style={styles.infoValue}>{value}</Text>
-  </View>
-);
+const InfoItem = ({ icon, value }) => {
+
+  const colors = useThemeColors();
+
+  return(
+    <View style={styles.infoItem}>
+      <Text style={styles.infoIcon}>{icon}</Text>
+      <Text style={styles.infoValue}>{value}</Text>
+    </View>
+  );
+};
 
 // Styles
 const styles = StyleSheet.create({
@@ -185,10 +194,12 @@ const styles = StyleSheet.create({
   editButton:{
   borderRadius: 8,
   backgroundColor:'#2563eb',
-  height: hp('7%'),
+  height: hp('8%'),
   width:wp('80%'),
   justifyContent:'center',
   alignItems:'center',
+  top: 2,
+  marginBottom: 5,
   },
   buttonText:{
     fontSize: 16,
@@ -230,7 +241,7 @@ const styles = StyleSheet.create({
   },
   assetsLabel: {
     fontSize: 16,
-    color: '#666',
+    color: '#2563eb',
     marginBottom: 3,
   },
   balance: {

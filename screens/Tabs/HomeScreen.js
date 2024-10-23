@@ -13,12 +13,14 @@ import tw from 'twrnc';
 import * as Notifications from 'expo-notifications'; // Import Notifications
 import { getToken } from 'expo-notifications'; 
 import * as Location from 'expo-location';
-
-
+import { useThemeColors } from '../Context/Theme/useThemeColors';
+import { useTheme } from '../Context/Theme/ThemeContext';
 
 const collections = [Collection1, Collection2, Collection3, Collection4];
 
 const HomeScreen = () => {
+  const colors = useThemeColors();
+  const {isDarkMode} = useTheme();
   const navigation = useNavigation();
   const [name, setName] = useState('');
   const scrollX = new Animated.Value(0);
@@ -240,7 +242,7 @@ const HomeScreen = () => {
       <TouchableOpacity onPress={() => onCollectionPress(item)} activeOpacity={0.8}>
         <Animated.View style={[styles.collectionItem, { transform: [{ scale }] }]}>
           <Image source={item.image} style={styles.collectionImage} />
-          <Text style={styles.collectionName}>{item.name}</Text>
+          <Text style={[styles.collectionName,{color: colors.text}]}>{item.name}</Text>
         </Animated.View>
       </TouchableOpacity>
     );
@@ -251,9 +253,9 @@ const HomeScreen = () => {
       <View style={styles.topSellingItem}>
         <Image source={item.image} style={styles.topSellingImage} />
         <View style={styles.topSellingInfo}>
-          <Text style={styles.topSellingName} numberOfLines={1} ellipsizeMode='tail'>{item.name}</Text>
-          <Text style={styles.topSellingPrice}>{item.floorPrice}<Text style={tw`text-[#6d28d9]`}> ETH</Text></Text>
-          <Text style={styles.topSellingVolume}>{item.volume} <Text style={tw`text-[#2563eb]`}> ETH</Text></Text>
+          <Text style={[styles.topSellingName, {color: colors.text}]} numberOfLines={1} ellipsizeMode='tail'>{item.name}</Text>
+          <Text style={[styles.topSellingPrice, {color: colors.ethVolumeAmount}]}>{item.floorPrice}<Text style={tw`text-[#6d28d9]`}> ETH</Text></Text>
+          <Text style={[styles.topSellingVolume, {color: colors.ethVolumeAmount}]}>{item.volume} <Text style={tw`text-[#2563eb]`}> ETH</Text></Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -261,32 +263,32 @@ const HomeScreen = () => {
 
   const renderCollectionHeader = () => (
     <View style={styles.collectionHeader}>
-      <Text style={styles.headerText}>Collection</Text>
-      <Text style={styles.headerText}>Floor Price</Text>
-      <Text style={styles.headerText}>Volume</Text>
+      <Text style={[styles.headerText, {color: colors.ethVolumeAmount}]}>Collection</Text>
+      <Text style={[styles.headerText, {color: colors.ethVolumeAmount}]}>Floor Price</Text>
+      <Text style={[styles.headerText, {color: colors.ethVolumeAmount}]}>Volume</Text>
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea,{ backgroundColor: colors.background}]}>
       <View style={styles.container}>
         <FlatList
           ListHeaderComponent={() => (
             <View>
               <View style={styles.header}>
                 <Pressable onPress={toggleDrawer}>
-                  <Ionicons name="menu-sharp" size={28} color="black" />
+                  <Ionicons name="menu-sharp" size={28} color={isDarkMode ? colors.text : "black"} />
                 </Pressable>
                 <TouchableOpacity onPress={ () => navigation.navigate('ProfileScreen', {showButton: true})}>
                   <Image source={profileImage} style={styles.profileImage} />
                 </TouchableOpacity>
               </View>
               <View style={styles.greetingContainer}>
-                <Text style={styles.greeting}>
+                <Text style={[styles.greeting, {color: colors.text}]}>
                   Hello, <Text style={styles.username}>{name}</Text>
                 </Text>
               </View>
-              <View style={styles.sectionHeader}>
+              <View style={[styles.sectionHeader, {color: colors.text}]}>
                 <Text style={styles.sectionTitle}>Top Collections</Text>
                   <TouchableOpacity onPress={() => navigation.navigate('Explore', { screen: 'Explore', params: { initialTab: 'Collections' } })}>
                   <Text style={styles.sectionLink}>See All</Text>
@@ -302,7 +304,7 @@ const HomeScreen = () => {
                 onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: false })}
                 scrollEventThrottle={16}
               />
-              <View style={styles.sectionHeader}>
+              <View style={[styles.sectionHeader, {color: colors.text}]}>
                 <Text style={styles.sectionTitle}>Top Selling</Text>
                 
               </View>

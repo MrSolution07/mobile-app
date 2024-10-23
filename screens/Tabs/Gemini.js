@@ -2,9 +2,11 @@ import React, { useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, SafeAreaView } from 'react-native';
 import DataContext from '../Context/Context';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
+import { useThemeColors } from '../Context/Theme/useThemeColors';
 
 const Gemini = () => {
   const { onSent, recentPrompt, showResult, loading, resultData, setInput, input, setShowResult, name, suggestedPrompts } = useContext(DataContext);
+  const colors = useThemeColors();
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
   // i honeslty dont know how to prevent the styling with Gemini sometimes it's okay some other...      //
@@ -32,13 +34,13 @@ const Gemini = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.container}>
+        <View style={[styles.container, {backgroundColor:colors.background}]}>
           <View style={styles.mainContainer}>
             {!showResult ? (
               <>
                 <View style={styles.greet}>
-                  <Text style={styles.greetText}>Hello, <Text style={styles.name}>{name}</Text> </Text>
-                  <Text style={styles.subText}>How can I help you today?</Text>
+                  <Text style={[styles.greetText,{color: colors.text}]}>Hello, <Text style={styles.name}>{name}</Text> </Text>
+                  <Text style={[styles.subText,{color: colors.ethVolumeAmount}]}>How can I help you today?</Text>
                 </View>
 
                 <ScrollView horizontal={true} style={styles.cardsContainer}>
@@ -50,18 +52,18 @@ const Gemini = () => {
                 </ScrollView>
               </>
             ) : (
-              <View style={styles.resultContainer}>
+              <View style={[styles.resultContainer,{color: colors.text}]}>
                 <TouchableOpacity onPress={handleBack} style={styles.backButton}>
                   <Text style={styles.backButtonText}>Back</Text>
                 </TouchableOpacity>
                 <View style={styles.resultTitle}>
-                  <Text>{recentPrompt}</Text>
+                  <Text style={{color: colors.text}}>{recentPrompt}</Text>
                 </View>
                 <View style={styles.resultData}>
                   {loading ? (
                     <ActivityIndicator size="large" color="#007bff" />
                   ) : (
-                    <Text>{resultData}</Text> // Result displayed word-by-word
+                    <Text style={{color: colors.text}}>{resultData}</Text> // Result displayed word-by-word
                   )}
                 </View>
               </View>

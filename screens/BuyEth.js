@@ -7,8 +7,10 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../config/firebaseConfig';
 import {EXPO_PUBLIC_ETHERSCAN_API_KEY} from '@env';
 import { arrayUnion } from 'firebase/firestore';
+import {useThemeColors} from './Context/Theme/useThemeColors';
 
 const BuyETHPage = () => {
+  const colors = useThemeColors();
   const [ethAmount, setEthAmount] = useState('');
   const [zarAmount, setZarAmount] = useState('');
   const [userBalance, setUserBalance] = useState(null);
@@ -188,21 +190,21 @@ const BuyETHPage = () => {
 
   if (loadingUserData || loadingEthStats) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={[styles.loadingContainer,{backgroundColor: colors.background}]}>
         <ActivityIndicator size="large" color="#075eec" />
-        <Text style={styles.loadingText}>Loading...</Text>
+        <Text style={[styles.loadingText, {color: colors.text}]}>Loading...</Text>
       </View>
     );
   }
 
   return (
     <SafeAreaView style={tw`flex-1`}>
-      <View style={styles.container}>
+      <View style={[styles.container,{backgroundColor: colors.background}]}>
         <ScrollView  contentContainerStyle={tw`flex-grow`}
         showsVerticalScrollIndicator={false}
         bounces={false}
         keyboardShouldPersistTaps="handled">
-          <Text style={styles.title}>Buy ETH</Text>
+          <Text style={[styles.title,{color: colors.text}]}>Buy ETH</Text>
 
       {/* ETH Stats Section */}
       <View style={styles.ethStats}>
@@ -270,7 +272,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    marginTop: '5%',
     backgroundColor: '#f5f5f5',
   },
   loadingContainer: {
@@ -289,6 +290,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: '#333',
     textAlign: 'center',
+    marginTop: '6%',
+
   },
   ethStats: {
     marginBottom: 20,
