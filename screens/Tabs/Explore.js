@@ -120,7 +120,7 @@ const Explore = ({ navigation }) => {
           accessibilityHint={`View details of ${item.title}`}
         >
           <Hexagon price={item.price} />
-          <Image source={item.imageUrl} style={styles.nftImage} />
+          <Image source={{uri: item.imageUrl}} style={styles.nftImage} />
           <View style={styles.nftNameContainer}>
             <Text style={styles.nftName}>{item.title}</Text>
           </View>

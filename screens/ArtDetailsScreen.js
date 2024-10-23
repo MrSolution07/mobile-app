@@ -1,29 +1,34 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions,Platform } from 'react-native';
-import { useRoute,useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Animated, Dimensions, Platform, ActivityIndicator } from 'react-native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import tw from 'twrnc';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../config/firebaseConfig';
 
-
-const { width } = Dimensions.get('window'); // Get screen width for dynamic positioning
+const { width } = Dimensions.get('window');
 
 const ArtDetailsScreen = () => {
   const route = useRoute();
   const { nft } = route.params; // Receiving NFT data from the previous screen
 
+  const [bids, setBids] = useState([]);
+  const [loadingBids, setLoadingBids] = useState(true);
+
   const navigation = useNavigation();
 
-  const [activeTab, setActiveTab] = useState('Details'); // State to track the active tab
-  const underlinePosition = useRef(new Animated.Value(0)).current; // Animated value for underline position
+  const [activeTab, setActiveTab] = useState('Details');
+  const underlinePosition = useRef(new Animated.Value(0)).current;
 
   const underlineWidth = wp('18%');
   const tabOffsetMap = {
-    Details: Platform.OS === 'ios'? wp('3.5%') : wp('3%'),
-    Owners:  Platform.OS === 'ios'? wp('27%'): wp('26%'),
-    Bids:  Platform.OS === 'ios'? wp('48%') : wp('48%'),
-    History: Platform.OS ==='ios'? wp('68.5%') : wp('69%'),
+    Details: Platform.OS === 'ios' ? wp('3.5%') : wp('3%'),
+    Owners: Platform.OS === 'ios' ? wp('27%') : wp('26%'),
+    Bids: Platform.OS === 'ios' ? wp('48%') : wp('48%'),
+    History: Platform.OS === 'ios' ? wp('68.5%') : wp('69%'),
   };
 
   useEffect(() => {
@@ -33,6 +38,29 @@ const ArtDetailsScreen = () => {
       useNativeDriver: false,
     }).start();
   }, []);
+
+
+  
+
+  // Fetch bids from Firestore
+  useEffect(() => {
+    const fetchBids = async () => {
+      try {
+        const nftDocRef = doc(db, 'nfts', nft.id);
+        const nftDoc = await getDoc(nftDocRef);
+        if (nftDoc.exists()) {
+          const nftData = nftDoc.data();
+          setBids(nftData.bids || []);
+        }
+      } catch (error) {
+        console.error('Error fetching bids:', error);
+      } finally {
+        setLoadingBids(false);
+      }
+    };
+
+    fetchBids();
+  }, [nft.id]);
 
   // Tab rendering function
   const renderTabContent = () => {
@@ -55,27 +83,34 @@ const ArtDetailsScreen = () => {
         return (
           <View style={styles.bidsContainer}>
             <Text style={styles.bidsTitle}>Bids</Text>
-            {nft.bids && nft.bids.length > 0 ? (
-              nft.bids.map((bid) => (
-                <View key={bid.id} style={styles.bidItem}>
-                  <Image source={bid.image} style={styles.bidderImage} />
-                  <View style={styles.bidderInfo}>
-                    <Text style={styles.bidderName}>{bid.name}</Text>
-                    <Text style={styles.bidPrice}>{bid.price} ETH</Text>
-                    <Text style={styles.bidDate}>{bid.date}</Text>
-                  </View>
-                </View>
-              ))
-            ) : (
-              <Text>No bids available.</Text>
-            )}
+            {loadingBids ? (
+        <ActivityIndicator size="large" color="#000" />
+      ) : bids.length > 0 ? (
+        bids.map((bid, index) => {
+          const bidDate = bid.timestamp
+            ? (bid.timestamp.toDate ? bid.timestamp.toDate() : new Date(bid.timestamp)).toLocaleDateString()
+            : 'Unknown date';
+
+          return (
+            <View key={index} style={styles.bidItem}>
+              <Image source={{ uri: bid.bidderImage }} style={styles.bidderImage} />
+              <View style={styles.bidderInfo}>
+                <Text style={styles.bidderName}>{bid.bidderName}</Text>
+                <Text style={styles.bidPrice}>{bid.offerAmount} ETH</Text>
+                <Text style={styles.bidDate}>{bidDate}</Text>
+              </View>
+            </View>
+          );
+        })
+      ) : (
+        <Text>No bids available.</Text>
+      )}
           </View>
         );
       case 'History':
         return (
           <View style={styles.historyContainer}>
             <Text style={styles.historyTitle}>History</Text>
-            {/* Render any historical details here */}
             <Text>No history available.</Text>
           </View>
         );
@@ -96,48 +131,43 @@ const ArtDetailsScreen = () => {
 
   return (
     <SafeAreaView style={tw`flex-1`}>
-    <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Image 
+           source={{ uri: nft.imageUrl } } 
+           style={styles.artImage}
+        />
 
-      <Image 
-        source={nft.imageUrl}  // Dynamically loading the NFT image from passed data
-        style={styles.artImage}
-      />
+        <View style={styles.detailsContainer}>
+          <Text style={styles.creatorName}>{nft.uploadedBy}</Text>
+          <Text style={styles.artNumber}>{nft.name}</Text>
 
-      <View style={styles.detailsContainer}>
-        <Text style={styles.creatorName}>{nft.uploadedBy}</Text>
-        <Text style={styles.artNumber}>{nft.name}</Text>
+          <View style={styles.tabContainer}>
+            {['Details', 'Owners', 'Bids', 'History'].map((tab) => (
+              <TouchableOpacity key={tab} onPress={() => handleTabPress(tab)}>
+                <Text style={[styles.tab, activeTab === tab && styles.activeTab]}>{tab}</Text>
+              </TouchableOpacity>
+            ))}
+            <Animated.View
+              style={[
+                styles.underline,
+                { width: underlineWidth, transform: [{ translateX: underlinePosition }] },
+              ]}
+            />
+          </View>
 
-        {/* Tabs for Details, Owners, Bids, History */}
-        <View style={styles.tabContainer}>
-          {['Details', 'Owners', 'Bids', 'History'].map((tab, index) => (
-            <TouchableOpacity key={tab} onPress={() => handleTabPress(tab, index)}>
-              <Text style={[styles.tab, activeTab === tab && styles.activeTab]}>{tab}</Text>
+          {renderTabContent()}
+
+          <View style={styles.bidContainer}>
+            <Text style={styles.currentBidLabel}>Current Bid</Text>
+            <Text style={styles.currentBid}>
+              {nft.price} ETH <FontAwesome5 name="ethereum" size={16} color="black" />
+            </Text>
+            <TouchableOpacity style={styles.offerButton} onPress={() => navigation.navigate('SubmitOffer', { nft })}>
+              <Text style={styles.offerButtonText}>Make Offer</Text>
             </TouchableOpacity>
-          ))}
-          {/* Animated underline */}
-          <Animated.View
-            style={[
-              styles.underline,
-              { width: underlineWidth, transform: [{ translateX: underlinePosition }] },
-            ]}
-          />
+          </View>
         </View>
-
-        {/* Render content based on selected tab */}
-        {renderTabContent()}
-
-        {/* Current Bid Section */}
-        <View style={styles.bidContainer}>
-          <Text style={styles.currentBidLabel}>Current Bid</Text>
-          <Text style={styles.currentBid}>
-            {nft.price} ETH <FontAwesome5 name="ethereum" size={16} color="black" />
-          </Text>
-          <TouchableOpacity style={styles.offerButton} onPress={() => navigation.navigate('SubmitOffer',{nft})}>
-            <Text style={styles.offerButtonText}>Make Offer</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -150,7 +180,7 @@ const styles = StyleSheet.create({
   },
   artImage: {
     width: '100%',
-    height: hp('45%'), // Adjust for responsiveness
+    height: hp('45%'),
     resizeMode: 'cover',
   },
   detailsContainer: {
@@ -175,7 +205,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginTop: hp('2%'),
-    position: 'relative', 
+    position: 'relative',
   },
   tab: {
     fontSize: hp('2%'),
@@ -268,11 +298,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
   },
-  historyContainer:{
-    top:hp('1%'),
+  historyContainer: {
+    marginTop: hp('3%'),
   },
-  historyTitle:{
-    top:hp('5%'),
+  historyTitle: {
+    fontSize: hp('2.2%'),
+    fontWeight: 'bold',
+    color: '#000',
   },
   offerButton: {
     backgroundColor: '#222',
