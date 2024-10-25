@@ -1,5 +1,3 @@
-// DrawerNavigator.js
-
 import React from 'react';
 import { 
     createDrawerNavigator, 
@@ -26,7 +24,6 @@ export default function DrawerNavigator() {
   return (
     <Drawer.Navigator
       initialRouteName="HomeTabs"
-      // Define the custom drawer content within the same file
       drawerContent={(props) => (
         <CustomDrawerContent {...props} />
       )}

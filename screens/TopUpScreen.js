@@ -199,7 +199,7 @@ const TopUpScreen = () => {
             keyboardType="numeric"
             value={amount}
             onChangeText={(text) => setAmount(text.replace(/[^0-9.]/g, ''))}
-            // placeholderTextColor={colors.placeholderText}
+            placeholderTextColor={colors.placeholderText}
 
           />
 
@@ -220,7 +220,7 @@ const TopUpScreen = () => {
               value={cardNumber}
               onChangeText={handleCardNumberChange}
               maxLength={19}
-              // placeholderTextColor={colors.placeholderText}
+              placeholderTextColor={colors.placeholderText}
             />
             {cardType && (
               <Image

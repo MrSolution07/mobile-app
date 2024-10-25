@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, SafeAreaView,KeyboardAvoidingView,Platform } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import DataContext from '../Context/Context';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
 import { useThemeColors } from '../Context/Theme/useThemeColors';
@@ -68,24 +69,31 @@ const Gemini = () => {
                 </View>
               </View>
             )}
+            <KeyboardAvoidingView
+            // style={{ flexGrow: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 10}>
+                <View style={styles.bottomContainer}>
+                  <View style={styles.searchBox}>
+                  
+                    <TextInput
+                      style={styles.input}
+                      value={input}
+                      onChangeText={(text) => setInput(text)}
+                      placeholder="Enter a prompt here"
+                      placeholderTextColor="#999"
+                    />
 
-            <View style={styles.bottomContainer}>
-              <View style={styles.searchBox}>
-                <TextInput
-                  style={styles.input}
-                  value={input}
-                  onChangeText={(text) => setInput(text)}
-                  placeholder="Enter a prompt here"
-                  placeholderTextColor="#999"
-                />
-                <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
-                  <Text style={styles.sendButtonText}>Send</Text>
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.bottomInfo}>
-                Gravity. It keeps you rooted to the ground...
-              </Text>
-            </View>
+                    <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
+                      <Text style={styles.sendButtonText}>Send</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={styles.bottomInfo}>
+                    Gravity. It keeps you rooted to the ground...
+                  </Text>
+                </View>
+                </KeyboardAvoidingView>
+
           </View>
         </View>
       </ScrollView>
@@ -173,6 +181,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#f1f1f1',
     padding: 8,
     borderRadius: 8,
+    top: 0,
+    marginBottom: '28%',
   },
   input: {
     flex: 1,
@@ -189,7 +199,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   bottomInfo: {
-    marginTop: 16,
+    bottom: 70,
     fontSize: 12,
     color: '#777',
     textAlign: 'center',

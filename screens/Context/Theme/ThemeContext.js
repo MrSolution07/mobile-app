@@ -6,18 +6,15 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const colorScheme = useColorScheme();
-  console.log('Theme is ', colorScheme);
 
-  const [isDarkMode, setIsDarkMode] = useState(null); // Start with null to load from storage
+  const [isDarkMode, setIsDarkMode] = useState(null); 
 
-  // Load the theme preference from AsyncStorage when the app starts
   useEffect(() => {
     const loadTheme = async () => {
       const savedTheme = await AsyncStorage.getItem('isDarkMode');
       if (savedTheme !== null) {
         setIsDarkMode(savedTheme === 'true');
       } else {
-        // Default to system preference if no saved preference
         setIsDarkMode(colorScheme === 'dark');
       }
     };
@@ -36,7 +33,6 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [isDarkMode]);
 
-  // Update dark mode based on system preference changes
   useEffect(() => {
     if (isDarkMode === null) {
       setIsDarkMode(colorScheme === 'dark');

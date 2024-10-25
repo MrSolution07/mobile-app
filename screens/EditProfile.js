@@ -175,6 +175,7 @@ const EditProfile = ({ navigation }) => {
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
         style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 50 : 0}
     >
     <View style={styles.container}>
         <Image

@@ -1,6 +1,6 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StyleSheet } from 'react-native';
+import React,{useState, useEffect} from 'react';
+import { createBottomTabNavigator, useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { StyleSheet,Keyboard } from 'react-native';
 import { BlurView } from 'expo-blur';
 import CustomTabIcon from './CustomTabIcon'; 
 import Home from './HomeScreen';
@@ -11,7 +11,26 @@ import { useThemeColors } from '../Context/Theme/useThemeColors';
 
 const Tab = createBottomTabNavigator();
 
+
+
 export default function Tabs() {
+
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setIsKeyboardVisible(true);
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setIsKeyboardVisible(false);
+    });
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   const colors = useThemeColors();
   return (
       <Tab.Navigator
@@ -22,17 +41,21 @@ export default function Tabs() {
           headerShown: false,
           tabBarStyle: {
             ...styles.tabBarStyle,
-            backgroundColor: colors.tabbackground
+            backgroundColor: colors.tabbackground,
+            display: isKeyboardVisible ? 'none' : 'flex',
           },
           tabBarIcon: ({ focused }) => <CustomTabIcon focused={focused} name={getIconName(route.name)} />,
           tabBarBackground:() =>{
             <BlurView intensity={80}
-            style={{...StyleSheet.absoluteFillObject,
+            style={{
+              ...StyleSheet.absoluteFillObject,
               borderTopLeftRadius:20,
               borderTopRightRadius:20,
               overflow:"hidden",
               // backgroundColor:"transparent"
+            
             }}
+
             />
           }
         })}
@@ -57,6 +80,7 @@ export default function Tabs() {
             name="Gemini"
             component={Gemini}
             options={{title:""}}
+            
           />
         
       </Tab.Navigator>

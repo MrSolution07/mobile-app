@@ -40,6 +40,9 @@ const SettingsScreen = () => {
               navigation.reset({
                 index: 0,
                 routes: [{ name: 'Login' }],
+                options :{
+                  gestureEnabled: false,
+                },
               });
             } catch (error) {
               Alert.alert('Error', 'Failed to logout. Please try again.');

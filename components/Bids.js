@@ -6,8 +6,10 @@ import tw from 'twrnc';
 import { collection, onSnapshot } from 'firebase/firestore'; 
 import { doc, getDoc, updateDoc, getDocs } from 'firebase/firestore';
 import * as Notifications from 'expo-notifications'; // Import notifications
+import { useThemeColors } from '../screens/Context/Theme/useThemeColors';
 
 const Bids = () => {
+  const colors = useThemeColors();
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [userBidsData, setUserBidsData] = useState([]); 
   const [bidsData, setBidsData] = useState([]); 
@@ -212,9 +214,9 @@ const Bids = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container,{backgroundColor:colors.background}]}>
       <View style={tw`mt-4`}>
-        <Text style={styles.title}>Bids on Your NFTs</Text>
+        <Text style={[styles.title,{color:colors.blueText}]}>Bids on Your NFTs</Text>
 
         {feedbackMessage ? (
           <Text style={styles.feedbackMessage}>{feedbackMessage}</Text>
@@ -228,7 +230,7 @@ const Bids = () => {
               contentContainerStyle={styles.flatListContent}
             />
 
-        <Text style={styles.title}>Your Bids</Text>
+        <Text style={[styles.title,{color:colors.blueText}]}>Your Bids</Text>
           <FlatList
           data={userBidsData} // This is the list for "Your Bids"
           renderItem={renderUserBidItem}
@@ -253,6 +255,7 @@ const styles = StyleSheet.create({
     fontSize: hp('3%'),
     marginBottom: hp('1%'),
     fontFamily: 'NotoSansJP_700Bold',
+    textAlign:'center',
   },
   feedbackMessage: {
     fontSize: hp('2%'),

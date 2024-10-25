@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
   editButton:{
   borderRadius: 25,
   backgroundColor:'#2563eb',
-  height: hp('6%'),
+  height: hp('7.4%'),
   width:wp('80%'),
   justifyContent:'center',
   alignItems:'center',

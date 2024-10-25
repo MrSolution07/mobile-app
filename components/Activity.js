@@ -7,10 +7,11 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { db, auth } from '../config/firebaseConfig'; 
 import { doc, onSnapshot } from 'firebase/firestore';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
-
 import tw from 'twrnc';
+import { useThemeColors } from '../screens/Context/Theme/useThemeColors';
 
 const Activity = () => {
+  const colors = useThemeColors();
   const { amount, ethAmount, zarAmount, withdrawAmount } = useContext(DataContext);
   const [transfers, setTransfers] = useState([]);
   const [ethTransactions, setEthTransactions] = useState([]);
@@ -56,35 +57,35 @@ const Activity = () => {
     <SafeAreaView style={tw`top-5 p-4`}>
     {transfers.length > 0 ? (
           transfers.map((transfer, index) => (
-            <View key={index} style={styles.activityContainer}>
+            <View key={index} style={[styles.activityContainer,{backgroundColor:colors.tabbackground}]}>
               <View style={styles.iconRow}>
                 <View style={styles.iconCircle}>
                   <MaterialCommunityIcons name="arrow-up" size={20} color="white" />
                 </View>
                 <View style={styles.activityContent}>
-                  <Text style={styles.activityType}>Transfer</Text>
+                  <Text style={[styles.activityType,{color:colors.text}]}>Transfer</Text>
                   <View style={tw`flex-row justify-between`}>
-                    <Text style={styles.activityAmount}>{transfer.amount} ZAR</Text>
-                    <Text style={styles.activityDate}>{transfer.date}</Text>
+                    <Text style={[styles.activityAmount,{color: colors.text}]}>{transfer.amount} ZAR</Text>
+                    <Text style={[styles.activityDate, {color: colors.grayText}]}>{transfer.date}</Text>
                   </View>
                 </View>
               </View>
             </View>
           ))
         ) : (
-          <Text>No transfers found.</Text>
+          <Text style={colors.text}>No transfers found.</Text>
         )}
 
-        <View style={styles.activityContainer}>
+        <View style={[styles.activityContainer,{backgroundColor:colors.tabbackground}]}>
           <View style={styles.iconRow}>
             <View style={styles.iconCircle}>
               <MaterialCommunityIcons name="arrow-down" size={20} color="white" />
             </View>
             <View style={styles.activityContent}>
-              <Text style={styles.activityType}>Withdrawals</Text>
+              <Text style={[styles.activityType,{color:colors.text}]}>Withdrawals</Text>
               <View style={tw`flex-row justify-between`}>
-              <Text style={styles.activityAmount}>{withdrawAmount} ZAR</Text>
-              <Text style={styles.activityDate}>2024-09-02</Text>
+              <Text style={[styles.activityAmount, {color:colors.text}]}>{withdrawAmount} ZAR</Text>
+              <Text style={[styles.activityDate, {color:colors.grayText}]}>2024-09-02</Text>
               </View>
             </View>
           </View>
@@ -92,23 +93,23 @@ const Activity = () => {
 
         {ethTransactions.length > 0 ? (
           ethTransactions.map((transaction, index) => (
-            <View key={index} style={styles.activityContainer}>
+            <View key={index} style={[styles.activityContainer,{backgroundColor:colors.tabbackground,borderColor:colors.text}]}>
               <View style={styles.iconRow}>
                 <View style={styles.iconCircle}>
                   <FontAwesome5 name="ethereum" size={20} color="white" />
                 </View>
                 <View style={styles.activityContent}>
-                  <Text style={styles.activityType}>Purchased ETH</Text>
+                  <Text style={[styles.activityType,{color:colors.text}]}>Purchased ETH</Text>
                   <View style={tw`flex-row justify-between`}>
-                    <Text style={styles.activityAmount}>{transaction.ethAmount} ETH</Text>
-                    <Text style={styles.activityDate}>{transaction.date}</Text>
+                    <Text style={[styles.activityAmount,{color:colors.text}]}>{transaction.ethAmount} ETH</Text>
+                    <Text style={[styles.activityDate,{color:colors.grayText}]}>{transaction.date}</Text>
                   </View>
                 </View>
               </View>
             </View>
           ))
         ) : (
-          <Text>No ETH purchases found.</Text>
+          <Text style={colors.text}>No ETH purchases found.</Text>
         )}
     </SafeAreaView>
     </ScrollView>
@@ -155,6 +156,7 @@ const styles = StyleSheet.create({
   activityAmount: {
     fontSize: 14,
     marginBottom: 5,
+    fontWeight:'600',
   },
   activityDate: {
     fontSize: 12,

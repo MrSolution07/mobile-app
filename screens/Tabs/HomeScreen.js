@@ -324,7 +324,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#ffffff',
-
   },
   container: {
     paddingHorizontal: wp('4%'),

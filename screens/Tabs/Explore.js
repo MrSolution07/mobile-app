@@ -20,14 +20,15 @@ import { collection, getDocs } from 'firebase/firestore';
 import debounce from 'lodash.debounce'; 
 import { Collection1, Collection2, Collection3, Collection4, Collection5, Collection6, Collection7, Collection8 } from '../NFT/dummy';
 import {useThemeColors} from '../Context/Theme/useThemeColors';
+import { useTheme } from '../Context/Theme/ThemeContext';
 import tw from 'twrnc';
 
-const Hexagon = ({ price }) => (
+const Hexagon = ({ price,isDarkMode,colors }) => (
   <View style={styles.hexagonContainer}>
     <Svg height={hp('15%')} width={150} viewBox="0 0 100 100" style={styles.svg}>
-      <Polygon points="50,5 100,25 100,75 50,95 0,75 0,25" fill="white" />
+      <Polygon points="50,5 100,25 100,75 50,95 0,75 0,25" fill={isDarkMode ? "black" : "white"} />
     </Svg>
-    <Text style={styles.priceText}>{price} ETH</Text>
+    <Text style={[styles.priceText, {color:colors.text}]}>{price} ETH</Text>
   </View>
 );
 
@@ -35,6 +36,7 @@ const collections = [Collection1, Collection2, Collection3, Collection4, Collect
 
 const Explore = ({ navigation }) => {
   const colors = useThemeColors();
+  const {isDarkMode} = useTheme();
   const [nfts, setNfts] = useState([]);
   const [activeTab, setActiveTab] = useState('NFTs');
   const [searchQuery, setSearchQuery] = useState('');
@@ -119,8 +121,9 @@ const Explore = ({ navigation }) => {
           accessibilityLabel={`Navigate to ${item.title}`}
           accessibilityHint={`View details of ${item.title}`}
         >
-          <Hexagon price={item.price} />
-          <Image source={{uri: item.imageUrl}} style={styles.nftImage} />
+          <Hexagon price={item.price} isDarkMode={isDarkMode} colors={colors}/>
+          <Image source={{ uri: item.imageUrl}} style={styles.nftImage} 
+          />
           <View style={styles.nftNameContainer}>
             <Text style={styles.nftName}>{item.title}</Text>
           </View>
@@ -222,12 +225,12 @@ const styles = StyleSheet.create({
     marginBottom: hp('2.5%'),
     marginHorizontal: wp('2%'),
     position: 'relative',
+
   },
   nftImage: {
     width: wp('40%'),
     height: hp('20%'),
     borderRadius: wp('2%'),
-    overflow: 'hidden',
   },
   nftNameContainer: {
     position: 'absolute',
@@ -247,7 +250,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    top: hp('-10%'),
+    top: -hp('10%'),
     zIndex: 1,
     overflow: 'hidden',
     borderRadius: wp('12%'),

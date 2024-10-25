@@ -13,13 +13,17 @@ export const darkColors = {
   primary:'black',
   secondary:'#075eec',
   profileCard: '#1f1f1f',
-  tabbackground: 'grey',
+  tabbackground: '#333333',
   walletGradient: ['#1B1F3B', '#2C3E50', '#4A6D8A'],
   uploadFormContainer : 'rgba(255,255,255,0.9)',
   ethVolumeAmount: '#F0EAD6',
   placeholderText:'grey',
   inputText:'black',
-  activeTabBackground: '#D3D3D3', 
+  purpleText: '#6d28d9',
+  blueText:'#2563eb',
+  submitform:'rgba(0,0,0,0.9)',
+  activeTabBackground: '#D3D3D3',
+  grayText: '#D3D3D3',
   inactiveTabBackground: '#808080'
   
 };

@@ -3,21 +3,25 @@ import { View, Text, Image, FlatList, StyleSheet, SafeAreaView, Pressable, Touch
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Svg, { Polygon } from 'react-native-svg';
+import { useThemeColors } from './Context/Theme/useThemeColors';
+import { useTheme } from './Context/Theme/ThemeContext';
 
-const Hexagon = ({ price }) => (
+const Hexagon = ({ price, isDarkMode,colors }) => (
   <View style={styles.hexagonContainer}>
     <Svg height={hp('15%')} width={150} viewBox="0 0 100 100" style={styles.svg}>
       <Polygon
         points="50,5 100,25 100,75 50,95 0,75 0,25"
-        fill="white"
+        fill={isDarkMode ?'black':'white'}
       />
     </Svg>
 
-    <Text style={styles.ethPrice}>{price} ETH</Text> 
+    <Text style={[styles.ethPrice,{color: colors.text}]}>{price} ETH</Text> 
   </View>
 );
 
 const CollectionDetailScreen = () => {
+  const colors = useThemeColors();
+  const {isDarkMode} = useTheme();
   const route = useRoute();
   const navigation = useNavigation();
   const { collection } = route.params; 
@@ -42,25 +46,25 @@ const CollectionDetailScreen = () => {
 
   const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => onNftPress(item)} activeOpacity={0.8} style={styles.nftItem}>
-      <Hexagon price={item.price} />
+      <Hexagon price={item.price}  isDarkMode={isDarkMode} colors={colors} />
       <Image source={item.imageUrl} style={styles.nftImage} />
-      <Text style={styles.nftName}>{item.name}</Text>
-      <Text style={styles.nftCreator}>Creator: {item.uploadedBy}</Text>
+      <Text style={[styles.nftName,{color:colors.blueText}]}>{item.name}</Text>
+      <Text style={[styles.nftCreator,{color:colors.grayText}]}>Creator: {item.uploadedBy}</Text>
     </TouchableOpacity>
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <Text style={styles.collectionTitle}>{collection.name}</Text>
+    <SafeAreaView style={[styles.safeArea,{backgroundColor:colors.background}]}>
+      <Text style={[styles.collectionTitle, {color:colors.text}]}>{collection.name}</Text>
       <FlatList
         data={collection.nfts}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.nftList}
+        columnWrapperStyle={styles.columWrapper}
         numColumns={2}
       />
       
-      <TouchableOpacity style={styles.makeOfferButton} onPress={handleMakeCollectionOffer}>
+      <TouchableOpacity style={[styles.makeOfferButton,{backgroundColor: colors.tabbackground}]} onPress={handleMakeCollectionOffer}>
         <Text style={styles.makeOfferButtonText}>Make Collection Offer</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -72,6 +76,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 6,
+
   },
   collectionTitle: {
     marginTop: Platform.OS === 'ios' ? hp('3%') : hp('4%'), 
@@ -80,9 +85,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: hp('2%'),
   },
-  nftList: {
-    paddingHorizontal: wp('4%'),
-  },
+  
   nftItem: {
     marginBottom: hp('2%'),
     padding: hp('1.5%'),
@@ -100,6 +103,10 @@ const styles = StyleSheet.create({
     borderRadius: wp('2%'),
     marginBottom: hp('1%'),
   },
+  columWrapper:{
+    overflow:'hidden',
+    
+  },
   nftName: {
     fontSize: hp('2.5%'),
     fontWeight: 'bold',
@@ -115,14 +122,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    top: hp('-8%'),
+    top: -hp('9%'),
     zIndex: 1,
-    overflow: 'hidden',
     borderRadius: wp('12%'),
+    overflow:'hidden',
   },
   ethPrice: {
     position: 'absolute',
-    top: hp('9.5%'),
+    top: hp('10%'),
     textAlign: 'center',
     fontSize: hp('1.9%'),
     fontWeight: 'bold',
@@ -137,7 +144,8 @@ const styles = StyleSheet.create({
   },
   makeOfferButtonText: {
     color: '#fff',
-    fontSize: hp('2%'),
+    fontSize: hp('2.4%'),
+    fontWeight:'600',
   },
 });
 

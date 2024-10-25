@@ -8,10 +8,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import tw from 'twrnc';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
+import { useThemeColors } from './Context/Theme/useThemeColors';
+import { useTheme } from './Context/Theme/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
 const ArtDetailsScreen = () => {
+  const colors = useThemeColors();
   const route = useRoute();
   const { nft } = route.params; // Receiving NFT data from the previous screen
 
@@ -68,21 +71,21 @@ const ArtDetailsScreen = () => {
       case 'Details':
         return (
           <View style={styles.descriptionContainer}>
-            <Text style={styles.descriptionTitle}>Description</Text>
-            <Text style={styles.descriptionText}>{nft.description}</Text>
+            <Text style={[styles.descriptionTitle,{color:colors.blueText}]}>Description</Text>
+            <Text style={[styles.descriptionText,{color:colors.text}]}>{nft.description}</Text>
           </View>
         );
       case 'Owners':
         return (
           <View style={styles.ownersContainer}>
-            <Text style={styles.ownersTitle}>Owner</Text>
-            <Text style={styles.ownerName}>Creator: {nft.uploadedBy}</Text>
+            <Text style={[styles.ownersTitle,{color:colors.blueText}]}>Owner</Text>
+            <Text style={[styles.ownerName,{color:colors.text}]}>Creator: {nft.uploadedBy}</Text>
           </View>
         );
       case 'Bids':
         return (
           <View style={styles.bidsContainer}>
-            <Text style={styles.bidsTitle}>Bids</Text>
+            <Text style={[styles.bidsTitle,{color:colors.blueText}]}>Bids</Text>
             {loadingBids ? (
         <ActivityIndicator size="large" color="#000" />
       ) : bids.length > 0 ? (
@@ -95,23 +98,23 @@ const ArtDetailsScreen = () => {
             <View key={index} style={styles.bidItem}>
               <Image source={{ uri: bid.bidderImage }} style={styles.bidderImage} />
               <View style={styles.bidderInfo}>
-                <Text style={styles.bidderName}>{bid.bidderName}</Text>
+                <Text style={[styles.bidderName, {color:colors.text}]}>{bid.bidderName}</Text>
                 <Text style={styles.bidPrice}>{bid.offerAmount} ETH</Text>
-                <Text style={styles.bidDate}>{bidDate}</Text>
+                <Text style={[styles.bidDate,{color:colors.inactiveTabBackground}]}>{bidDate}</Text>
               </View>
             </View>
           );
         })
       ) : (
-        <Text>No bids available.</Text>
+        <Text style={[styles.noBidsText, {color:colors.text}]}>No bids available.</Text>
       )}
           </View>
         );
       case 'History':
         return (
           <View style={styles.historyContainer}>
-            <Text style={styles.historyTitle}>History</Text>
-            <Text>No history available.</Text>
+            <Text style={[styles.historyTitle,{color:colors.blueText}]}>History</Text>
+            <Text style={[styles.noHistoryText, {color: colors.text}]}>No history available.</Text>
           </View>
         );
       default:
@@ -132,24 +135,23 @@ const ArtDetailsScreen = () => {
   return (
     <SafeAreaView style={tw`flex-1`}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Image 
-           source={{ uri: nft.imageUrl } } 
-           style={styles.artImage}
+        <Image source={{uri: nft.imageUrl }} style={styles.artImage}
         />
 
-        <View style={styles.detailsContainer}>
-          <Text style={styles.creatorName}>{nft.uploadedBy}</Text>
-          <Text style={styles.artNumber}>{nft.name}</Text>
+        <View style={[styles.detailsContainer, {backgroundColor:colors.background}]}>
+          <Text style={[styles.creatorName,{color:colors.text}]}>{nft.uploadedBy}</Text>
+          <Text style={[styles.artNumber,{color:colors.text}]}>{nft.name}</Text>
 
           <View style={styles.tabContainer}>
             {['Details', 'Owners', 'Bids', 'History'].map((tab) => (
               <TouchableOpacity key={tab} onPress={() => handleTabPress(tab)}>
-                <Text style={[styles.tab, activeTab === tab && styles.activeTab]}>{tab}</Text>
+                <Text style={[styles.tab,{color: colors.inactiveTabBackground} ,activeTab === tab && styles.activeTab,{color:colors.text}]}>{tab}</Text>
               </TouchableOpacity>
             ))}
             <Animated.View
               style={[
                 styles.underline,
+                {backgroundColor: colors.text},
                 { width: underlineWidth, transform: [{ translateX: underlinePosition }] },
               ]}
             />
@@ -158,11 +160,11 @@ const ArtDetailsScreen = () => {
           {renderTabContent()}
 
           <View style={styles.bidContainer}>
-            <Text style={styles.currentBidLabel}>Current Bid</Text>
-            <Text style={styles.currentBid}>
+            <Text style={[styles.currentBidLabel, {color:colors.text}]}>Current Bid</Text>
+            <Text style={[styles.currentBid,{color: colors.purpleText}]}>
               {nft.price} ETH <FontAwesome5 name="ethereum" size={16} color="black" />
             </Text>
-            <TouchableOpacity style={styles.offerButton} onPress={() => navigation.navigate('SubmitOffer', { nft })}>
+            <TouchableOpacity style={[styles.offerButton,{backgroundColor: colors.tabbackground}]} onPress={() => navigation.navigate('SubmitOffer', { nft })}>
               <Text style={styles.offerButtonText}>Make Offer</Text>
             </TouchableOpacity>
           </View>
@@ -175,7 +177,7 @@ const ArtDetailsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#000',
+    // backgroundColor: '#000',
     paddingBottom: hp('2%'),
   },
   artImage: {
@@ -189,6 +191,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopLeftRadius: wp('5%'),
     borderTopRightRadius: wp('5%'),
+    marginBottom:-50,
     marginTop: -wp('10%'),
   },
   creatorName: {
@@ -227,7 +230,7 @@ const styles = StyleSheet.create({
     marginTop: hp('3%'),
   },
   descriptionTitle: {
-    fontSize: hp('2.2%'),
+    fontSize: hp('2.3%'),
     fontWeight: 'bold',
     color: '#000',
   },
@@ -240,13 +243,14 @@ const styles = StyleSheet.create({
     marginTop: hp('3%'),
   },
   ownersTitle: {
-    fontSize: hp('2.2%'),
+    fontSize: hp('2.4%'),
     fontWeight: 'bold',
     color: '#000',
   },
   ownerName: {
     fontSize: hp('2%'),
     color: '#555',
+    marginTop: 8,
   },
   bidsContainer: {
     marginTop: hp('3%'),
@@ -255,6 +259,10 @@ const styles = StyleSheet.create({
     fontSize: hp('2.2%'),
     fontWeight: 'bold',
     color: '#000',
+    marginBottom: 8,
+  },
+  noBidsText:{
+    color: '#fff',
   },
   bidItem: {
     flexDirection: 'row',
@@ -305,6 +313,10 @@ const styles = StyleSheet.create({
     fontSize: hp('2.2%'),
     fontWeight: 'bold',
     color: '#000',
+  },
+  noHistoryText:{
+    color:'#fff',
+    marginTop: 8,
   },
   offerButton: {
     backgroundColor: '#222',

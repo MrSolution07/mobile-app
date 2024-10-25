@@ -109,6 +109,8 @@ const Withdraw = () => {
               keyboardType="numeric"
               value={withdrawAmount}
               onChangeText={setWithdrawAmount}
+              placeholderTextColor={colors.placeholderText}
+
               
             />
 
@@ -120,6 +122,8 @@ const Withdraw = () => {
               keyboardType="numeric"
               value={accountNumber}
               onChangeText={setAccountNumber}
+              placeholderTextColor={colors.placeholderText}
+
             />
 
             <View style={styles.cardInputContainer}>
@@ -130,6 +134,8 @@ const Withdraw = () => {
                 value={cardNumber}
                 onChangeText={handleCardNumberChange}
                 maxLength={19}
+                placeholderTextColor={colors.placeholderText}
+
               />
               {cardType && (
                 <Image
@@ -147,6 +153,8 @@ const Withdraw = () => {
               value={cvv}
               onChangeText={setCvv}
               maxLength={3}
+              placeholderTextColor={colors.placeholderText}
+
             />
 
             <TextInput
@@ -155,6 +163,8 @@ const Withdraw = () => {
               value={expiryDate}
               onChangeText={setExpiryDate}
               maxLength={5}
+              placeholderTextColor={colors.placeholderText}
+
             />
 
             {errorMessage ? (

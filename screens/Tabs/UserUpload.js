@@ -143,7 +143,7 @@ const UploadNFTScreen = () => {
     };
 
     return (
-        <SafeAreaView style={[tw`flex-1`,{backgroundColor: colors.background}]}>
+        <SafeAreaView style={[tw`flex-1 bg-white`,{backgroundColor: colors.background}]}>
         <KeyboardAvoidingView
             style={styles.keyboardAvoidingContainer}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -292,7 +292,6 @@ const styles = StyleSheet.create({
         flexGrow: 1, 
         justifyContent: 'center',
         padding: 12,
-        
     },
     screenTitle: {
         fontSize: 27,
@@ -304,11 +303,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff',
         padding: 18,
         borderRadius: 15,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.15,
+        shadowColor: 'lightgrey',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.10,
         shadowRadius: 10,
-        elevation: 5,
+        elevation: 3,
     },
     inputContainer: {
         borderBottomWidth: 0,
