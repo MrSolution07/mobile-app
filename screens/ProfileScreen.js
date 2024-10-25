@@ -192,9 +192,9 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   editButton:{
-  borderRadius: 8,
+  borderRadius: 25,
   backgroundColor:'#2563eb',
-  height: hp('8%'),
+  height: hp('6%'),
   width:wp('80%'),
   justifyContent:'center',
   alignItems:'center',

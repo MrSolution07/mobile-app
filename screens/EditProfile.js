@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, SafeAreaView, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Image, SafeAreaView, TouchableOpacity, Alert, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator'; // Import the image manipulator
@@ -172,7 +172,11 @@ const EditProfile = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+        style={{ flex: 1 }}
+    >
+    <View style={styles.container}>
         <Image
           source={{ uri: isDarkMode ?'https://i.pinimg.com/564x/c6/04/60/c60460f2e96140732fdf9a79b6432f3e.jpg' :'https://i.pinimg.com/originals/6b/f8/48/6bf848ae5afdb77782a1ff14067b194a.jpg' }}
           style={styles.backgroundImage}
@@ -224,6 +228,7 @@ const EditProfile = ({ navigation }) => {
           </View>
         </ScrollView>
       </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -240,6 +245,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: '100%',
+    
   },
   blurView: {
     position: 'absolute',
@@ -260,7 +266,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     marginTop: hp('10%'),
     alignItems: 'center',
-    height:hp('91%'),
+    height:hp('85%'),
   },
   fieldContainer:{
       width:wp('75%'),
@@ -285,7 +291,7 @@ const styles = StyleSheet.create({
   saveButton: {
     backgroundColor: '#2563eb',
     paddingVertical: hp(2.5), 
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: 'center',
     width: '100%',
     top: hp('5%'),

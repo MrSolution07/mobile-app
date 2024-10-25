@@ -13,7 +13,7 @@ export const darkColors = {
   primary:'black',
   secondary:'#075eec',
   profileCard: '#1f1f1f',
-  tabbackground: 'rgba(255,255,255,0.4)',
+  tabbackground: 'grey',
   walletGradient: ['#1B1F3B', '#2C3E50', '#4A6D8A'],
   uploadFormContainer : 'rgba(255,255,255,0.9)',
   ethVolumeAmount: '#F0EAD6',

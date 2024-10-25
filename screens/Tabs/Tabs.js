@@ -101,5 +101,6 @@ const styles = StyleSheet.create({
       justifyContent: 'space-between', 
       paddingBottom: 10,
       paddingTop: 10,
+      
   },
 });
