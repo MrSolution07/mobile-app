@@ -103,28 +103,26 @@ const getIconName = (routeName) => {
 };
 
 const styles = StyleSheet.create({
-  
+  container: {
+    flex: 1,
+    backgroundColor: 'black', 
+    paddingBottom: 5,
+    paddingTop: 5, 
+  },
   tabBarStyle: {
-    // height: 50,
-    // borderRadius: 10,
-    // backgroundColor: 'black',
-    // opacity: 0.8,
-    // elevation: 5,
-    // alignSelf:'center',
-    // bottom: 15,
-    // width: '80%',
-      height: 60,
-      borderRadius: 10,
-      backgroundColor: 'black',
-      opacity: 0.9,
-      elevation: 5,
-      alignSelf: 'center',
-      bottom: 15,
-      width: '80%', 
-      flexDirection: 'row', 
-      justifyContent: 'space-between', 
-      paddingBottom: 10,
-      paddingTop: 10,
-      
+    height: 60,
+    borderRadius: 12,
+    backgroundColor: 'black',
+    opacity: 0.9,
+    elevation: 5,
+    alignSelf: 'center',
+    marginBottom: 10, 
+    width: '80%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: 10,
+    paddingTop: 10,
+    left: '9.5%', 
+    position: 'absolute',
   },
 });
