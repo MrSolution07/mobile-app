@@ -5,8 +5,9 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import tw from 'twrnc';
 import { collection, onSnapshot } from 'firebase/firestore'; 
 import { doc, getDoc, updateDoc, getDocs } from 'firebase/firestore';
-import * as Notifications from 'expo-notifications'; // Import notifications
+import * as Notifications from 'expo-notifications'; 
 import { useThemeColors } from '../screens/Context/Theme/useThemeColors';
+import { setDoc, deleteDoc } from 'firebase/firestore';
 
 const Bids = () => {
   const colors = useThemeColors();
@@ -121,45 +122,73 @@ const Bids = () => {
         const bidderId = bid.bidderId;
 
         if (action === 'Accept') {
-            
-            const creatorAmount = bidAmount * 0.95; // ( after 5% fee)
-            const bidderDocRef = doc(db, 'users', bidderId);
-            const bidderSnapshot = await getDoc(bidderDocRef);
+          const creatorAmount = bidAmount * 0.95; 
+          const bidderDocRef = doc(db, 'users', bidderId);
+          const bidderSnapshot = await getDoc(bidderDocRef);
+      
+          if (bidderSnapshot.exists()) {
+              const bidderData = bidderSnapshot.data();
+              const newBidderBalance = bidderData.ethAmount - bidAmount;
+      
+              if (newBidderBalance < 0) throw new Error("Insufficient balance");
+      
+              // Update the bidder's balance
+              await updateDoc(bidderDocRef, { ethAmount: newBidderBalance });
+      
+              const creatorDocRef = doc(db, 'users', nftData.creatorId);
+              const creatorSnapshot = await getDoc(creatorDocRef);
+      
+              if (creatorSnapshot.exists()) {
+                  const creatorData = creatorSnapshot.data();
+                  const newCreatorBalance = creatorData.ethAmount + creatorAmount;
+      
+                  // Update the creator's balance
+                  await updateDoc(creatorDocRef, { ethAmount: newCreatorBalance });
+      
+                  // Send notification to the bidder
+                  sendNotification(bidderId, 'Offer Accepted', 'Your offer has been accepted.');
+      
+                  // Update the NFT's ownership and status in the main NFT collection
+                  const nftDocRef = doc(db, 'nfts', nftDocId);
+                  await updateDoc(nftDocRef, { 
+                      bids: [], 
+                      status: 'purchased', 
+                      ownerId: bidderId,
+                      creatorId: bidderId,
+                  });
+      
+            // Prepare NFT data for the purchased section
+                  const purchasedNFTData = {
+                    ...nftData,
+                    ownerId: bidderId,
+                    status: 'purchased'
+                };
 
-            if (bidderSnapshot.exists()) {
-                const bidderData = bidderSnapshot.data();
-                const newBidderBalance = bidderData.ethAmount - bidAmount;
+                // Add NFT to bidder's purchased section
+                const purchasedNFTsCollectionRef = collection(db, 'users', bidderId, 'purchased');
+                await setDoc(doc(purchasedNFTsCollectionRef, nftDocId), purchasedNFTData);
 
-                // Check if bidder has enough balance but this is for debugging 
-                if (newBidderBalance < 0) {
-                    throw new Error("Insufficient balance");
-                }
+                // Remove NFT from creator's minted section
+                const mintedNFTsCollectionRef = collection(db, 'users', nftData.creatorId, 'minted');
+                await deleteDoc(doc(mintedNFTsCollectionRef, nftDocId));
 
-                await updateDoc(bidderDocRef, { ethAmount: newBidderBalance });
+                // Create a new NFT object for the sold section
+                const soldNFTData = {
+                    ...nftData,
+                    status: 'sold',
+                    ownerId: bidderId,
+                    soldAt: new Date().toISOString(), // Record the sale date
+                };
 
-                
-                const creatorDocRef = doc(db, 'users', nftData.creatorId);
-                const creatorSnapshot = await getDoc(creatorDocRef);
-
-                if (creatorSnapshot.exists()) {
-                    const creatorData = creatorSnapshot.data();
-                    const newCreatorBalance = creatorData.ethAmount + creatorAmount;
-
-                    await updateDoc(creatorDocRef, { ethAmount: newCreatorBalance });
-
-                    // Notify the bidder
-                    sendNotification(bidderId, 'Offer Accepted', 'Your offer has been accepted.');
-
-                    // Clear all other bids for this NFT
-                    await updateDoc(doc(db, 'nfts', nftDocId), { bids: [] });
-
-                    // Mark the NFT as sold and update ownership
-                    await updateDoc(doc(db, 'nfts', nftDocId), { status: 'sold', ownerId: bidderId });
-
-                    console.log("Bid accepted and processed");
-                }
+                // Ensure you generate a unique ID for the sold NFT document
+                const soldNFTsCollectionRef = collection(db, 'users', nftData.creatorId, 'sold');
+                const newSoldNFTDocRef = doc(soldNFTsCollectionRef); // Create a new document with a unique ID
+                await setDoc(newSoldNFTDocRef, soldNFTData);
             }
-        } else if (action === 'Reject') {
+        }
+      }
+
+      else if (action === 'Reject') {
             // Remove the rejected bid
             const updatedBids = nftData.bids.filter(b => b.id !== bidId);
             await updateDoc(doc(db, 'nfts', nftDocId), { bids: updatedBids });
@@ -194,9 +223,9 @@ const Bids = () => {
         <TouchableOpacity style={styles.rejectButton} onPress={() => handleAction('Reject', item.id)}>
           <Text style={styles.actionText}>Reject</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.counterOfferButton} onPress={() => handleAction('Counter Offer', item.id)}>
+        {/* <TouchableOpacity style={styles.counterOfferButton} onPress={() => handleAction('Counter Offer', item.id)}>
           <Text style={styles.actionText} numberOfLines={2}>Counter Offer</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );

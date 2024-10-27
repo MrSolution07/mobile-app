@@ -49,11 +49,20 @@ const SubmitOfferScreen = () => {
 
 const handleOfferSubmit = async () => {
   setLoading(true);
-  if (!offerAmount || isNaN(offerAmount) || parseFloat(offerAmount) <= 0) {
-      Alert.alert('Error', 'Please enter a valid offer amount.');
-      return;
+  const currentUser = auth.currentUser;
+  if (currentUser && currentUser.uid === nft.creatorId) {
+    Alert.alert("Sorry", "You can't make an offer on your own NFT.");
+    setLoading(false);
+    return;
   }
 
+  if (!offerAmount || isNaN(offerAmount) || parseFloat(offerAmount) <= 0) {
+    Alert.alert('Error', 'Please enter a valid offer amount.');
+    setLoading(false);
+    return;
+  }
+
+  // Rest of your existing handleOfferSubmit code
   try {
       const currentUser = auth.currentUser;
 
@@ -141,9 +150,9 @@ const handleOfferSubmit = async () => {
       navigation.goBack();
 
   } catch (error) {
-      console.error('Error submitting offer:', error);
-      Alert.alert('Error', 'There was an issue submitting your offer. Please try again.');
-  }finally{
+    console.error('Error submitting offer:', error);
+    Alert.alert('Error', 'There was an issue submitting your offer. Please try again.');
+  } finally {
     setLoading(false);
   }
 };

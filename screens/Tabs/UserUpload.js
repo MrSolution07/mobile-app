@@ -201,7 +201,7 @@ const UploadNFTScreen = () => {
                         control={control}
                         rules={{ 
                             required: 'Price is required', 
-                            pattern: { value: /^\d+(\.\d{1,2})?$/, message: 'Invalid price format' } 
+                            pattern: { value: /^\d+(\.\d{1,10})?$/, message: 'Invalid price format' } 
                         }}
                         render={({ field: { onChange, onBlur, value } }) => (
                             <Input

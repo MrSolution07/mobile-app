@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, FlatList, ScrollView, ActivityIndicator } from 'react-native';
-import { collection, onSnapshot, query, where } from 'firebase/firestore'; 
+import { View, Text, Image, FlatList, ScrollView, ActivityIndicator, TouchableOpacity, Alert, TextInput } from 'react-native';
+import { collection, onSnapshot, query, where, updateDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../config/firebaseConfig'; 
 import tw from 'twrnc';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useThemeColors} from '../screens/Context/Theme/useThemeColors';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useThemeColors } from '../screens/Context/Theme/useThemeColors';
 
 const Items = () => {
   const colors = useThemeColors();
@@ -13,7 +13,6 @@ const Items = () => {
   const [purchasedNFTs, setPurchasedNFTs] = useState([]);
   const [soldNFTs, setSoldNFTs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isLandscape, setIsLandscape] = useState(false);
 
   const fetchNFTsByStatus = (status, setState) => {
     const user = auth.currentUser;
@@ -21,17 +20,17 @@ const Items = () => {
 
     const nftQuery = query(
       collection(db, 'nfts'),
-      where('userId', '==', user.uid),
-      where('status', '==', status)
+      where('status', '==', status),
+      where(status === 'purchased' ? 'ownerId' : 'userId', '==', user.uid)
     );
 
     const unsubscribe = onSnapshot(nftQuery, (querySnapshot) => {
-      const nfts = querySnapshot.docs.map(doc => doc.data());
+      const nfts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setState(nfts);
-      setLoading(false); // Stop loading when data is fetched
+      setLoading(false);
     });
 
-    return unsubscribe; // Return unsubscribe function to stop listening on unmount
+    return unsubscribe;
   };
 
   useEffect(() => {
@@ -46,101 +45,65 @@ const Items = () => {
     };
   }, []);
 
-  // const renderItem = ({ item }) => {
-  //   const tagsArray = item.tags ? item.tags.split(',').map(tag => tag.trim()) : [];
-
-  //   return (
-  //     <View style={tw`bg-white p-2 rounded-lg shadow-md ${isLandscape ? 'w-40 h-60' : 'w-full h-60'}`}>
-  //       <Image source={{ uri: item.imageUrl }} style={tw`h-30 w-full rounded-md`} />
-        
-  //       <Text style={tw`text-lg font-bold mt-2 `}>{item.title}</Text>
-        
-  //       <Text style={tw`text-xs text-gray-500 `}>{item.description}</Text>
-        
-  //       {tagsArray.length > 0 && (
-  //         <View style={tw`flex-row flex-wrap mt-1`}>
-  //           {tagsArray.map((tag, index) => (
-  //             <Text key={index} style={tw`text-xs text-gray-400 mr-1`}>
-  //               #{tag}
-  //             </Text>
-  //           ))}
-  //         </View>
-  //       )}
-        
-  //       <View style={tw`flex-row items-center gap-x-2 mt-1`}>
-  //         <Text style={tw`font-bold text-sm`}>
-  //           {item.price ? `${item.price} ETH` : 'Price N/A'}
-  //         </Text>
-  //         <FontAwesome5 name="ethereum" size={18} color="black" />
-  //       </View>
-
-  //       <Text style={tw`text-xs text-gray-400 mt-1`}>Token ID: {item.tokenId}</Text>
-  //     </View>
-  //   );
-  // };
-
-//i JUST converterd the flatlist into a map and wrapped the component in a scrollview, for better UX. but i'll kepp the above code just in case. 
+  const handleUpdatePrice = async (nftId) => {
+    Alert.prompt(
+      "Update Price",
+      "Enter the new price in ETH:",
+      async (price) => {
+        try {
+          if (price) {
+            const nftDocRef = doc(db, 'nfts', nftId);
+            await updateDoc(nftDocRef, { price: parseFloat(price) });
+            Alert.alert("Success", "Price updated successfully.");
+          }
+        } catch (error) {
+          console.error("Error updating price:", error);
+          Alert.alert("Error", "Could not update price. Please try again.");
+        }
+      },
+      "plain-text"
+    );
+  };
 
   return (
-    <SafeAreaView style={[tw`flex-1 justify-center p-1 bg-white`,{backgroundColor:colors.background}]}>
+    <SafeAreaView style={[tw`flex-1 justify-center p-1`, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={{ paddingBottom: 15 }}>
-    
-      <View style={tw`h-full m-2`}>
+        <View style={tw`h-full m-2`}>
 
-      {/* Recently Minted NFTs */}
+          {/* Minted NFTs */}
+          <Text style={tw`text-xl p-2 font-bold text-[#075eec]`}>Recently Minted NFTs</Text>
+          {loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            mintedNFTs.length > 0 ? (
+              mintedNFTs.map((item) => (
+                <NFTCard key={item.id} item={item} isOwner={false} colors={colors} />
+              ))
+            ) : (
+              <Text style={[tw`text-center mt-4`, { color: colors.text }]}>No NFTs minted yet.</Text>
+            )
+          )}
 
-      <Text style={tw`text-xl p-2 font-bold text-[#075eec]`}>Recently Minted NFTs</Text>
-      {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
-      ) : (
-        mintedNFTs.length > 0 ? (
-          mintedNFTs.map((item) => {
-            const tagsArray = item.tags ? item.tags.split(',').map(tag => tag.trim()) : [];
-            
-            return (
-              <View key={item.tokenId} style={tw`bg-white p-2 rounded-lg shadow-md ${isLandscape ? 'w-40 h-60' : 'w-full h-65'}`}>
-                <Image source={{ uri: item.imageUrl }} resizeMode='cover' style={tw`h-35 items-center w-full rounded-md`} />
-                <Text style={tw`text-lg font-bold mt-2`}>{item.title}</Text>
-                <Text style={tw`text-xs text-gray-500`} numberOfLines={2}>{item.description}</Text>
-                {tagsArray.length > 0 && (
-                  <View style={tw`flex-row flex-wrap mt-1`}>
-                    {tagsArray.map((tag, index) => (
-                      <Text key={index} style={tw`text-xs text-gray-400 mr-1`}>
-                        #{tag}
-                      </Text>
-                    ))}
-                  </View>
-                )}
-                <View style={tw`flex-row items-center gap-x-2 mt-1`}>
-                  <Text style={tw`font-bold text-sm`}>{item.price ? `${item.price} ETH` : 'Price N/A'}</Text>
-                  <FontAwesome5 name="ethereum" size={18} color="black" />
-                </View>
-                <Text style={tw`text-xs text-gray-400 mt-1`}>Token ID: {item.tokenId}</Text>
-              </View>
-            );
-          })
-        ) : (
-          <Text style={[tw`text-center mt-4`,{color:colors.text}]}>No NFTs minted yet.</Text>
-        )
-      )}
-    
-          {/* Purchased NFTs */}
+          {/* Purchased NFTs with Price Update Option */}
           <Text style={tw`text-xl p-2 font-bold text-[#075eec] mb-4`}>Purchased NFTs</Text>
           {loading ? (
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
             purchasedNFTs.length > 0 ? (
               purchasedNFTs.map((item) => (
-                <View key={item.tokenId} style={tw`bg-white m-2 p-2 rounded-lg shadow-md`}>
-                  <Image source={{ uri: item.imageUrl }} style={tw`h-48 w-full rounded-md`} />
-                  <Text style={tw`text-lg font-bold mt-2`}>{item.title}</Text>
-                </View>
+                <NFTCard
+                  key={item.id}
+                  item={item}
+                  isOwner={true}
+                  onPriceUpdate={() => handleUpdatePrice(item.id)}
+                  colors={colors}
+                />
               ))
             ) : (
-              <Text style={[tw`text-center mt-4 text-gray-500`,{color:colors.text}]}>No NFTs purchased yet.</Text>
+              <Text style={[tw`text-center mt-4`, { color: colors.text }]}>No NFTs purchased yet.</Text>
             )
           )}
-    
+
           {/* Sold NFTs */}
           <Text style={tw`text-xl p-2 font-bold text-[#075eec] mb-4 mt-8`}>Sold NFTs</Text>
           {loading ? (
@@ -148,21 +111,35 @@ const Items = () => {
           ) : (
             soldNFTs.length > 0 ? (
               soldNFTs.map((item) => (
-                <View key={item.tokenId} style={tw`bg-white m-2 p-2 rounded-lg shadow-md`}>
-                  <Image source={{ uri: item.imageUrl }} style={tw`h-48 w-full rounded-md`} />
-                  <Text style={tw`text-lg font-bold mt-2`}>{item.title}</Text>
-                </View>
+                <NFTCard key={item.id} item={item} isOwner={false} colors={colors} />
               ))
             ) : (
-              <Text style={[tw`text-center mt-4 text-gray-500`,{color:colors.text}]}>No NFTs sold yet.</Text>
+              <Text style={[tw`text-center mt-4`, { color: colors.text }]}>No NFTs sold yet.</Text>
             )
           )}
         </View>
-    
       </ScrollView>
     </SafeAreaView>
-    
   );
 };
+
+// Separate Card Component for NFTs
+const NFTCard = ({ item, isOwner, onPriceUpdate, colors }) => (
+  <View style={tw`bg-white m-2 p-2 rounded-lg shadow-md`}>
+    <Image source={{ uri: item.imageUrl }} style={tw`h-48 w-full rounded-md`} />
+    <Text style={tw`text-lg font-bold mt-2`}>{item.title}</Text>
+    <Text style={tw`text-xs text-gray-500`} numberOfLines={2}>{item.description}</Text>
+    <Text style={tw`text-xs text-gray-400 mt-1`}>Token ID: {item.tokenId}</Text>
+    <View style={tw`flex-row items-center gap-x-2 mt-1`}>
+      <Text style={tw`font-bold text-sm`}>{item.price ? `${item.price} ETH` : 'Price N/A'}</Text>
+      <FontAwesome5 name="ethereum" size={18} color="black" />
+    </View>
+    {isOwner && (
+      <TouchableOpacity onPress={onPriceUpdate} style={tw`bg-blue-500 p-2 mt-2 rounded-lg`}>
+        <Text style={tw`text-white text-center`}>Update Price</Text>
+      </TouchableOpacity>
+    )}
+  </View>
+);
 
 export default Items;
