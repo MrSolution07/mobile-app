@@ -12,6 +12,7 @@ export const darkColors = {
   text:'#ffffff',
   primary:'black',
   secondary:'#075eec',
+  whiteBackground: '#fff',
   profileCard: '#1f1f1f',
   tabbackground: '#333333',
   walletGradient: ['#1B1F3B', '#2C3E50', '#4A6D8A'],

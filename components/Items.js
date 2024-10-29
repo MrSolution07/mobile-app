@@ -66,8 +66,8 @@ const Items = () => {
   };
 
   return (
-    <SafeAreaView style={[tw`flex-1 justify-center p-1`, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 15 }}>
+    <SafeAreaView style={[tw`flex-1 justify-center p-1 bg-white`, { backgroundColor: colors.background }]}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 70 }}>
         <View style={tw`h-full m-2`}>
 
           {/* Minted NFTs */}

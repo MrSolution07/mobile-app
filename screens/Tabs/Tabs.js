@@ -44,6 +44,7 @@ export default function Tabs() {
             backgroundColor: colors.tabbackground,
             display: isKeyboardVisible ? 'none' : 'flex',
           },
+          tabBarSafeAreaInset: { bottom: 'always' },
           tabBarIcon: ({ focused }) => <CustomTabIcon focused={focused} name={getIconName(route.name)} />,
           tabBarBackground:() =>{
             <BlurView intensity={80}

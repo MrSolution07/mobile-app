@@ -7,10 +7,12 @@ import { collection, onSnapshot } from 'firebase/firestore';
 import { doc, getDoc, updateDoc, getDocs } from 'firebase/firestore';
 import * as Notifications from 'expo-notifications'; 
 import { useThemeColors } from '../screens/Context/Theme/useThemeColors';
+import { useTheme } from '../screens/Context/Theme/ThemeContext';
 import { setDoc, deleteDoc } from 'firebase/firestore';
 
 const Bids = () => {
   const colors = useThemeColors();
+  const {isDarkMode} = useTheme();
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [userBidsData, setUserBidsData] = useState([]); 
   const [bidsData, setBidsData] = useState([]); 
@@ -204,16 +206,16 @@ const Bids = () => {
 
 
 
-  const renderBidItem = ({ item }) => (
+  const renderBidItem = ({ item}) => (
     <View style={styles.bidItem}>
       <View style={styles.bidderInfo}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Image source={{ uri: item.bidderImage }} style={styles.bidderImage} />
-          <Text style={styles.bidderName}>{item.bidderName}</Text>
+          <Text style={isDarkMode? {color:colors.text}: styles.bidderName}>{item.bidderName}</Text>
         </View>
         <Text style={styles.bidPrice}>{item.itemPrice} ETH</Text>
-        <Text style={styles.bidDate}>{item.date}</Text>
-        <Text style={styles.itemName}>{item.itemName}</Text>
+        <Text style={isDarkMode? {color:colors.text}: styles.bidDate}>{item.date}</Text>
+        <Text style={isDarkMode? {color:colors.text}: styles.itemName}>{item.itemName}</Text>
       </View>
       <Image source={{ uri: item.itemImage }} style={styles.itemImage} />
       <View style={styles.actionsContainer}>
@@ -234,10 +236,10 @@ const Bids = () => {
     <View style={styles.userBidItem}>
       <Image source={{ uri: item.itemImage }} style={styles.userItemImage} />
       <View style={styles.userBidInfo}>
-        <Text style={styles.userItemName}>{item.itemName}</Text>
+        <Text style={isDarkMode? {color:colors.text}: styles.userItemName}>{item.itemName}</Text>
         <Text style={styles.userBidPrice}>{item.itemPrice} ETH</Text>
-        <Text style={styles.userBidDate}>{item.date}</Text>
-        <Text style={styles.userBidStatus}>{item.status}</Text>
+        <Text style={isDarkMode? {color:colors.text}: styles.userBidDate}>{item.date}</Text>
+        <Text style={isDarkMode? {color:colors.text}: styles.userBidStatus}>{item.status}</Text>
       </View>
     </View>
   );
@@ -296,6 +298,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     marginBottom: hp('1%'),
+    width: wp('90%'),
+    borderRadius: 5,
+    borderBottomColor: '#eee',
   },
   bidderImage: {
     width: wp('10%'),
@@ -312,6 +317,7 @@ const styles = StyleSheet.create({
   },
   flatListContent: {
     paddingBottom: 70,
+    padding:15,
   },
   bidPrice: {
     fontSize: hp('1.8%'),
@@ -372,10 +378,12 @@ const styles = StyleSheet.create({
   userBidItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: wp('2%'),
+    padding: wp('3%'),
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     marginBottom: hp('3%'),
+    width:wp('90%'),
+    borderRadius: wp('8%'),
   },
   userItemImage: {
     width: wp('15%'),

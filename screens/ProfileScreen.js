@@ -74,13 +74,13 @@ const UserProfile = ({ navigation }) => {
   const { name, balance, email, phoneNo, location, ProfileImage } = userData;
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor:colors.background}]}>
+    <SafeAreaView style={styles.safeArea}>
      <ScrollView contentContainerStyle={tw`flex-grow`}
         showsVerticalScrollIndicator={false}
-        bounces={false}
+        bounces={false} 
         keyboardShouldPersistTaps="handled">
 
-      <View style={styles.container}>
+      <View style={ styles.container}>
         <Image
           source={{ uri: 'https://i.pinimg.com/originals/6b/f8/48/6bf848ae5afdb77782a1ff14067b194a.jpg' }}
           style={styles.backgroundImage}
@@ -88,7 +88,7 @@ const UserProfile = ({ navigation }) => {
         />
         <BlurView style={styles.blurView} intensity={1} tint="dark" />
 
-        <View style={styles.content}>
+        <View style={isDarkMode ? {backgroundColor:colors.background} :styles.content}>
           <LinearGradient
             colors={['rgba(255, 255, 255, 0.5)', 'rgba(7, 94, 236, 0.5)', 'rgba(128, 0, 128, 0.5)']}
             style={styles.header}
@@ -147,7 +147,6 @@ const InfoItem = ({ icon, value }) => {
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -200,12 +199,14 @@ const styles = StyleSheet.create({
   alignItems:'center',
   top: 2,
   marginBottom: 5,
+  flex: 1,
   },
   buttonText:{
     fontSize: 16,
     fontFamily: 'Roboto_700Bold',
     textAlign:'center',
     color: '#fff',
+    fontWeight:'600',
     letterSpacing: 1,
   },
   avatarCard: {

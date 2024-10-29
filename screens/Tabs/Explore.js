@@ -14,6 +14,7 @@ import {
   Platform,
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import Svg, { Polygon } from 'react-native-svg';
 import { db } from '../../config/firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
@@ -28,7 +29,7 @@ const Hexagon = ({ price,isDarkMode,colors }) => (
     <Svg height={hp('15%')} width={150} viewBox="0 0 100 100" style={styles.svg}>
       <Polygon points="50,5 100,25 100,75 50,95 0,75 0,25" fill={isDarkMode ? "black" : "white"} />
     </Svg>
-    <Text style={[styles.priceText, {color:colors.text}]}>{price} ETH</Text>
+    <Text style={[styles.priceText, {color:colors.text}]} numberOfLines={2} ellipsizeMode="tail">{price} ETH</Text>
   </View>
 );
 
@@ -37,6 +38,7 @@ const collections = [Collection1, Collection2, Collection3, Collection4, Collect
 const Explore = ({ navigation }) => {
   const colors = useThemeColors();
   const {isDarkMode} = useTheme();
+  const tabBarHeight = useBottomTabBarHeight();
   const [nfts, setNfts] = useState([]);
   const [activeTab, setActiveTab] = useState('NFTs');
   const [searchQuery, setSearchQuery] = useState('');
@@ -122,7 +124,8 @@ const Explore = ({ navigation }) => {
           accessibilityHint={`View details of ${item.title}`}
         >
           <Hexagon price={item.price} isDarkMode={isDarkMode} colors={colors}/>
-          <Image source={{ uri: item.imageUrl}} style={styles.nftImage} 
+          <Image source={Platform.OS === 'ios' ? { uri: item.imageUrl } : item.imageUrl} 
+           style={styles.nftImage} 
           />
           <View style={styles.nftNameContainer}>
             <Text style={styles.nftName}>{item.title}</Text>
@@ -192,6 +195,8 @@ const Explore = ({ navigation }) => {
           keyExtractor={(item) => item.id || item.name} // Collections use 'name' as key
           numColumns={2}
           columnWrapperStyle={styles.columnWrapper}
+          contentContainerStyle={{ paddingBottom: tabBarHeight }}
+          initialNumToRender={5}
         />
       </View>
     </SafeAreaView>
@@ -261,6 +266,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333333',
     fontWeight: 'bold',
+    width: 100,
   },
   columnWrapper: {
     justifyContent: 'space-between',

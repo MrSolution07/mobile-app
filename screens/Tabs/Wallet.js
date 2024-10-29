@@ -5,22 +5,24 @@ import Account from '../../components/Account';
 import Items from '../../components/Items';
 import Activity from '../../components/Activity';
 import Bids from '../../components/Bids'; 
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRoute,useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
 import tw from 'twrnc';
 import { useTheme } from '../Context/Theme/ThemeContext';
 import { useThemeColors } from '../Context/Theme/useThemeColors';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 const Wallet = () => {
   const colors = useThemeColors();
-  const { isDarkMode } = useTheme()
+  const { isDarkMode } = useTheme();
+  const tabBarHeight = useBottomTabBarHeight();
   const [activeTab, setActiveTab] = useState('Account');
   const animationValue = useRef(new Animated.Value(0)).current;
   const screenWidth = Dimensions.get('window').width;
 
   const route = useRoute();
-  const navigation = useNavigation();
 
 
   const handleTabSwitch = (tab) => {
@@ -38,7 +40,8 @@ const Wallet = () => {
   }, [route.params?.tab]);
 
   return (
-    <View style={[tw`flex-1`, styles.walletContainer,{backgroundColor: colors.background}]}>
+    <SafeAreaView style={{flex:1, backgroundColor:colors.background}}>
+    <View style={[tw`flex-1`, styles.walletContainer]}>
       <LinearGradient
         colors={isDarkMode ? colors.walletGradient : ['rgba(255, 255, 255, 0.5)', 'rgba(7, 94, 236, 0.5)', 'rgba(128, 0, 128, 0.5)']}
         style={styles.gradientBackground}
@@ -65,21 +68,22 @@ const Wallet = () => {
             transform: [{ translateX: animationValue }],
           }}
         >
-          <View style={{ width: screenWidth }}>
+          <View style={{ width: screenWidth,paddingBottom:tabBarHeight }}>
             <Account />
           </View>
-          <View style={{ width: screenWidth }}>
+          <View style={{ width: screenWidth,paddingBottom:tabBarHeight  }}>
             <Items />
           </View>
-          <View style={{ width: screenWidth }}>
+          <View style={{ width: screenWidth,paddingBottom:tabBarHeight }}>
             <Bids /> 
           </View>
-          <View style={{ width: screenWidth }}>
+          <View style={{ width: screenWidth,paddingBottom:tabBarHeight}}>
             <Activity />
           </View>
         </Animated.View>
       </View>
     </View>
+    </SafeAreaView>
   );
 };
 

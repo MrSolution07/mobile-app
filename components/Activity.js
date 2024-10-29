@@ -9,9 +9,11 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
 import tw from 'twrnc';
 import { useThemeColors } from '../screens/Context/Theme/useThemeColors';
+import { useTheme } from '../screens/Context/Theme/ThemeContext';
 
 const Activity = () => {
   const colors = useThemeColors();
+  const {isDarkMode} = useTheme();
   const { amount, ethAmount, zarAmount, withdrawAmount } = useContext(DataContext);
   const [transfers, setTransfers] = useState([]);
   const [ethTransactions, setEthTransactions] = useState([]);
@@ -52,74 +54,8 @@ const Activity = () => {
     return () => unsubscribeETH();
   }, [currentUser]);
 
-  return (
-    <ScrollView contentContainerStyle={tw`flex-grow`}>
-    <SafeAreaView style={tw`top-5 p-4`}>
-    {transfers.length > 0 ? (
-          transfers.map((transfer, index) => (
-            <View key={index} style={[styles.activityContainer,{backgroundColor:colors.tabbackground}]}>
-              <View style={styles.iconRow}>
-                <View style={styles.iconCircle}>
-                  <MaterialCommunityIcons name="arrow-up" size={20} color="white" />
-                </View>
-                <View style={styles.activityContent}>
-                  <Text style={[styles.activityType,{color:colors.text}]}>Transfer</Text>
-                  <View style={tw`flex-row justify-between`}>
-                    <Text style={[styles.activityAmount,{color: colors.text}]}>{transfer.amount} ZAR</Text>
-                    <Text style={[styles.activityDate, {color: colors.grayText}]}>{transfer.date}</Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-          ))
-        ) : (
-          <Text style={colors.text}>No transfers found.</Text>
-        )}
-
-        <View style={[styles.activityContainer,{backgroundColor:colors.tabbackground}]}>
-          <View style={styles.iconRow}>
-            <View style={styles.iconCircle}>
-              <MaterialCommunityIcons name="arrow-down" size={20} color="white" />
-            </View>
-            <View style={styles.activityContent}>
-              <Text style={[styles.activityType,{color:colors.text}]}>Withdrawals</Text>
-              <View style={tw`flex-row justify-between`}>
-              <Text style={[styles.activityAmount, {color:colors.text}]}>{withdrawAmount} ZAR</Text>
-              <Text style={[styles.activityDate, {color:colors.grayText}]}>2024-09-02</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
-        {ethTransactions.length > 0 ? (
-          ethTransactions.map((transaction, index) => (
-            <View key={index} style={[styles.activityContainer,{backgroundColor:colors.tabbackground,borderColor:colors.text}]}>
-              <View style={styles.iconRow}>
-                <View style={styles.iconCircle}>
-                  <FontAwesome5 name="ethereum" size={20} color="white" />
-                </View>
-                <View style={styles.activityContent}>
-                  <Text style={[styles.activityType,{color:colors.text}]}>Purchased ETH</Text>
-                  <View style={tw`flex-row justify-between`}>
-                    <Text style={[styles.activityAmount,{color:colors.text}]}>{transaction.ethAmount} ETH</Text>
-                    <Text style={[styles.activityDate,{color:colors.grayText}]}>{transaction.date}</Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-          ))
-        ) : (
-          <Text style={colors.text}>No ETH purchases found.</Text>
-        )}
-    </SafeAreaView>
-    </ScrollView>
-
-  );
-};
-
-const styles = StyleSheet.create({
-  activityContainer: {
-    backgroundColor: '#ffffff',
+  const getActivityContainerStyle = (isDarkMode) => ({
+    backgroundColor: isDarkMode ? colors.tabbackground : 'white',
     borderRadius: 15,
     padding: 20,
     marginBottom: 15,
@@ -130,7 +66,88 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
-  },
+  });
+
+  return (
+    <SafeAreaView style={tw`top-5 p-4 flex-1`}>
+    <ScrollView contentContainerStyle={tw`flex-grow`}>
+    {transfers.length > 0 ? (
+          transfers.map((transfer, index) => (
+            <View key={index} style={getActivityContainerStyle(isDarkMode)}>
+              <View style={styles.iconRow}>
+                <View style={styles.iconCircle}>
+                  <MaterialCommunityIcons name="arrow-up" size={20} color="white" />
+                </View>
+                <View style={styles.activityContent}>
+                  <Text style={isDarkMode ? {color:colors.text}: styles.activityType}>Transfer</Text>
+                  <View style={tw`flex-row justify-between`}>
+                    <Text style={isDarkMode ?{color: colors.text}: styles.activityAmount}>{transfer.amount} ZAR</Text>
+                    <Text style={isDarkMode ? {color: colors.grayText}:styles.activityDate}>{transfer.date}</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          ))
+        ) : (
+          <Text style={isDarkMode? {color:colors.text} : {color:'#000'}}>No transfers found.</Text>
+        )}
+
+        <View style={getActivityContainerStyle(isDarkMode)}>
+          <View style={styles.iconRow}>
+            <View style={styles.iconCircle}>
+              <MaterialCommunityIcons name="arrow-down" size={20} color="white" />
+            </View>
+            <View style={styles.activityContent}>
+              <Text style={isDarkMode? {color:colors.text}: styles.activityType}>Withdrawals</Text>
+              <View style={tw`flex-row justify-between`}>
+              <Text style={isDarkMode?  {color:colors.text}: styles.activityAmount}>{withdrawAmount} ZAR</Text>
+              <Text style={isDarkMode? {color:colors.grayText}: styles.activityDate}>2024-09-02</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {ethTransactions.length > 0 ? (
+          ethTransactions.map((transaction, index) => (
+            <View key={index} style={getActivityContainerStyle(isDarkMode)}>
+              <View style={styles.iconRow}>
+                <View style={styles.iconCircle}>
+                  <FontAwesome5 name="ethereum" size={20} color="white" />
+                </View>
+                <View style={styles.activityContent}>
+                  <Text style={isDarkMode ? {color:colors.text}: styles.activityType}>Purchased ETH</Text>
+                  <View style={tw`flex-row justify-between`}>
+                    <Text style={isDarkMode?{color:colors.text}: styles.activityAmount}>{transaction.ethAmount} ETH</Text>
+                    <Text style={isDarkMode? {color:colors.grayText}: styles.activityDate}>{transaction.date}</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          ))
+        ) : (
+          <Text style={isDarkMode? {color:colors.text} : {color:'#000'}}>No ETH purchases found.</Text>
+        )}
+    </ScrollView>
+    </SafeAreaView>
+
+
+  );
+};
+
+const styles = StyleSheet.create({
+  // activityContainer: {
+  //   backgroundColor: '#fffff',
+  //   borderRadius: 15,
+  //   padding: 20,
+  //   marginBottom: 15,
+  //   width: wp('90%'),
+  //   height: hp('14%'),
+  //   shadowColor: '#000',
+  //   shadowOffset: { width: 0, height: 2 },
+  //   shadowOpacity: 0.2,
+  //   shadowRadius: 5,
+  //   elevation: 5,
+  // },
   iconRow: {
     flexDirection: 'row',
     alignItems: 'center',

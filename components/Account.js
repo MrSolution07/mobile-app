@@ -6,8 +6,13 @@ import { db, auth } from '../config/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import tw from 'twrnc';
+import { useThemeColors } from '../screens/Context/Theme/useThemeColors';
+import { useTheme } from '../screens/Context/Theme/ThemeContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Account = () => {
+  const colors = useThemeColors();
+  const {isDarkMode} = useTheme();
   const navigation = useNavigation();
   const [zarAmount, setZarAmount] = useState(0);
   const [ethAmount, setEthAmount] = useState(0);
@@ -53,7 +58,7 @@ const Account = () => {
           </Text>
 
           <View style={tw`flex-row rounded-md gap-x-2 items-center justify-center w-40 p-2 top-3`}>
-            <Text style={tw`font-bold text-xl text-black`}>{ethAmount ? ethAmount : 0} </Text>
+            <Text style={tw`font-bold text-xl text-black`}numberOfLines={3}>{ethAmount ? ethAmount : 0} </Text>
             <Text style={tw`text-[#6d28d9] font-bold text-xl`}>ETH</Text>
             <FontAwesome5 name="ethereum" size={20} color="black" />
           </View>
@@ -84,13 +89,14 @@ const Account = () => {
 
 const styles = StyleSheet.create({
   accountContainer: {
-    flex: 1,
+    // flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: hp('5.5%'),
   },
   scrollContainer: {
-    flexGrow: 1,
+    // flexGrow: 1,
+    top: 0,
   },
   balanceContainer: {
     width: wp('90%'),

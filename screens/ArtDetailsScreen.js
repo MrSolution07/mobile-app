@@ -135,7 +135,7 @@ const ArtDetailsScreen = () => {
   return (
     <SafeAreaView style={tw`flex-1`}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Image source={{uri: nft.imageUrl }} style={styles.artImage}
+        <Image source={ Platform.OS === 'ios' ? {uri: nft.imageUrl}: nft.imageUrl} style={styles.artImage}
         />
 
         <View style={[styles.detailsContainer, {backgroundColor:colors.background}]}>
@@ -161,7 +161,7 @@ const ArtDetailsScreen = () => {
 
           <View style={styles.bidContainer}>
             <Text style={[styles.currentBidLabel, {color:colors.text}]}>Current Bid</Text>
-            <Text style={[styles.currentBid,{color: colors.purpleText}]}>
+            <Text style={[styles.currentBid,{color: colors.purpleText}]} numberOfLines={2}>
               {nft.price} ETH <FontAwesome5 name="ethereum" size={16} color="black" />
             </Text>
             <TouchableOpacity style={[styles.offerButton,{backgroundColor: colors.tabbackground}]} onPress={() => navigation.navigate('SubmitOffer', { nft })}>
@@ -305,6 +305,7 @@ const styles = StyleSheet.create({
     fontSize: hp('2.5%'),
     fontWeight: 'bold',
     color: '#000',
+    width: 100,
   },
   historyContainer: {
     marginTop: hp('3%'),

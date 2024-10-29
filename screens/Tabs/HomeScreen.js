@@ -9,6 +9,7 @@ import { doc, getDoc,setDoc, updateDoc } from 'firebase/firestore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Collection1, Collection2, Collection3, Collection4 } from '../NFT/dummy';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import tw from 'twrnc';
 import * as Notifications from 'expo-notifications'; // Import Notifications
 import { getToken } from 'expo-notifications'; 
@@ -21,6 +22,7 @@ const collections = [Collection1, Collection2, Collection3, Collection4];
 const HomeScreen = () => {
   const colors = useThemeColors();
   const {isDarkMode} = useTheme();
+  const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation();
   const [name, setName] = useState('');
   const scrollX = new Animated.Value(0);
@@ -313,7 +315,7 @@ const HomeScreen = () => {
           renderItem={renderVerticalItem}
           keyExtractor={(item, index) => `${item.name}-${index}`}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.verticalList}
+          contentContainerStyle={styles.verticalList,{paddingBottom:tabBarHeight}}
         />
       </View>
     </SafeAreaView>
