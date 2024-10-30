@@ -315,7 +315,7 @@ const HomeScreen = () => {
           renderItem={renderVerticalItem}
           keyExtractor={(item, index) => `${item.name}-${index}`}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.verticalList,{paddingBottom:tabBarHeight}}
+          contentContainerStyle={[styles.verticalList, { paddingBottom: tabBarHeight }]}
         />
       </View>
     </SafeAreaView>
