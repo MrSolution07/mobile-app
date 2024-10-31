@@ -33,24 +33,56 @@ const HomeScreen = () => {
   
 
   // Request notification permissions
-  const requestNotificationPermissions = async () => {
-    const { status } = await Notifications.getPermissionsAsync();
-    if (status !== 'granted') {
-      const { status: newStatus } = await Notifications.requestPermissionsAsync();
-      if (newStatus !== 'granted') {
-        Alert.alert('Notification permissions not granted');
-        return;
-      }
-    }
+  // const requestNotificationPermissions = async () => {
+  //   const { status } = await Notifications.getPermissionsAsync();
+  //   if (status !== 'granted') {
+  //     const { status: newStatus } = await Notifications.requestPermissionsAsync();
+  //     if (newStatus !== 'granted') {
+  //       Alert.alert('Notification permissions not granted');
+  //       return;
+  //     }
+  //   }
 
-    // Get the push token
-    const token = await Notifications.getExpoPushTokenAsync();
-    // console.log('Push Token:', token); // Log the push token or save it in your database
-    // Save the token in the database for the current user
-    const currentUser = auth.currentUser;
-    if (currentUser) {
-      // Save the token in Firestore under the user document
-      await setDoc(doc(db, 'users', currentUser.uid), { pushToken: token }, { merge: true });
+  //   // Get the push token
+  //   const token = await Notifications.getExpoPushTokenAsync();
+  //   // console.log('Push Token:', token); // Log the push token or save it in your database
+  //   // Save the token in the database for the current user
+  //   const currentUser = auth.currentUser;
+  //   if (currentUser) {
+  //     // Save the token in Firestore under the user document
+  //     await setDoc(doc(db, 'users', currentUser.uid), { pushToken: token }, { merge: true });
+  //   }
+  // };
+  const requestNotificationPermissions = async () => {
+    try {
+      // Check existing permissions
+      const { status } = await Notifications.getPermissionsAsync();
+      let finalStatus = status;
+  
+      // Request permissions if not already granted
+      if (status !== 'granted') {
+        const { status: newStatus } = await Notifications.requestPermissionsAsync();
+        finalStatus = newStatus;
+        if (newStatus !== 'granted') {
+          Alert.alert('Notification permissions not granted');
+          return;
+        }
+      }
+  
+      // Get the push token if permission is granted
+      if (finalStatus === 'granted') {
+        const { data: token } = await Notifications.getExpoPushTokenAsync();
+        console.log('Push Token:', token); // Optional: Log the push token for testing
+        
+        // Save the token to Firestore under the current user's document
+        const currentUser = auth.currentUser;
+        if (currentUser && token) {
+          await setDoc(doc(db, 'users', currentUser.uid), { pushToken: token }, { merge: true });
+        }
+      }
+    } catch (error) {
+      console.error('Error while requesting notification permissions or saving token:', error);
+      Alert.alert('Failed to set up notifications', 'Please check your internet connection.');
     }
   };
 
