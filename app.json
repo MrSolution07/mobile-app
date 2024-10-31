@@ -10,7 +10,13 @@
     },
     "android": {
       "package": "com.mr_solution.mobileapp",
-      "scheme": "fb568695575728130"
+      "scheme": "fb568695575728130",
+      "splash": {
+        "image": "./assets/images/splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      }
+      
     },
     "ios": {
       "bundleIdentifier": "com.mrsolution.mobileapp",
@@ -18,6 +24,11 @@
       "infoPlist": {
         "NSFaceIDUsageDescription": "This app uses Face ID to authenticate the user.",
         "NSBiometricUsageDescription": "This app uses biometric authentication to secure your account."
+      },
+      "splash": {
+        "image": "./assets/images/splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
       }
     }
   }
