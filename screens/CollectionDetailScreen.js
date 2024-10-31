@@ -47,7 +47,7 @@ const CollectionDetailScreen = () => {
   const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => onNftPress(item)} activeOpacity={0.8} style={styles.nftItem}>
       <Hexagon price={item.price}  isDarkMode={isDarkMode} colors={colors} />
-      <Image source={item.imageUrl} style={styles.nftImage} />
+      <Image source={item.image} style={styles.nftImage} />
       <Text style={[styles.nftName,{color:colors.blueText}]}>{item.name}</Text>
       <Text style={[styles.nftCreator,{color:colors.grayText}]}>Creator: {item.uploadedBy}</Text>
     </TouchableOpacity>

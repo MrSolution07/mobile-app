@@ -23,6 +23,7 @@ import { Collection1, Collection2, Collection3, Collection4, Collection5, Collec
 import {useThemeColors} from '../Context/Theme/useThemeColors';
 import { useTheme } from '../Context/Theme/ThemeContext';
 import tw from 'twrnc';
+import axios from 'axios';
 
 const Hexagon = ({ price,isDarkMode,colors }) => (
   <View style={styles.hexagonContainer}>
@@ -79,8 +80,8 @@ const Explore = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
-    const fetchCollections = () => {
-      const data = collections.map((collection) => {
+    const fetchLocalCollections = () => {
+      const localCollections = collections.map((collection) => {
         const prices = collection.nfts.map((nft) => nft.price);
         const floorPrice = Math.min(...prices);
         const volume = prices.reduce((acc, price) => acc + price, 0);
@@ -90,13 +91,47 @@ const Explore = ({ navigation }) => {
           floorPrice,
           volume,
           image: collection.image,
+          isLocal: true, // Flag to identify local collections
         };
       });
-      setCollectionData(data);
+      return localCollections;
     };
-    
+  
+    const fetchCollections = async () => {
+      try {
+        const options = {
+          method: 'GET',
+          headers: {
+            accept: 'application/json',
+            'x-api-key': '73b5488d384f4be88dab537a9276bd0f',
+          },
+        };
+        const response = await axios.get('https://api.opensea.io/api/v2/collections?chain=ethereum', options);
+  
+        console.log("API Response:", response);
+  
+        const apiCollections = response.data.collections
+          ?.filter(collection => collection.image_url) // Skip collections with empty image_url
+          .map((collection) => ({
+            id: collection.slug,
+            name: collection.name,
+            price: collection.stats?.price,
+            volume: collection.stats?.total_volume,
+            image: { uri: collection.image_url },
+            isLocal: false, // Flag to identify API collections
+          })) || [];
+  
+        // Combine local and API collections
+        setCollectionData([...fetchLocalCollections(), ...apiCollections]);
+      } catch (error) {
+        console.error('Error fetching collections:', error.response?.data || error.message);
+      }
+    };
+  
     fetchCollections();
   }, []);
+  
+
 
   useEffect(() => {
     if (activeTab === 'NFTs') {
@@ -113,6 +148,9 @@ const Explore = ({ navigation }) => {
   }, [searchQuery, nfts, collectionData, activeTab]);
 
   const debouncedSearch = debounce((text) => setSearchQuery(text), 300);
+
+
+
 
   const renderItem = ({ item }) => {
     if (activeTab === 'NFTs') {
@@ -133,16 +171,27 @@ const Explore = ({ navigation }) => {
         </Pressable>
       );
     } else if (activeTab === 'Collections') {
-      return (
-        <Pressable style={styles.itemContainer}
-        onPress={() => navigation.navigate('CollectionDetailScreen', { collection: item })}>
-          
+      const collectionContent = (
+        <>
+          <Hexagon price={item.floorPrice} isDarkMode={isDarkMode} colors={colors} />
           <Image source={item.image} style={styles.nftImage} />
           <View style={styles.nftNameContainer}>
             <Text style={styles.nftName}>{item.name}</Text>
-           
-           
           </View>
+        </>
+      );
+    
+      // For local collections, enable navigation, while remote collections are displayed only
+      return (
+        <Pressable
+          style={[styles.itemContainer, item.isLocal ? {} : { opacity: 0.6 }]}
+          onPress={() => {
+            if (item.isLocal) {
+              navigation.navigate('CollectionDetailScreen', { collection: item });
+            }
+          }}
+        >
+          {collectionContent}
         </Pressable>
       );
     }
@@ -150,10 +199,10 @@ const Explore = ({ navigation }) => {
 
   if (loading) {
     return (
-    <View style={{backgroundColor: colors.background, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <ActivityIndicator size="large" color={colors.text} />
-    </View>
-    )
+      <View style={{backgroundColor: colors.background, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={colors.text} />
+      </View>
+    );
   }
 
   return (

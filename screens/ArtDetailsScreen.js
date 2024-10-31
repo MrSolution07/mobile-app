@@ -135,8 +135,18 @@ const ArtDetailsScreen = () => {
   return (
     <SafeAreaView style={tw`flex-1`}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Image source={ Platform.OS === 'ios' ? {uri: nft.imageUrl}: nft.imageUrl} style={styles.artImage}
-        />
+      {nft.imageUrl ? (
+  <Image 
+    source={{ uri: nft.imageUrl }} 
+    style={styles.artImage} 
+  />
+) : (
+  <Image 
+    source={nft.image} 
+    style={styles.artImage} 
+  />
+)}
+
 
         <View style={[styles.detailsContainer, {backgroundColor:colors.background}]}>
           <Text style={[styles.creatorName,{color:colors.text}]}>{nft.uploadedBy}</Text>

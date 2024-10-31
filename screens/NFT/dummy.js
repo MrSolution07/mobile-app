@@ -12,7 +12,7 @@ const Collection1 = {
       price: 4.25,
       description:
         "The action painter abstract expressionists were directly influenced by automatism. Pollock channelled this into producing gestural...",
-        imageUrl: assets.nft01,
+        image: assets.nft01,
       bids: [
         {
           bidderId: "BID-11",
@@ -37,7 +37,7 @@ const Collection1 = {
       price: 7.25,
       description:
         "The action painter abstract expressionists were directly influenced by automatism...",
-        imageUrl: assets.nft02,
+        image: assets.nft02,
       bids: [
         {
           bidderId: "BID-21",
@@ -55,7 +55,7 @@ const Collection1 = {
       price: 95.25,
       description:
         "The action painter abstract expressionists were directly influenced by automatism...",
-        imageUrl: assets.nft03,
+        image: assets.nft03,
       bids: [
         {
           bidderId: "BID-31",
@@ -80,7 +80,7 @@ const Collection2 = {
       price: 54.25,
       description:
         "The action painter abstract expressionists were directly influenced by automatism...",
-        imageUrl: assets.nft04,
+        image: assets.nft04,
       bids: [
         {
           bidderId: "BID-41",
@@ -98,7 +98,7 @@ const Collection2 = {
       price: 10.25,
       description:
         "The action painter abstract expressionists were directly influenced by automatism...",
-        imageUrl: assets.nft05,
+        image: assets.nft05,
       bids: [
         {
           bidderId: "BID-51",
@@ -116,7 +116,7 @@ const Collection2 = {
       price: 20.25,
       description:
         "The action painter abstract expressionists were directly influenced by automatism...",
-      imageUrl: assets.nft06,
+      image: assets.nft06,
       bids: [
         {
           bidderId: "BID-61",
@@ -141,7 +141,7 @@ const Collection3 = {
       price: 18.25,
       description:
         "The action painter abstract expressionists were directly influenced by automatism...",
-        imageUrl: assets.nft07,
+        image: assets.nft07,
       bids: [],
     },
   ],
@@ -158,7 +158,7 @@ const Collection4 = {
       price: 150.75,
       description:
         "A powerful urban piece that captures the essence of rebellion and freedom.",
-        imageUrl: assets.nft08,
+        image: assets.nft08,
       bids: [],
     },
   ],
@@ -175,7 +175,7 @@ const Collection5 = {
       price: 125.0,
       description:
         "A surreal digital journey through subconscious dreamscapes.",
-        imageUrl: assets.nft09,
+        image: assets.nft09,
       bids: [],
     },
   ],
@@ -192,7 +192,7 @@ const Collection6 = {
       price: 2.5,
       description:
         "A playful pixelated artwork that explores the intersection of technology and art.",
-        imageUrl: assets.nft10,
+        image: assets.nft10,
       bids: [],
     },
   ],
@@ -209,7 +209,7 @@ const Collection7 = {
       price: 300.0,
       description:
         "A stunning virtual reality city rendered in breathtaking detail.",
-        imageUrl: assets.nft11,
+        image: assets.nft11,
       bids: [],
     },
   ],
@@ -226,7 +226,7 @@ const Collection8 = {
       price: 50.0,
       description:
         "A breathtaking photograph of the golden hour in a pristine landscape.",
-        imageUrl: assets.nft12,
+        image: assets.nft12,
       bids: [],
     },
   ],
@@ -243,7 +243,7 @@ const Collection9 = {
       price: 10.75,
       description:
         "A minimalistic design that explores movement and space with white lines on a black canvas.",
-        imageUrl: assets.nft13,
+        image: assets.nft13,
       bids: [],
     },
   ],
@@ -260,7 +260,7 @@ const Collection10 = {
       price: 999.99,
       description:
         "A digital representation of the iconic 'Starry Night' artwork.",
-        imageUrl: assets.nft14,
+        image: assets.nft14,
       bids: [],
     },
   ],

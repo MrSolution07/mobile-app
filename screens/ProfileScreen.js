@@ -71,7 +71,7 @@ const UserProfile = ({ navigation }) => {
   }
 
   // Destructure user data
-  const { name, balance, email, phoneNo, location, ProfileImage } = userData;
+  const { name, ethAmount, email, phoneNo, location, ProfileImage } = userData;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -107,7 +107,7 @@ const UserProfile = ({ navigation }) => {
               <View style={styles.userInfo}>
                 <Text style={styles.name}>{name}</Text>
                 <Text style={styles.assetsLabel}>Total Assets</Text>
-                <Text style={styles.balance}>{balance || '0.00'}</Text>
+                <Text style={styles.balance}>{ethAmount || '0.00'} ETH</Text>
               </View>
             </View>
 
