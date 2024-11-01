@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, FlatList, ScrollView, ActivityIndicator, TouchableOpacity, Alert, TextInput } from 'react-native';
+import { View, Text, Image, FlatList, ScrollView, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import { collection, onSnapshot, query, where, updateDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../config/firebaseConfig'; 
 import tw from 'twrnc';
@@ -12,6 +12,7 @@ const Items = () => {
   const [mintedNFTs, setMintedNFTs] = useState([]);
   const [purchasedNFTs, setPurchasedNFTs] = useState([]);
   const [soldNFTs, setSoldNFTs] = useState([]);
+  const [soldedNFTs, setSoldedNFTs] = useState([]); // State for the new 'soldednfts' collection
   const [loading, setLoading] = useState(true);
 
   const fetchNFTsByStatus = (status, setState) => {
@@ -33,15 +34,35 @@ const Items = () => {
     return unsubscribe;
   };
 
+  const fetchSoldedNFTs = () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const soldedNFTsQuery = query(
+      collection(db, 'soldednfts'),
+      where('creatorId', '==', user.uid)
+    );
+
+    const unsubscribe = onSnapshot(soldedNFTsQuery, (querySnapshot) => {
+      const nfts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setSoldedNFTs(nfts);
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  };
+
   useEffect(() => {
     const unsubscribeMinted = fetchNFTsByStatus('minted', setMintedNFTs);
     const unsubscribePurchased = fetchNFTsByStatus('purchased', setPurchasedNFTs);
     const unsubscribeSold = fetchNFTsByStatus('sold', setSoldNFTs);
+    const unsubscribeSoldedNFTs = fetchSoldedNFTs(); // Fetch for 'soldednfts' collection
 
     return () => {
       unsubscribeMinted();
       unsubscribePurchased();
       unsubscribeSold();
+      unsubscribeSoldedNFTs(); // Unsubscribe on cleanup
     };
   }, []);
 
@@ -105,7 +126,7 @@ const Items = () => {
           )}
 
           {/* Sold NFTs */}
-          <Text style={tw`text-xl p-2 font-bold text-[#075eec] mb-4 mt-8`}>Sold NFTs</Text>
+          {/* <Text style={tw`text-xl p-2 font-bold text-[#075eec] mb-4 mt-8`}>Sold NFTs</Text>
           {loading ? (
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
@@ -115,6 +136,20 @@ const Items = () => {
               ))
             ) : (
               <Text style={[tw`text-center mt-4`, { color: colors.text }]}>No NFTs sold yet.</Text>
+            )
+          )} */}
+
+          {/* Solded NFTs */}
+          <Text style={tw`text-xl p-2 font-bold text-[#075eec] mb-4 mt-8`}>Sold NFTs</Text>
+          {loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            soldedNFTs.length > 0 ? (
+              soldedNFTs.map((item) => (
+                <NFTCard key={item.id} item={item} isOwner={false} colors={colors} />
+              ))
+            ) : (
+              <Text style={[tw`text-center mt-4`, { color: colors.text }]}>No NFTs solded yet.</Text>
             )
           )}
         </View>

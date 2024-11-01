@@ -123,8 +123,9 @@ const Bids = () => {
         const bidAmount = bid.offerAmount; 
         const bidderId = bid.bidderId;
 
+        // this is the target 
         if (action === 'Accept') {
-          const creatorAmount = bidAmount * 0.95; 
+          const creatorAmount = bidAmount * 0.98; // 2% commission for the platform 
           const bidderDocRef = doc(db, 'users', bidderId);
           const bidderSnapshot = await getDoc(bidderDocRef);
       
@@ -174,21 +175,26 @@ const Bids = () => {
                 const mintedNFTsCollectionRef = collection(db, 'users', nftData.creatorId, 'minted');
                 await deleteDoc(doc(mintedNFTsCollectionRef, nftDocId));
 
+                
                 // Create a new NFT object for the sold section
                 const soldNFTData = {
-                    ...nftData,
-                    status: 'sold',
-                    ownerId: bidderId,
-                    soldAt: new Date().toISOString(), // Record the sale date
+                  ...nftData,
+                  status: 'sold',
+                  ownerId: bidderId,
+                  soldAt: new Date().toISOString(), // Record the sale date
                 };
 
                 // Ensure you generate a unique ID for the sold NFT document
                 const soldNFTsCollectionRef = collection(db, 'users', nftData.creatorId, 'sold');
                 const newSoldNFTDocRef = doc(soldNFTsCollectionRef); // Create a new document with a unique ID
                 await setDoc(newSoldNFTDocRef, soldNFTData);
+
+                // Add NFT to "soldednfts" table for the creator
+                const soldedNFTsCollectionRef = collection(db, 'soldednfts');
+                await setDoc(doc(soldedNFTsCollectionRef, nftDocId), soldNFTData);
+              }
             }
-        }
-      }
+          }
 
       else if (action === 'Reject') {
             // Remove the rejected bid
