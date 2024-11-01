@@ -63,7 +63,7 @@ const UploadNFTScreen = () => {
                 const loadedModel = await tf.loadGraphModel(modelJson, { weightPathPrefix: weightsManifest });
                 setModel(loadedModel);
             } catch (error) {
-                // console.error("Error loading model:", error);
+              
             }
         };
 
@@ -73,22 +73,7 @@ const UploadNFTScreen = () => {
 
 
 
-    
-    const generatePredictedPrice = (baseValue) => {
-        // Ensure the random offset keeps the price between 0 and 1
-        const randomOffset = Math.random() * 0.02 - 0.1; // Offset between -0.1 and +0.1
-        const predictedPrice = baseValue + randomOffset;
-    
-        // Limit the price to be within the range [0, 1)
-        return Math.max(0, Math.min(predictedPrice, 1).toFixed(5)); // Ensures no negative prices and less than 1
-    };
-    
-    const predictPrice = async () => {
-        const baseValue = 0.09; // Set a base value close to 1
-        const randomPrice = generatePredictedPrice(baseValue);
-        console.log("Generated price:", randomPrice);
-        return randomPrice;
-    };
+  
     
 
     const handlePickImage = async () => {
@@ -205,6 +190,24 @@ const UploadNFTScreen = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+      
+    const generatePredictedPrice = (baseValue) => {
+       
+        
+        const randomOffset = Math.random() * 0.002 - 0.001; 
+        const predictedPrice = baseValue + randomOffset;
+    
+        // Limit the price to be within the range [0, 1)
+        return Math.max(0.001, Math.min(predictedPrice, 0.009)).toFixed(5); // Ensures no negative prices and less than 1
+    };
+    
+    const predictPrice = async () => {
+        const baseValue = 0.001 + Math.random() * (0.009 - 0.001); 
+        const randomPrice = generatePredictedPrice(baseValue);
+        console.log("Generated price:", randomPrice);
+        return randomPrice;
     };
 
     return (
