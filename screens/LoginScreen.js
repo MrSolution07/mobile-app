@@ -212,10 +212,10 @@ const LoginScreen = ({ navigation }) => {
                   <Text style={styles.socialButtonText}>Login with Google</Text>
                 </Pressable>
 
-                <Pressable style={styles.socialButton} >
+                {/* <Pressable style={styles.socialButton} >
                   <FontAwesome5 name="phone-alt" size={20} color="black" style={tw`right-3`} />
                   <Text style={styles.socialButtonText}>Login with Number</Text>
-                </Pressable>
+                </Pressable> */}
 
                 <View style={styles.signUpContainer}>
                   <Text style={styles.signUpText}>Don't have an account?{' '}</Text>

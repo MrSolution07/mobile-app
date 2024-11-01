@@ -17,6 +17,7 @@ const Activity = () => {
   const { amount, ethAmount, zarAmount, withdrawAmount } = useContext(DataContext);
   const [transfers, setTransfers] = useState([]);
   const [ethTransactions, setEthTransactions] = useState([]);
+  const [withdrawals, setWithdrawals] = useState([]);
   const currentUser = auth.currentUser;
 
 
@@ -47,6 +48,22 @@ const Activity = () => {
       if (docSnapshot.exists()) {
         const userData = docSnapshot.data();
         setEthTransactions(userData.BuyETH || []); // Fetch the 'ethTransactions' array
+      }
+    });
+
+    // Cleanup listener on unmount
+    return () => unsubscribeETH();
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const userDocRef = doc(db, 'users', currentUser.uid);
+
+    const unsubscribeETH = onSnapshot(userDocRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const userData = docSnapshot.data();
+        setWithdrawals(userData.withdrawals || []); // Fetch the 'withdrawals' array
       }
     });
 
@@ -92,7 +109,9 @@ const Activity = () => {
           <Text style={isDarkMode? {color:colors.text} : {color:'#000'}}>No transfers found.</Text>
         )}
 
-        <View style={getActivityContainerStyle(isDarkMode)}>
+        {withdrawals.length > 0? (
+         withdrawals.map((withdraw,index) => (
+        <View key={index} style={getActivityContainerStyle(isDarkMode)}>
           <View style={styles.iconRow}>
             <View style={styles.iconCircle}>
               <MaterialCommunityIcons name="arrow-down" size={20} color="white" />
@@ -100,12 +119,16 @@ const Activity = () => {
             <View style={styles.activityContent}>
               <Text style={isDarkMode? {color:colors.text}: styles.activityType}>Withdrawals</Text>
               <View style={tw`flex-row justify-between`}>
-              <Text style={isDarkMode?  {color:colors.text}: styles.activityAmount}>{withdrawAmount} ZAR</Text>
-              <Text style={isDarkMode? {color:colors.grayText}: styles.activityDate}>2024-09-02</Text>
+              <Text style={isDarkMode?  {color:colors.text}: styles.activityAmount}>{withdraw.amount} ZAR</Text>
+              <Text style={isDarkMode? {color:colors.grayText}: styles.activityDate}>{withdraw.date}</Text>
               </View>
             </View>
           </View>
         </View>
+        ))
+      ): (
+        <Text style={isDarkMode? {color:colors.text} : {color:'#000'}}>No withdrawals found.</Text>
+        )}
 
         {ethTransactions.length > 0 ? (
           ethTransactions.map((transaction, index) => (

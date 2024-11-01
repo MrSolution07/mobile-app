@@ -46,7 +46,7 @@ const Account = () => {
     }, [])
   );
 
-  const currentZarBalance = parseFloat(zarAmount || 0) - (withdrawAmount ? parseFloat(withdrawAmount) + 0.02 : 0);
+  // const currentZarBalance = parseFloat(zarAmount || 0) - (withdrawAmount ? parseFloat(withdrawAmount) + 0.02 : 0);
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer} >
@@ -54,11 +54,11 @@ const Account = () => {
         <View style={styles.balanceContainer}>
           <Text style={styles.balanceTitle}>BALANCE</Text>
           <Text style={styles.balanceAmount}>
-            {currentZarBalance.toFixed(2)} ZAR
+            {zarAmount} ZAR
           </Text>
 
           <View style={tw`flex-row rounded-md gap-x-2 items-center justify-center w-40 p-2 top-3`}>
-            <Text style={tw`font-bold text-xl text-black`}numberOfLines={2}>{ethAmount ? ethAmount : 0} </Text>
+            <Text style={tw`font-bold text-xl text-black`} numberOfLines={2}>{ethAmount ? ethAmount : 0} </Text>
             <Text style={tw`text-[#6d28d9] font-bold text-xl`}>ETH</Text>
             <FontAwesome5 name="ethereum" size={20} color="black" />
           </View>
@@ -71,7 +71,7 @@ const Account = () => {
               <Text style={styles.buttonText}>Withdraw</Text>
             </Pressable>
             <Pressable style={styles.actionButton} onPress={() => {
-              if (currentZarBalance >= 50) { 
+              if (zarAmount >= 50) { 
                 navigation.navigate('BuyEth');
               } else {
                 alert("Insufficient funds to purchase ETH.");

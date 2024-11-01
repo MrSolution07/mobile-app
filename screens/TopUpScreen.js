@@ -373,6 +373,8 @@ const styles = StyleSheet.create({
   confirmingText: {
     color: '#ffffff',
     fontSize: wp(4),
+    fontWeight: 'bold',
+
   },
 });
 

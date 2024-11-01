@@ -29,7 +29,7 @@ const ArtDetailsScreen = () => {
   const underlineWidth = wp('18%');
   const tabOffsetMap = {
     Details: Platform.OS === 'ios' ? wp('3.5%') : wp('3%'),
-    Owners: Platform.OS === 'ios' ? wp('27%') : wp('26%'),
+    Creator: Platform.OS === 'ios' ? wp('27%') : wp('26%'),
     Bids: Platform.OS === 'ios' ? wp('48%') : wp('48%'),
     History: Platform.OS === 'ios' ? wp('68.5%') : wp('69%'),
   };
@@ -75,10 +75,10 @@ const ArtDetailsScreen = () => {
             <Text style={[styles.descriptionText,{color:colors.text}]}>{nft.description}</Text>
           </View>
         );
-      case 'Owners':
+      case 'Creator':
         return (
           <View style={styles.ownersContainer}>
-            <Text style={[styles.ownersTitle,{color:colors.blueText}]}>Owner</Text>
+            <Text style={[styles.ownersTitle,{color:colors.blueText}]}>Creator</Text>
             <Text style={[styles.ownerName,{color:colors.text}]}>Creator: {nft.uploadedBy}</Text>
           </View>
         );
@@ -155,7 +155,7 @@ const ArtDetailsScreen = () => {
           <Text style={[styles.artNumber,{color:colors.text}]}>{nft.name}</Text>
 
           <View style={styles.tabContainer}>
-            {['Details', 'Owners', 'Bids', 'History'].map((tab) => (
+            {['Details', 'Creator', 'Bids', 'History'].map((tab) => (
               <TouchableOpacity key={tab} onPress={() => handleTabPress(tab)}>
                 <Text style={[styles.tab,{color: colors.inactiveTabBackground} ,activeTab === tab && styles.activeTab,{color:colors.text}]}>{tab}</Text>
               </TouchableOpacity>
@@ -304,10 +304,12 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   bidContainer: {
-    marginTop: hp('8%'),
+    marginTop: hp('5%'),
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    flexGrow:1,
+    marginBottom: hp('5%'),
   },
   currentBidLabel: {
     fontSize: hp('2%'),
