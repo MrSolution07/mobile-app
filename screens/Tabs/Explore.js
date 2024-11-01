@@ -108,7 +108,7 @@ const Explore = ({ navigation }) => {
         };
         const response = await axios.get('https://api.opensea.io/api/v2/collections?chain=ethereum', options);
   
-        console.log("API Response:", response);
+       
   
         const apiCollections = response.data.collections
           ?.filter(collection => collection.image_url) // Skip collections with empty image_url

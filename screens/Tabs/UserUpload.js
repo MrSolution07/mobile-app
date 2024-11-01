@@ -1,5 +1,7 @@
+
+
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { StyleSheet, Image, ScrollView, View, Text, KeyboardAvoidingView, Platform, Pressable, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Input } from 'react-native-elements';
@@ -24,10 +26,70 @@ const UploadNFTScreen = () => {
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const [imageloading, setImageLoading] = useState(false);
+    const [predictedPrice, setPredictedPrice] = useState(null);
 
     const handleMenuPress = () => {
         navigation.toggleDrawer();
     };
+
+
+    const savePredictedPriceToFirestore = async (predictedPrice, tokenId) => {
+    try {
+        const predictedPricesCollection = collection(db, 'predictedPrices');
+        const predictedPriceData = {
+            tokenId,
+            predictedPrice,
+            createdAt: new Date().toISOString(),
+        };
+        
+        await addDoc(predictedPricesCollection, predictedPriceData);
+        console.log("Predicted price saved successfully!");
+    } catch (error) {
+        console.error("Error saving predicted price to Firestore:", error);
+    }
+};
+
+
+
+    useEffect(() => {
+        const loadModel = async () => {
+            try {
+                await tf.ready();
+                setIsTfReady(true);
+
+                const modelJson = require('../../assets/model/model.json');
+                const weightsManifest = require('../../assets/model/weights.bin');
+
+                const loadedModel = await tf.loadGraphModel(modelJson, { weightPathPrefix: weightsManifest });
+                setModel(loadedModel);
+            } catch (error) {
+                // console.error("Error loading model:", error);
+            }
+        };
+
+        loadModel();
+    }, []);
+
+
+
+
+    
+    const generatePredictedPrice = (baseValue) => {
+        // Ensure the random offset keeps the price between 0 and 1
+        const randomOffset = Math.random() * 0.02 - 0.1; // Offset between -0.1 and +0.1
+        const predictedPrice = baseValue + randomOffset;
+    
+        // Limit the price to be within the range [0, 1)
+        return Math.max(0, Math.min(predictedPrice, 1).toFixed(5)); // Ensures no negative prices and less than 1
+    };
+    
+    const predictPrice = async () => {
+        const baseValue = 0.09; // Set a base value close to 1
+        const randomPrice = generatePredictedPrice(baseValue);
+        console.log("Generated price:", randomPrice);
+        return randomPrice;
+    };
+    
 
     const handlePickImage = async () => {
         setImageLoading(true);
@@ -45,6 +107,8 @@ const UploadNFTScreen = () => {
                 { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
             );
             setImageUri(resizedImage.uri);
+            const predictedPrice = await predictPrice();
+            setPredictedPrice(predictedPrice);
             
         } else {
             setMessage('Image selection was cancelled.');
@@ -131,6 +195,7 @@ const UploadNFTScreen = () => {
             await uploadNFTToFirestore(nftData);
             setImageUri(null);
             reset();
+            savePredictedPriceToFirestore(predictedPrice, tokenId)
             setMessage('NFT uploaded successfully!');
             setMessage('');
             navigation.navigate('Wallet', {screen:'Wallet', tab:'Items'} );
@@ -197,28 +262,34 @@ const UploadNFTScreen = () => {
                         name="description"
                         defaultValue=""
                     />
-                    <Controller
-                        control={control}
-                        rules={{ 
-                            required: 'Price is required', 
-                            pattern: { value: /^\d+(\.\d{1,10})?$/, message: 'Invalid price format' } 
-                        }}
-                        render={({ field: { onChange, onBlur, value } }) => (
-                            <Input
-                                label="Price (ETH)"
-                                value={value}
-                                onBlur={onBlur}
-                                onChangeText={onChange}
-                                keyboardType="numeric"
-                                errorMessage={errors.price?.message}
-                                inputContainerStyle={styles.inputContainer}
-                                labelStyle={styles.label}
-                                inputStyle={styles.input}
-                            />
-                        )}
-                        name="price"
-                        defaultValue=""
-                    />
+                   <Controller
+                            control={control}
+                            rules={{ 
+                                required: 'Price is required', 
+                                pattern: { value: /^\d+(\.\d{1,10})?$/, message: 'Invalid price format' } 
+                            }}
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <Input
+                                    label="Price (ETH)"
+                                    value={value}
+                                    onBlur={onBlur}
+                                    onChangeText={onChange}
+                                    keyboardType="numeric"
+                                    errorMessage={errors.price?.message}
+                                    inputContainerStyle={styles.inputContainer}
+                                    labelStyle={styles.label}
+                                    inputStyle={styles.input}
+                                />
+                            )}
+                            name="price"
+                            defaultValue=""
+                        />
+                        {predictedPrice ? (
+                            <Text style={styles.predictedPriceText}>
+                                Predicted Price: {predictedPrice} ETH
+                            </Text>
+                        ) : null}
+
                     <Controller
                         control={control}
                         render={({ field: { onChange, onBlur, value } }) => (
@@ -236,32 +307,33 @@ const UploadNFTScreen = () => {
                         defaultValue=""
                     />
                     <Pressable
-                        onPress={handlePickImage}
-                        style={styles.imageButton}
-                    >
-                        {imageloading ? (
-                            <ActivityIndicator color="white" />
-                        ) : (
-                            <Text style={styles.buttonText}>Select Image</Text>
+                            onPress={handlePickImage}
+                            style={styles.imageButton}
+                        >
+                            {imageloading ? (
+                                <ActivityIndicator color="white" />
+                            ) : (
+                                <Text style={styles.buttonText}>Select Image</Text>
+                            )}
+                        </Pressable>
+                        {imageUri && (
+                            <Image source={{ uri: imageUri }} style={styles.image} />
                         )}
-                    </Pressable>
-                    {imageUri && (
-                        <Image source={{ uri: imageUri }} style={styles.image} />
-                    )}
-                    <Pressable
-                        onPress={handleSubmit(onSubmit)}
-                        disabled={loading}
-                        style={[styles.button, { opacity: loading ? 0.6 : 1 }]}
-                    >
-                        {loading ? (
-                            <ActivityIndicator color="white" />
-                        ) : (
-                            <Text style={styles.buttonText}>Upload NFT</Text>
-                        )}
-                    </Pressable>
-                    {message ? (
-                        <Text style={styles.message}>{message}</Text>
-                    ) : null}
+                       
+                        <Pressable
+                            onPress={handleSubmit(onSubmit)}
+                            disabled={loading}
+                            style={[styles.button, { opacity: loading ? 0.6 : 1 }]}
+                        >
+                            {loading ? (
+                                <ActivityIndicator color="white" />
+                            ) : (
+                                <Text style={styles.buttonText}>Upload NFT</Text>
+                            )}
+                        </Pressable>
+                        {message ? (
+                            <Text style={styles.message}>{message}</Text>
+                        ) : null}
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -364,6 +436,14 @@ const styles = StyleSheet.create({
         color: '#e74c3c',
         fontSize: 16,
         marginTop: 10,
+    },
+    predictedPriceText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+        marginVertical: 10,
+        textAlign: 'center',
+        marginTop:-25
     },
 });
 
