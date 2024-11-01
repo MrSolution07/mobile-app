@@ -327,6 +327,9 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 20,
   },
+  placeholder:{
+    color:'lightgray',
+  },
   inputWithIcon: {
     height: 50,
     borderColor: '#dcdcdc', 

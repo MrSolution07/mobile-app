@@ -64,9 +64,9 @@ const CollectionDetailScreen = () => {
         numColumns={2}
       />
       
-      <TouchableOpacity style={[styles.makeOfferButton,{backgroundColor: colors.tabbackground}]} onPress={handleMakeCollectionOffer}>
+      {/* <TouchableOpacity style={[styles.makeOfferButton,{backgroundColor: colors.tabbackground}]} onPress={handleMakeCollectionOffer}>
         <Text style={styles.makeOfferButtonText}>Make Collection Offer</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </SafeAreaView>
   );
 };

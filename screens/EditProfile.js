@@ -21,6 +21,8 @@ const EditProfile = ({ navigation }) => {
   const [userLocation, setUserLocation] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false); // Loading state
+  const [saveChangesLoading, setSaveChangesLoading] = useState(false);
+  const [loadingImage,setLoadingImage] = useState(false);
 
   // Fetch user data and profile image
   useEffect(() => {
@@ -99,9 +101,12 @@ const EditProfile = ({ navigation }) => {
     });
 
     if (!result.canceled) {
+      setLoadingImage(true);
       const downloadURL = await uploadImage(result.assets[0].uri);
       setAvatar({ uri: downloadURL });
     }
+    setLoadingImage(false);  
+
   };
 
   // Take a photo
@@ -116,9 +121,12 @@ const EditProfile = ({ navigation }) => {
     });
 
     if (!result.canceled) {
+      setLoadingImage(true);
       const downloadURL = await uploadImage(result.assets[0].uri);
       setAvatar({ uri: downloadURL });
     }
+    
+    setLoadingImage(false);  
   };
 
   // Show options to pick image from gallery or take a photo
@@ -136,6 +144,7 @@ const EditProfile = ({ navigation }) => {
   };
 
   const handleSave = async () => {
+    setSaveChangesLoading(true);
     if (!username || !userEmail) {
       Alert.alert('Error', 'Username and Email are required.');
       return;
@@ -188,11 +197,17 @@ const EditProfile = ({ navigation }) => {
           <View style={[styles.formContainer,{backgroundColor:colors.background}]}>
             
             <TouchableOpacity onPress={handleImageOptions}>
+              {loadingImage ?
+              ( <ActivityIndicator size='small' color="#D3D3D3" style={{justifyContent:'center',alignContent:"center"}} />
+              ):(
               <Image 
                 source={avatar ? avatar : { uri: 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' }} 
                 style={styles.avatar} 
               />
+              )
+            }
             </TouchableOpacity>
+            
             <View style={styles.fieldContainer}>
             <Text style={{color: colors.text}}>Username</Text>
             <TextInput
@@ -223,7 +238,8 @@ const EditProfile = ({ navigation }) => {
             />
 
             <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={loading}>
-              {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveButtonText}>Save Changes</Text>}
+
+              {saveChangesLoading ? <Text style={styles.saveButtonText}>Saving...<Text/></Text> : <Text style={styles.saveButtonText}>Save Changes</Text>}
             </TouchableOpacity>
             </View>
           </View>

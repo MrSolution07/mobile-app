@@ -18,7 +18,7 @@ export const darkColors = {
   walletGradient: ['#1B1F3B', '#2C3E50', '#4A6D8A'],
   uploadFormContainer : 'rgba(255,255,255,0.9)',
   ethVolumeAmount: '#F0EAD6',
-  placeholderText:'grey',
+  placeholderText:'#808080',
   inputText:'black',
   purpleText: '#6d28d9',
   blueText:'#2563eb',

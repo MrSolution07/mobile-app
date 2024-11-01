@@ -62,7 +62,6 @@ const handleOfferSubmit = async () => {
     return;
   }
 
-  // Rest of your existing handleOfferSubmit code
   try {
       const currentUser = auth.currentUser;
 

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Animated, Pressable, Alert, Platform} from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { SafeAreaView, View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Animated, Pressable, Alert, Platform,ActivityIndicator} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import * as LocalAuthentication from 'expo-local-authentication'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { db, auth } from '../../config/firebaseConfig';
-import { doc, getDoc,setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc,setDoc, updateDoc,onSnapshot } from 'firebase/firestore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Collection1, Collection2, Collection3, Collection4 } from '../NFT/dummy';
@@ -16,6 +16,7 @@ import { getToken } from 'expo-notifications';
 import * as Location from 'expo-location';
 import { useThemeColors } from '../Context/Theme/useThemeColors';
 import { useTheme } from '../Context/Theme/ThemeContext';
+import DataContext from '../Context/Context';
 
 const collections = [Collection1, Collection2, Collection3, Collection4];
 
@@ -24,12 +25,15 @@ const HomeScreen = () => {
   const {isDarkMode} = useTheme();
   const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation();
-  const [name, setName] = useState('');
+  // const [name, setName] = useState('');
+  const {name,setName} = useContext(DataContext);
   const scrollX = new Animated.Value(0);
   const [profileImage, setProfileImage] = useState(null);
   const [loginPromptShown, setLoginPromptShown] = useState(false);
   const [collectionData, setCollectionData] = useState([]);
   const [location, setLocation] = useState(null); 
+  const [loading, setLoading] = useState(true);
+
   
 
   // Request notification permissions
@@ -187,32 +191,40 @@ const HomeScreen = () => {
     checkLoginPreference();
   }, []);
 
-  useEffect(() => {
-    const fetchProfileImage = async () => {
-      const currentUser = auth.currentUser;
+  
+useEffect(() => {
+  const currentUser = auth.currentUser;
 
-      if (currentUser) {
-        const userRef = doc(db, 'users', currentUser.uid);
-        const userDoc = await getDoc(userRef);
-        
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          console.log('User Data:', userData);
-          setName(userData.name);
-          setProfileImage(userData.ProfileImage ? { uri: userData.ProfileImage } : {uri:"https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"});
-        
-          if (!userData.country) {
-            requestLocationPermission();
-          } else {
-            setLocation(userData.country); // Set location from the database
-          }
+  if (currentUser) {
+    const userRef = doc(db, 'users', currentUser.uid);
+
+    const unsubscribe = onSnapshot(userRef, (userDoc) => {
+      if (userDoc.exists()) {
+        setLoading(false);
+        const userData = userDoc.data();
+        console.log('User Data:', userData);
+
+        setName(userData.name);
+        setProfileImage(
+          userData.ProfileImage 
+            ? { uri: userData.ProfileImage } 
+            : { uri: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" }
+        );
+
+        // Handle location
+        if (!userData.country) {
+          requestLocationPermission();
+        } else {
+          setLocation(userData.country); // Set location from the database
         }
+      } else {
+        console.log("No such document!");
       }
-    };
+    });
 
-    fetchProfileImage();
-  }, []);
-
+    return () => unsubscribe();
+  }
+}, []);
 
     // Request Location Permission
     const requestLocationPermission = async () => {
@@ -317,7 +329,12 @@ const HomeScreen = () => {
               </View>
               <View style={styles.greetingContainer}>
                 <Text style={[styles.greeting, {color: colors.text}]}>
-                  Hello, <Text style={styles.username}>{name}</Text>
+                  Hello, 
+                  {loading ? (
+                      <ActivityIndicator size="small" color="#D3D3D3" style={{justifyContent:'center'}} />
+                    ) : (
+                      <Text style={styles.username}> {name}</Text>
+                    )}
                 </Text>
               </View>
               <View style={[styles.sectionHeader, {color: colors.text}]}>
