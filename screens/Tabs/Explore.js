@@ -17,7 +17,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import Svg, { Polygon } from 'react-native-svg';
 import { db } from '../../config/firebaseConfig';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs,orderBy,limit,query} from 'firebase/firestore';
 import debounce from 'lodash.debounce'; 
 import { Collection1, Collection2, Collection3, Collection4, Collection5, Collection6, Collection7, Collection8 } from '../NFT/dummy';
 import {useThemeColors} from '../Context/Theme/useThemeColors';
@@ -46,6 +46,8 @@ const Explore = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [filteredData, setFilteredData] = useState([]);
   const [collectionData, setCollectionData] = useState([]);
+  const [recentNfts, setRecentNfts] = useState([]);
+
 
   useFocusEffect(
     React.useCallback(() => {
@@ -65,7 +67,7 @@ const Explore = ({ navigation }) => {
         const fetchedNfts = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
-          imageUrl: doc.data().imageUrl , // Ensure imageUrl is in the right format
+          imageUrl: { uri: doc.data().imageUrl }, // Ensure imageUrl is in the right format
         }));
         setNfts(fetchedNfts);
         setFilteredData(fetchedNfts); // Set initial filteredData to fetched NFTs
@@ -78,6 +80,8 @@ const Explore = ({ navigation }) => {
     
     fetchNfts();
   }, []);
+
+  
 
   useEffect(() => {
     const fetchLocalCollections = () => {
@@ -131,7 +135,37 @@ const Explore = ({ navigation }) => {
     fetchCollections();
   }, []);
   
-
+  useEffect(() => {
+    const fetchRecentNfts = async () => {
+      try {
+        const q = query(
+          collection(db, 'nfts'),
+          orderBy('createdAt', 'desc'),
+          limit(10)
+        );
+  
+        const querySnapshot = await getDocs(q);
+        
+        const fetchedRecentNfts = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            imageUrl: { uri: data.imageUrl },
+            createdAt: data.createdAt instanceof Date ? data.createdAt : new Date(data.createdAt),
+          };
+        });
+        
+        setRecentNfts(fetchedRecentNfts);
+        // console.log("Recent NFTs state set to:", fetchedRecentNfts);
+  
+      } catch (error) {
+        console.error("Error fetching recent NFTs: ", error);
+      }
+    };
+  
+    fetchRecentNfts();
+  }, []);
 
   useEffect(() => {
     if (activeTab === 'NFTs') {
@@ -144,8 +178,13 @@ const Explore = ({ navigation }) => {
         collection.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredData(filteredCollections);
-    }
-  }, [searchQuery, nfts, collectionData, activeTab]);
+  } else if (activeTab === 'Recents') {
+    const filteredRecentNFTs = recentNfts.filter((nft) =>
+      nft.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredData(filteredRecentNFTs);
+  }
+  }, [searchQuery, nfts, collectionData,recentNfts ,activeTab]);
 
   const debouncedSearch = debounce((text) => setSearchQuery(text), 300);
 
@@ -162,7 +201,7 @@ const Explore = ({ navigation }) => {
           accessibilityHint={`View details of ${item.title}`}
         >
           <Hexagon price={item.price} isDarkMode={isDarkMode} colors={colors}/>
-          <Image source={{ uri: item.imageUrl }} 
+          <Image source={Platform.OS === 'ios' ? { uri: item.imageUrl } : item.imageUrl} 
            style={styles.nftImage} 
           />
           <View style={styles.nftNameContainer}>
@@ -194,9 +233,33 @@ const Explore = ({ navigation }) => {
           {collectionContent}
         </Pressable>
       );
-    }
+    } else if (activeTab === 'Recents') {
+      return (
+          <Pressable
+              style={styles.itemContainer}
+              onPress={() => {
+                  // Ensure created at is converted to string, if it's a date object
+                  const nftToNavigate = {
+                      ...item,
+                      createdAt: item.createdAt instanceof Date ? item.createdAt.toISOString() : item.createdAt,
+                  };
+                  navigation.navigate('ArtDetailsScreen', { nft: nftToNavigate });
+              }}
+              accessibilityLabel={`Navigate to ${item.title}`}
+              accessibilityHint={`View details of ${item.title}`}
+          >
+              <Hexagon price={item.price} isDarkMode={isDarkMode} colors={colors} />
+              <Image 
+                  source={Platform.OS === 'ios' ? { uri: item.imageUrl } : item.imageUrl} 
+                  style={styles.nftImage} 
+              />
+              <View style={styles.nftNameContainer}>
+                  <Text style={styles.nftName}>{item.title}</Text>
+              </View>
+          </Pressable>
+      );
+    };
   };
-
   if (loading) {
     return (
       <View style={{backgroundColor: colors.background, flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -217,7 +280,7 @@ const Explore = ({ navigation }) => {
         />
         </View>
         <View style={styles.tabs}>
-          {['NFTs', 'Collections', 'Recent'].map((tab) => (
+          {['NFTs', 'Collections', 'Recents'].map((tab) => (
             <TouchableOpacity
               key={tab}
               onPress={() => setActiveTab(tab)}
@@ -245,7 +308,7 @@ const Explore = ({ navigation }) => {
           numColumns={2}
           columnWrapperStyle={styles.columnWrapper}
           contentContainerStyle={{ paddingBottom: tabBarHeight }}
-          initialNumToRender={5}
+          // initialNumToRender={5}
         />
       </View>
     </SafeAreaView>
