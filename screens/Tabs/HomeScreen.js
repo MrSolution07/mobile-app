@@ -17,6 +17,8 @@ import * as Location from 'expo-location';
 import { useThemeColors } from '../Context/Theme/useThemeColors';
 import { useTheme } from '../Context/Theme/ThemeContext';
 import DataContext from '../Context/Context';
+import { onAuthStateChanged } from 'firebase/auth';
+
 
 const collections = [Collection1, Collection2, Collection3, Collection4];
 
@@ -34,29 +36,6 @@ const HomeScreen = () => {
   const [location, setLocation] = useState(null); 
   const [loading, setLoading] = useState(true);
 
-  
-
-  // Request notification permissions
-  // const requestNotificationPermissions = async () => {
-  //   const { status } = await Notifications.getPermissionsAsync();
-  //   if (status !== 'granted') {
-  //     const { status: newStatus } = await Notifications.requestPermissionsAsync();
-  //     if (newStatus !== 'granted') {
-  //       Alert.alert('Notification permissions not granted');
-  //       return;
-  //     }
-  //   }
-
-  //   // Get the push token
-  //   const token = await Notifications.getExpoPushTokenAsync();
-  //   // console.log('Push Token:', token); // Log the push token or save it in your database
-  //   // Save the token in the database for the current user
-  //   const currentUser = auth.currentUser;
-  //   if (currentUser) {
-  //     // Save the token in Firestore under the user document
-  //     await setDoc(doc(db, 'users', currentUser.uid), { pushToken: token }, { merge: true });
-  //   }
-  // };
   const requestNotificationPermissions = async () => {
     try {
       // Check existing permissions
@@ -192,46 +171,50 @@ const HomeScreen = () => {
   }, []);
 
   
-useEffect(() => {
-  const currentUser = auth.currentUser;
+  useEffect(() => {
+    // Monitor authentication state
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const userRef = doc(db, 'users', user.uid);
 
-  if (currentUser) {
-    const userRef = doc(db, 'users', currentUser.uid);
+        // Listen for real-time updates on the user's data
+        const unsubscribeUser = onSnapshot(userRef, (userDoc) => {
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            console.log('User Data:', userData);
 
-    const unsubscribe = onSnapshot(userRef, (userDoc) => {
-      if (userDoc.exists()) {
-        setLoading(false);
-        const userData = userDoc.data();
-        console.log('User Data:', userData);
+            setName(userData.name);
+            setProfileImage(
+              userData.ProfileImage 
+                ? { uri: userData.ProfileImage } 
+                : { uri: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" }
+            );
 
-        setName(userData.name);
-        setProfileImage(
-          userData.ProfileImage 
-            ? { uri: userData.ProfileImage } 
-            : { uri: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" }
-        );
+            // Handle location
+            if (!userData.country) {
+              requestLocationPermission(); // Ensure this function is defined in your code
+            } else {
+              setLocation(userData.country);
+            }
+          } else {
+            console.log("No such document!");
+          }
+          setLoading(false); // Set loading to false once data is loaded
+        });
 
-        // Handle location
-        if (!userData.country) {
-          requestLocationPermission();
-        } else {
-          setLocation(userData.country); // Set location from the database
-        }
-        setLoading(false);
-
+        // Cleanup user snapshot listener on component unmount
+        return () => unsubscribeUser();
       } else {
-        console.log("No such document!");
+        console.log("No current user logged in.");
         setLoading(false);
-
       }
-      
     });
 
-        return () => unsubscribe();
-        } else {
-          setLoading(false); 
-        }
-      }, []);
+    // Cleanup auth state listener on component unmount
+    return () => unsubscribeAuth();
+  }, []); // Empty dependency array ensures this runs only once when the component mounts
+
+
 
     // Request Location Permission
     const requestLocationPermission = async () => {
