@@ -65,7 +65,7 @@ const Explore = ({ navigation }) => {
         const fetchedNfts = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
-          imageUrl: { uri: doc.data().imageUrl }, // Ensure imageUrl is in the right format
+          imageUrl: doc.data().imageUrl , // Ensure imageUrl is in the right format
         }));
         setNfts(fetchedNfts);
         setFilteredData(fetchedNfts); // Set initial filteredData to fetched NFTs
@@ -162,7 +162,7 @@ const Explore = ({ navigation }) => {
           accessibilityHint={`View details of ${item.title}`}
         >
           <Hexagon price={item.price} isDarkMode={isDarkMode} colors={colors}/>
-          <Image source={Platform.OS === 'ios' ? { uri: item.imageUrl } : item.imageUrl} 
+          <Image source={{ uri: item.imageUrl }} 
            style={styles.nftImage} 
           />
           <View style={styles.nftNameContainer}>
