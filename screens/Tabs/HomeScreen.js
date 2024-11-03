@@ -217,14 +217,21 @@ useEffect(() => {
         } else {
           setLocation(userData.country); // Set location from the database
         }
+        setLoading(false);
+
       } else {
         console.log("No such document!");
+        setLoading(false);
+
       }
+      
     });
 
-    return () => unsubscribe();
-  }
-}, []);
+        return () => unsubscribe();
+        } else {
+          setLoading(false); 
+        }
+      }, []);
 
     // Request Location Permission
     const requestLocationPermission = async () => {

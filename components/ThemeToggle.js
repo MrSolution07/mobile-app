@@ -18,7 +18,7 @@ const ThemeToggle = () => {
   return (
     <View style={styles.optionContainer}>
       <Ionicons name={isDarkMode ? "moon-outline" : "moon-outline"} size={24} style={styles.icon} />
-      <Text style={[styles.label, { color: isDarkMode ? colors.textLight : colors.textDark }]}>{isDarkMode ? 'Dark Mode' : 'Dark Mode'}
+      <Text style={[styles.label, { color: isDarkMode ? colors.textLight : colors.textDark }]}>{isDarkMode ? 'Light Mode' : 'Dark Mode'}
       </Text>
       <Switch
         value={isDarkMode}  
