@@ -12,6 +12,9 @@ import tw from 'twrnc';
 import { useTheme } from '../Context/Theme/ThemeContext';
 import { useThemeColors } from '../Context/Theme/useThemeColors';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as ScreenOrientation from 'expo-screen-orientation';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 
 const Wallet = () => {
@@ -38,6 +41,19 @@ const Wallet = () => {
     const tab = route.params?.tab || 'Account'; 
     handleTabSwitch(tab);
   }, [route.params?.tab]);
+
+
+  useFocusEffect(
+    useCallback(() => {
+      // Lock the screen orientation when the tab is focused
+      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+
+      return () => {
+        // Unlock the orientation when leaving the tab
+        ScreenOrientation.unlockAsync();
+      };
+    }, [])
+  );
 
   return (
     <SafeAreaView style={{flex:1, backgroundColor:colors.background}}>

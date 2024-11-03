@@ -3,6 +3,7 @@
     "name": "metawaysa",
     "slug": "metawaysa",
     "version": "1.0.0",
+    "orientation": "default",
     "extra": {
       "eas": {
         "projectId": "e1efd1de-84ab-4602-a753-0e6d4b0d9e6c"
