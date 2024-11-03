@@ -168,7 +168,7 @@ const handleOfferSubmit = async () => {
         keyboardShouldPersistTaps="handled">
 
         <View style={styles.container}>
-          <Image source={nft.imageUrl } style={styles.backgroundImage} />
+          <Image source={{uri:nft.imageUrl}} style={styles.backgroundImage} />
           <View style={styles.card}>
             <Text style={styles.title}>Make an Offer on {nft.title}</Text>
             <Text style={styles.nftPrice}>
