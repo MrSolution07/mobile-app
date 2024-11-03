@@ -79,12 +79,26 @@ const TopUpScreen = () => {
     }
   };
 
+  // well... it works but it's not the best way to do it
+  let hasShownAlert = false;
   const determineCardType = (number) => {
     const cleanedNumber = number.replace(/\s+/g, '');
-    if (cleanedNumber.startsWith('4')) {
-      return 'visa';
-    } else if (cleanedNumber.startsWith('5')) {
-      return 'mastercard';
+    if (cleanedNumber.length === 1) {
+      if (cleanedNumber.startsWith('4')) {
+        hasShownAlert = false; 
+        return 'visa';
+      } else if (cleanedNumber.startsWith('5')) {
+        hasShownAlert = false; 
+        return 'mastercard';
+      } else if (!hasShownAlert) {
+        Alert.alert('Invalid Card', 'Please use a valid card number.');
+        hasShownAlert = true; 
+      }
+    }else if(cleanedNumber.startsWith('5')){
+        return 'mastercard';
+    }
+    else if(cleanedNumber.startsWith('4')){
+        return 'visa';
     }
     return null;
   };
@@ -245,21 +259,30 @@ const TopUpScreen = () => {
             placeholder="CVV"
             keyboardType="numeric"
             value={cvv}
-            
             onChangeText={(text) => setCvv(text.replace(/[^0-9]/g, ''))}
             maxLength={3}
             placeholderTextColor={colors.placeholderText}
-
           />
 
           <TextInput
             style={styles.input}
             placeholder="Expiry Date (MM/YY)"
             value={expiryDate}
-            onChangeText={setExpiryDate}
-            maxLength={5}
-            placeholderTextColor={colors.placeholderText}
+            onChangeText={(text) => {
+              // Remove any non-numeric characters
+              let formattedText = text.replace(/[^0-9]/g, '');
 
+              // Format the input to MM/YY
+              if (formattedText.length >= 2) {
+                formattedText = formattedText.slice(0, 2) + '/' + formattedText.slice(2, 4); // Add '/' after first two digits and limit to 4 digits
+              } else if (formattedText.length === 1) {
+                formattedText = formattedText.slice(0, 2); // Ensure only the first digit is taken
+              }
+
+              setExpiryDate(formattedText);
+            }}
+            maxLength={5} // Ensure input is limited to MM/YY
+            placeholderTextColor={colors.placeholderText}
           />
 
           {errorMessage ? (
