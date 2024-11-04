@@ -2,7 +2,7 @@
 
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import React, { useState, useEffect} from 'react';
-import { StyleSheet, Image, ScrollView, View, Text, KeyboardAvoidingView, Platform, Pressable, ActivityIndicator } from 'react-native';
+import { StyleSheet, Image, ScrollView, View, Text, KeyboardAvoidingView, Platform, Pressable, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Input } from 'react-native-elements';
 import * as ImagePicker from 'expo-image-picker';
@@ -17,6 +17,8 @@ import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import tw from 'twrnc';  
 import { useThemeColors } from '../Context/Theme/useThemeColors';
+import * as Clipboard from 'expo-clipboard';
+import { Alert } from 'react-native';
 
 const UploadNFTScreen = () => {
     const colors = useThemeColors();
@@ -30,6 +32,14 @@ const UploadNFTScreen = () => {
 
     const handleMenuPress = () => {
         navigation.toggleDrawer();
+    };
+
+
+    const copyToClipboard = async () => {
+        if (predictedPrice) {
+            await Clipboard.setStringAsync(`${predictedPrice}`);
+            Alert.alert("Copied to Clipboard", "The price has been copied to your clipboard.");
+        }
     };
 
 
@@ -288,9 +298,15 @@ const UploadNFTScreen = () => {
                             defaultValue=""
                         />
                         {predictedPrice ? (
+                            <View style={styles.predictedPriceContainer}>
                             <Text style={styles.predictedPriceText}>
-                                Predicted Price: {predictedPrice} ETH
+                                Suggested Price: {predictedPrice} ETH
                             </Text>
+                            <TouchableOpacity onPress={copyToClipboard} style={styles.copyButton}>
+                                <Text style={styles.copyButtonText}>Copy</Text>
+                            </TouchableOpacity>
+                        </View>
+                            
                         ) : null}
 
                     <Controller
@@ -448,6 +464,16 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop:-25
     },
+    predictedPriceContainer: { flexDirection: 'row', alignItems: 'center' },
+   
+    copyButton: { backgroundColor: '#4CAF50', 
+        padding: 15, 
+        borderRadius: 4, 
+        marginBottom:30,
+        marginLeft:5
+
+    },
+    copyButtonText: { color: '#fff' },
 });
 
 export default UploadNFTScreen;
