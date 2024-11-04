@@ -15,6 +15,8 @@ import Tabs from '../Tabs/Tabs';
 import SettingsScreen from '../SettingsScreen';
 import UploadNFTScreen from '../Tabs/UserUpload';
 import { useThemeColors } from '../Context/Theme/useThemeColors';
+import { Linking } from 'react-native';
+import ViewGalleryPlaceholder from './ViewGallery';
 
 const Drawer = createDrawerNavigator();
 
@@ -86,6 +88,25 @@ export default function DrawerNavigator() {
           ),
         }}
       />
+
+<Drawer.Screen
+  name="ViewGallery"
+  component={ViewGalleryPlaceholder}// No component is rendered
+  options={{
+    drawerLabel: 'VR Gallery',
+    drawerIcon: ({ color }) => (
+      <Ionicons name="image-outline" size={22} color={color} />
+    ),
+    // Use onPress to open the external link
+    onPress: () => Linking.openURL('https://metaway-68b26.web.app/'),
+  }}
+  listeners={{
+    drawerItemPress: e => {
+      e.preventDefault(); // Prevent navigation action
+      Linking.openURL('https://metaway-68b26.web.app/'); // Open the link
+    },
+  }}
+/>
     </Drawer.Navigator>
   );
 }
