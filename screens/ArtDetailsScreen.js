@@ -31,7 +31,7 @@ const ArtDetailsScreen = () => {
     Details: Platform.OS === 'ios' ? wp('3.5%') : wp('3%'),
     Creator: Platform.OS === 'ios' ? wp('27%') : wp('26%'),
     Bids: Platform.OS === 'ios' ? wp('48%') : wp('48%'),
-    History: Platform.OS === 'ios' ? wp('68.5%') : wp('69%'),
+    Certified: Platform.OS === 'ios' ? wp('68.5%') : wp('69%'),
   };
 
   useEffect(() => {
@@ -110,11 +110,11 @@ const ArtDetailsScreen = () => {
       )}
           </View>
         );
-      case 'History':
+      case 'Certified':
         return (
           <View style={styles.historyContainer}>
-            <Text style={[styles.historyTitle,{color:colors.blueText}]}>History</Text>
-            <Text style={[styles.noHistoryText, {color: colors.text}]}>No history available.</Text>
+            <Text style={[styles.historyTitle,{color:colors.blueText}]}>Authentication</Text>
+            <Text style={[styles.noHistoryText, {color: colors.text}]}>This NFT has been authenticated and certified by <Text style={{color:'#075eec'}}>MetawaySA</Text>.</Text>
           </View>
         );
       default:
@@ -155,7 +155,7 @@ const ArtDetailsScreen = () => {
           <Text style={[styles.artNumber,{color:colors.text}]}>{nft.name}</Text>
 
           <View style={styles.tabContainer}>
-            {['Details', 'Creator', 'Bids', 'History'].map((tab) => (
+            {['Details', 'Creator', 'Bids', 'Certified'].map((tab) => (
               <TouchableOpacity key={tab} onPress={() => handleTabPress(tab)}>
                 <Text style={[styles.tab,{color: colors.inactiveTabBackground} ,activeTab === tab && styles.activeTab,{color:colors.text}]}>{tab}</Text>
               </TouchableOpacity>

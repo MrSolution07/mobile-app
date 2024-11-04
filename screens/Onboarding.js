@@ -225,7 +225,7 @@ const Onboarding = ({ navigation }) => {
        {currentSlideIndex === 0  && (
         <View style={styles.swipe}>
           <Text style={styles.swipeText}>Swipe</Text>
-          <MaterialCommunityIcons name="chevron-triple-right" size={24} color="rgba(7, 94, 236, 0.75)" style={styles.icon} />
+          <MaterialCommunityIcons name="chevron-triple-left" size={24} color="rgba(7, 94, 236, 0.75)" style={styles.icon} />
         </View>
       )}
       <Footer />
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   },
   swipe: {
     position: 'absolute',
-    bottom:hp('25%'),
+    bottom:hp('24%'),
     left: wp('40%'),
     flexDirection: 'row',
     alignItems: 'center',

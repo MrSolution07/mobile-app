@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Animated, Dimensions, StyleSheet } from 'react-native';
 import tw from 'twrnc';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const { width, height } = Dimensions.get('window');
 
@@ -45,7 +46,7 @@ const Slide = ({ item, scrollX, index }) => {
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: 28,
+    fontSize: wp('6.8%'),
     textAlign: 'center',
     marginTop: 20,
     color: 'black',
