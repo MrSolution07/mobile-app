@@ -203,14 +203,14 @@ const LoginScreen = ({ navigation }) => {
                   )}
                 </Pressable>
 
-                <Pressable 
+                {/* <Pressable 
                   style={styles.socialButton}
                   onPress={() => promptAsync()}
                   disabled={!request}
                 >
                   <FontAwesome name="google" size={20} color="black" style={tw`right-3`} />
                   <Text style={styles.socialButtonText}>Login with Google</Text>
-                </Pressable>
+                </Pressable> */}
 
                 {/* <Pressable style={styles.socialButton} >
                   <FontAwesome5 name="phone-alt" size={20} color="black" style={tw`right-3`} />

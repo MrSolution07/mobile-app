@@ -51,13 +51,33 @@ const Explore = ({ navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      const fetchCards = async () => {
-        const querySnapshot = await getDocs(collection(db, 'nfts'));
-        const fetchedNfts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setNfts(fetchedNfts);
-      };
-      fetchCards();
-    }, [])
+      if (activeTab === 'Recents') {
+        const fetchRecentNfts = async () => {
+          try {
+            const q = query(
+              collection(db, 'nfts'),
+              orderBy('createdAt', 'desc'),
+              limit(10)
+            );
+            const querySnapshot = await getDocs(q);
+            const fetchedRecentNfts = querySnapshot.docs.map(doc => {
+              const data = doc.data();
+              return {
+                id: doc.id,
+                ...data,
+                imageUrl: data.imageUrl,
+                createdAt: data.createdAt instanceof Date ? data.createdAt : new Date(data.createdAt),
+              };
+            });
+            setRecentNfts(fetchedRecentNfts);
+          } catch (error) {
+            console.error("Error fetching recent NFTs: ", error);
+          }
+        };
+        
+        fetchRecentNfts();
+      }
+    }, [activeTab])
   );
 
   useEffect(() => {

@@ -55,7 +55,7 @@ const HomeScreen = () => {
       // Get the push token if permission is granted
       if (finalStatus === 'granted') {
         const { data: token } = await Notifications.getExpoPushTokenAsync();
-        console.log('Push Token:', token); // Optional: Log the push token for testing
+        // console.log('Push Token:', token); // Optional: Log the push token for testing
         
         // Save the token to Firestore under the current user's document
         const currentUser = auth.currentUser;
@@ -64,7 +64,7 @@ const HomeScreen = () => {
         }
       }
     } catch (error) {
-      console.error('Error while requesting notification permissions or saving token:', error);
+      // console.error('Error while requesting notification permissions or saving token:', error);
       Alert.alert('Failed to set up notifications', 'Please check your internet connection.');
     }
   };
@@ -181,7 +181,7 @@ const HomeScreen = () => {
         const unsubscribeUser = onSnapshot(userRef, (userDoc) => {
           if (userDoc.exists()) {
             const userData = userDoc.data();
-            console.log('User Data:', userData);
+            // console.log('User Data:', userData);
 
             setName(userData.name);
             setProfileImage(
@@ -238,7 +238,7 @@ const HomeScreen = () => {
           storeLocationInFirestore(country); // Store in Firestore
         }
       } catch (error) {
-        console.error('Error fetching country:', error);
+        // console.error('Error fetching country:', error);
       }
     };
   
