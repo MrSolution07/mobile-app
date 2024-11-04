@@ -71,16 +71,16 @@ const UserProfile = ({ navigation }) => {
   }
 
   // Destructure user data
-  const { name, balance, email, phoneNo, location, ProfileImage } = userData;
+  const { name, ethAmount, email, phoneNo, location, ProfileImage } = userData;
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor:colors.background}]}>
+    <SafeAreaView style={styles.safeArea}>
      <ScrollView contentContainerStyle={tw`flex-grow`}
         showsVerticalScrollIndicator={false}
-        bounces={false}
+        bounces={false} 
         keyboardShouldPersistTaps="handled">
 
-      <View style={styles.container}>
+      <View style={ styles.container}>
         <Image
           source={{ uri: 'https://i.pinimg.com/originals/6b/f8/48/6bf848ae5afdb77782a1ff14067b194a.jpg' }}
           style={styles.backgroundImage}
@@ -88,7 +88,7 @@ const UserProfile = ({ navigation }) => {
         />
         <BlurView style={styles.blurView} intensity={1} tint="dark" />
 
-        <View style={styles.content}>
+        <View style={isDarkMode ? {backgroundColor:colors.background} :styles.content}>
           <LinearGradient
             colors={['rgba(255, 255, 255, 0.5)', 'rgba(7, 94, 236, 0.5)', 'rgba(128, 0, 128, 0.5)']}
             style={styles.header}
@@ -107,7 +107,7 @@ const UserProfile = ({ navigation }) => {
               <View style={styles.userInfo}>
                 <Text style={styles.name}>{name}</Text>
                 <Text style={styles.assetsLabel}>Total Assets</Text>
-                <Text style={styles.balance}>{balance || '0.00'}</Text>
+                <Text style={styles.balance}>{ethAmount || '0.00'} ETH</Text>
               </View>
             </View>
 
@@ -147,7 +147,6 @@ const InfoItem = ({ icon, value }) => {
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -192,20 +191,22 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   editButton:{
-  borderRadius: 8,
+  borderRadius: 25,
   backgroundColor:'#2563eb',
-  height: hp('8%'),
+  height: hp('7.4%'),
   width:wp('80%'),
   justifyContent:'center',
   alignItems:'center',
   top: 2,
   marginBottom: 5,
+  flex: 1,
   },
   buttonText:{
     fontSize: 16,
     fontFamily: 'Roboto_700Bold',
     textAlign:'center',
     color: '#fff',
+    fontWeight:'600',
     letterSpacing: 1,
   },
   avatarCard: {

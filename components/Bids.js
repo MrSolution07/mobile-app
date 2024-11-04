@@ -5,9 +5,14 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import tw from 'twrnc';
 import { collection, onSnapshot } from 'firebase/firestore'; 
 import { doc, getDoc, updateDoc, getDocs } from 'firebase/firestore';
-import * as Notifications from 'expo-notifications'; // Import notifications
+import * as Notifications from 'expo-notifications'; 
+import { useThemeColors } from '../screens/Context/Theme/useThemeColors';
+import { useTheme } from '../screens/Context/Theme/ThemeContext';
+import { setDoc, deleteDoc } from 'firebase/firestore';
 
 const Bids = () => {
+  const colors = useThemeColors();
+  const {isDarkMode} = useTheme();
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [userBidsData, setUserBidsData] = useState([]); 
   const [bidsData, setBidsData] = useState([]); 
@@ -118,46 +123,80 @@ const Bids = () => {
         const bidAmount = bid.offerAmount; 
         const bidderId = bid.bidderId;
 
+        // this is the target 
         if (action === 'Accept') {
-            
-            const creatorAmount = bidAmount * 0.95; // ( after 5% fee)
-            const bidderDocRef = doc(db, 'users', bidderId);
-            const bidderSnapshot = await getDoc(bidderDocRef);
+          const creatorAmount = bidAmount * 0.98; // 2% commission for the platform 
+          const bidderDocRef = doc(db, 'users', bidderId);
+          const bidderSnapshot = await getDoc(bidderDocRef);
+      
+          if (bidderSnapshot.exists()) {
+              const bidderData = bidderSnapshot.data();
+              const newBidderBalance = bidderData.ethAmount - bidAmount;
+      
+              if (newBidderBalance < 0) throw new Error("Insufficient balance");
+      
+              // Update the bidder's balance
+              await updateDoc(bidderDocRef, { ethAmount: newBidderBalance });
+      
+              const creatorDocRef = doc(db, 'users', nftData.creatorId);
+              const creatorSnapshot = await getDoc(creatorDocRef);
+      
+              if (creatorSnapshot.exists()) {
+                  const creatorData = creatorSnapshot.data();
+                  const newCreatorBalance = creatorData.ethAmount + creatorAmount;
+      
+                  // Update the creator's balance
+                  await updateDoc(creatorDocRef, { ethAmount: newCreatorBalance });
+      
+                  // Send notification to the bidder
+                  sendNotification(bidderId, 'Offer Accepted', 'Your offer has been accepted.');
+      
+                  // Update the NFT's ownership and status in the main NFT collection
+                  const nftDocRef = doc(db, 'nfts', nftDocId);
+                  await updateDoc(nftDocRef, { 
+                      bids: [], 
+                      status: 'purchased', 
+                      ownerId: bidderId,
+                      creatorId: bidderId,
+                  });
+      
+            // Prepare NFT data for the purchased section
+                  const purchasedNFTData = {
+                    ...nftData,
+                    ownerId: bidderId,
+                    status: 'purchased'
+                };
 
-            if (bidderSnapshot.exists()) {
-                const bidderData = bidderSnapshot.data();
-                const newBidderBalance = bidderData.ethAmount - bidAmount;
+                // Add NFT to bidder's purchased section
+                const purchasedNFTsCollectionRef = collection(db, 'users', bidderId, 'purchased');
+                await setDoc(doc(purchasedNFTsCollectionRef, nftDocId), purchasedNFTData);
 
-                // Check if bidder has enough balance but this is for debugging 
-                if (newBidderBalance < 0) {
-                    throw new Error("Insufficient balance");
-                }
-
-                await updateDoc(bidderDocRef, { ethAmount: newBidderBalance });
+                // Remove NFT from creator's minted section
+                const mintedNFTsCollectionRef = collection(db, 'users', nftData.creatorId, 'minted');
+                await deleteDoc(doc(mintedNFTsCollectionRef, nftDocId));
 
                 
-                const creatorDocRef = doc(db, 'users', nftData.creatorId);
-                const creatorSnapshot = await getDoc(creatorDocRef);
+                // Create a new NFT object for the sold section
+                const soldNFTData = {
+                  ...nftData,
+                  status: 'sold',
+                  ownerId: bidderId,
+                  soldAt: new Date().toISOString(), // Record the sale date
+                };
 
-                if (creatorSnapshot.exists()) {
-                    const creatorData = creatorSnapshot.data();
-                    const newCreatorBalance = creatorData.ethAmount + creatorAmount;
+                // Ensure you generate a unique ID for the sold NFT document
+                const soldNFTsCollectionRef = collection(db, 'users', nftData.creatorId, 'sold');
+                const newSoldNFTDocRef = doc(soldNFTsCollectionRef); // Create a new document with a unique ID
+                await setDoc(newSoldNFTDocRef, soldNFTData);
 
-                    await updateDoc(creatorDocRef, { ethAmount: newCreatorBalance });
-
-                    // Notify the bidder
-                    sendNotification(bidderId, 'Offer Accepted', 'Your offer has been accepted.');
-
-                    // Clear all other bids for this NFT
-                    await updateDoc(doc(db, 'nfts', nftDocId), { bids: [] });
-
-                    // Mark the NFT as sold and update ownership
-                    await updateDoc(doc(db, 'nfts', nftDocId), { status: 'sold', ownerId: bidderId });
-
-                    console.log("Bid accepted and processed");
-                }
+                // Add NFT to "soldednfts" table for the creator
+                const soldedNFTsCollectionRef = collection(db, 'soldednfts');
+                await setDoc(doc(soldedNFTsCollectionRef, nftDocId), soldNFTData);
+              }
             }
-        } else if (action === 'Reject') {
+          }
+
+      else if (action === 'Reject') {
             // Remove the rejected bid
             const updatedBids = nftData.bids.filter(b => b.id !== bidId);
             await updateDoc(doc(db, 'nfts', nftDocId), { bids: updatedBids });
@@ -173,16 +212,16 @@ const Bids = () => {
 
 
 
-  const renderBidItem = ({ item }) => (
+  const renderBidItem = ({ item}) => (
     <View style={styles.bidItem}>
       <View style={styles.bidderInfo}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Image source={{ uri: item.bidderImage }} style={styles.bidderImage} />
-          <Text style={styles.bidderName}>{item.bidderName}</Text>
+          <Text style={isDarkMode? {color:colors.text}: styles.bidderName}>{item.bidderName}</Text>
         </View>
         <Text style={styles.bidPrice}>{item.itemPrice} ETH</Text>
-        <Text style={styles.bidDate}>{item.date}</Text>
-        <Text style={styles.itemName}>{item.itemName}</Text>
+        <Text style={isDarkMode? {color:colors.text}: styles.bidDate}>{item.date}</Text>
+        <Text style={isDarkMode? {color:colors.text}: styles.itemName}>{item.itemName}</Text>
       </View>
       <Image source={{ uri: item.itemImage }} style={styles.itemImage} />
       <View style={styles.actionsContainer}>
@@ -192,9 +231,9 @@ const Bids = () => {
         <TouchableOpacity style={styles.rejectButton} onPress={() => handleAction('Reject', item.id)}>
           <Text style={styles.actionText}>Reject</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.counterOfferButton} onPress={() => handleAction('Counter Offer', item.id)}>
+        {/* <TouchableOpacity style={styles.counterOfferButton} onPress={() => handleAction('Counter Offer', item.id)}>
           <Text style={styles.actionText} numberOfLines={2}>Counter Offer</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );
@@ -203,18 +242,18 @@ const Bids = () => {
     <View style={styles.userBidItem}>
       <Image source={{ uri: item.itemImage }} style={styles.userItemImage} />
       <View style={styles.userBidInfo}>
-        <Text style={styles.userItemName}>{item.itemName}</Text>
+        <Text style={isDarkMode? {color:colors.text}: styles.userItemName}>{item.itemName}</Text>
         <Text style={styles.userBidPrice}>{item.itemPrice} ETH</Text>
-        <Text style={styles.userBidDate}>{item.date}</Text>
-        <Text style={styles.userBidStatus}>{item.status}</Text>
+        <Text style={isDarkMode? {color:colors.text}: styles.userBidDate}>{item.date}</Text>
+        <Text style={isDarkMode? {color:colors.text}: styles.userBidStatus}>{item.status}</Text>
       </View>
     </View>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container,{backgroundColor:colors.background}]}>
       <View style={tw`mt-4`}>
-        <Text style={styles.title}>Bids on Your NFTs</Text>
+        <Text style={[styles.title,{color:colors.blueText}]}>Bids on Your NFTs</Text>
 
         {feedbackMessage ? (
           <Text style={styles.feedbackMessage}>{feedbackMessage}</Text>
@@ -228,7 +267,7 @@ const Bids = () => {
               contentContainerStyle={styles.flatListContent}
             />
 
-        <Text style={styles.title}>Your Bids</Text>
+        <Text style={[styles.title,{color:colors.blueText}]}>Your Bids</Text>
           <FlatList
           data={userBidsData} // This is the list for "Your Bids"
           renderItem={renderUserBidItem}
@@ -253,6 +292,7 @@ const styles = StyleSheet.create({
     fontSize: hp('3%'),
     marginBottom: hp('1%'),
     fontFamily: 'NotoSansJP_700Bold',
+    textAlign:'center',
   },
   feedbackMessage: {
     fontSize: hp('2%'),
@@ -264,6 +304,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     marginBottom: hp('1%'),
+    width: wp('90%'),
+    borderRadius: 5,
+    borderBottomColor: '#eee',
   },
   bidderImage: {
     width: wp('10%'),
@@ -280,6 +323,7 @@ const styles = StyleSheet.create({
   },
   flatListContent: {
     paddingBottom: 70,
+    padding:15,
   },
   bidPrice: {
     fontSize: hp('1.8%'),
@@ -340,10 +384,12 @@ const styles = StyleSheet.create({
   userBidItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: wp('2%'),
+    padding: wp('3%'),
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     marginBottom: hp('3%'),
+    width:wp('90%'),
+    borderRadius: wp('8%'),
   },
   userItemImage: {
     width: wp('15%'),

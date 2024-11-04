@@ -16,9 +16,16 @@ target 'mobileapp' do
   use_expo_modules!
   config = use_native_modules!
   use_modular_headers!
-  
-  # Firebase/Auth version explicitly set to match RNFBAuth requirements
+
+  # Firebase dependencies at version 10.7.0
+  pod 'Firebase/CoreOnly', '10.7.0'
   pod 'Firebase/Auth', '10.7.0'
+  pod 'Firebase/Firestore', '10.7.0'
+
+  # Align gRPC-Core version to match Firebase dependencies
+  pod 'gRPC-Core', '1.44.0'
+  pod 'abseil/algorithm', '1.20211102.0'
+  pod 'abseil/memory', '1.20211102.0'
 
   use_react_native!(
     :path => config[:reactNativePath],
@@ -26,22 +33,17 @@ target 'mobileapp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  # Post-install configuration for DEFINES_MODULE and codegen
   post_install do |installer|
     installer.pods_project.targets.each do |target|
-      target.build_configurations.each do |config|
-        config.build_settings['DEFINES_MODULE'] = 'YES'
-      end
-    end
-
-    react_native_post_install(installer, config[:reactNativePath])
-
-    installer.target_installation_results.pod_target_installation_results.each do |pod_name, target_installation_result|
-      target_installation_result.resource_bundle_targets.each do |resource_bundle_target|
-        resource_bundle_target.build_configurations.each do |config|
-          config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+      if ['expo-dev-menu', 'Main', 'ReactNativeCompatibles', 'SafeAreaView', 'Vendored'].include?(target.name)
+        target.build_configurations.each do |config|
+          config.build_settings['DEFINES_MODULE'] = 'YES'
         end
       end
     end
+    
+    react_native_post_install(installer, config[:reactNativePath])
   end
 
   post_integrate do |installer|

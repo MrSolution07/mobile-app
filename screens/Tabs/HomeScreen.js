@@ -1,55 +1,76 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Animated, Pressable, Alert, Platform} from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { SafeAreaView, View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Animated, Pressable, Alert, Platform,ActivityIndicator} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import * as LocalAuthentication from 'expo-local-authentication'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { db, auth } from '../../config/firebaseConfig';
-import { doc, getDoc,setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc,setDoc, updateDoc,onSnapshot } from 'firebase/firestore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Collection1, Collection2, Collection3, Collection4 } from '../NFT/dummy';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import tw from 'twrnc';
 import * as Notifications from 'expo-notifications'; // Import Notifications
 import { getToken } from 'expo-notifications'; 
 import * as Location from 'expo-location';
 import { useThemeColors } from '../Context/Theme/useThemeColors';
 import { useTheme } from '../Context/Theme/ThemeContext';
+import DataContext from '../Context/Context';
+import { onAuthStateChanged } from 'firebase/auth';
+
 
 const collections = [Collection1, Collection2, Collection3, Collection4];
 
 const HomeScreen = () => {
   const colors = useThemeColors();
   const {isDarkMode} = useTheme();
+  const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation();
-  const [name, setName] = useState('');
-  const [surname, setSurname] = useState('');
+
+  // const [name, setName] = useState('');
+  const {name,setName} = useContext(DataContext);
+
   const scrollX = new Animated.Value(0);
   const [profileImage, setProfileImage] = useState(null);
   const [loginPromptShown, setLoginPromptShown] = useState(false);
   const [collectionData, setCollectionData] = useState([]);
   const [location, setLocation] = useState(null); 
-  
-  
+  const [loading, setLoading] = useState(true);
 
-  // Request notification permissions
+
   const requestNotificationPermissions = async () => {
-    const { status } = await Notifications.getPermissionsAsync();
-    if (status !== 'granted') {
-      const { status: newStatus } = await Notifications.requestPermissionsAsync();
-      if (newStatus !== 'granted') {
-        Alert.alert('Notification permissions not granted');
-        return;
+    try {
+      // Check existing permissions
+      const { status } = await Notifications.getPermissionsAsync();
+      let finalStatus = status;
+  
+      // Request permissions if not already granted
+      if (status !== 'granted') {
+        const { status: newStatus } = await Notifications.requestPermissionsAsync();
+        finalStatus = newStatus;
+        if (newStatus !== 'granted') {
+          Alert.alert('Notification permissions not granted');
+          return;
+        }
       }
-    }
 
-    // Get the push token
-    const token = await Notifications.getExpoPushTokenAsync();
-    // console.log('Push Token:', token); // Log the push token or save it in your database
-    const currentUser = auth.currentUser;
-    if (currentUser) {
-      // Save the token in Firestore under the user document
-      await setDoc(doc(db, 'users', currentUser.uid), { pushToken: token }, { merge: true });
+  
+      // Get the push token if permission is granted
+      if (finalStatus === 'granted') {
+        const { data: token } = await Notifications.getExpoPushTokenAsync();
+        console.log('Push Token:', token); // Optional: Log the push token for testing
+        
+        // Save the token to Firestore under the current user's document
+        const currentUser = auth.currentUser;
+        if (currentUser && token) {
+          await setDoc(doc(db, 'users', currentUser.uid), { pushToken: token }, { merge: true });
+        }
+      }
+    } catch (error) {
+      console.error('Error while requesting notification permissions or saving token:', error);
+      Alert.alert('Failed to set up notifications', 'Please check your internet connection.');
+
     }
   };
 
@@ -156,51 +177,49 @@ const HomeScreen = () => {
   }, []);
 
 
+  
   useEffect(() => {
-    const fetchProfileImage = async () => {
-      try {
-        const currentUser = auth.currentUser;
-    
-        if (currentUser) {
-          const userRef = doc(db, 'users', currentUser.uid);
-          const userDoc = await getDoc(userRef, { source: 'server' });  // Force server fetch
-          
+    // Monitor authentication state
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const userRef = doc(db, 'users', user.uid);
+
+        // Listen for real-time updates on the user's data
+        const unsubscribeUser = onSnapshot(userRef, (userDoc) => {
           if (userDoc.exists()) {
             const userData = userDoc.data();
-            console.log('User Document Data:', userData);
-            setName(userData.name || '');  // Handle undefined values
-            setProfileImage(userData.ProfileImage ? { uri: userData.ProfileImage } : {uri:"https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"});
+            console.log('User Data:', userData);
+
+            setName(userData.name);
+            setProfileImage(
+              userData.ProfileImage 
+                ? { uri: userData.ProfileImage } 
+                : { uri: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" }
+            );
+
+            // Handle location
+            if (!userData.country) {
+              requestLocationPermission(); // Ensure this function is defined in your code
+            } else {
+              setLocation(userData.country);
+            }
           } else {
-            console.log('No such user document!');
+            console.log("No such document!");
           }
-        } else {
-          console.log('No user is currently authenticated.');
-        }
-      } catch (error) {
-        console.error('Error fetching user document:', error);
-        // Optionally retry or notify the user
+          setLoading(false); // Set loading to false once data is loaded
+        });
+
+        // Cleanup user snapshot listener on component unmount
+        return () => unsubscribeUser();
+      } else {
+        console.log("No current user logged in.");
+        setLoading(false);
       }
-    };
-    
-    
-  
-    // Retry logic in case the user is not immediately available
-    const retryFetchProfileImage = async (retryCount = 5) => {
-      const intervalId = setInterval(async () => {
-        if (auth.currentUser) {
-          clearInterval(intervalId);  // Stop retrying when the user is available
-          await fetchProfileImage();  // Fetch profile image and name
-        } else if (retryCount === 0) {
-          clearInterval(intervalId);  // Stop retrying after a few attempts
-          console.log("Failed to fetch user after multiple attempts.");
-        }
-        retryCount -= 1;
-      }, 1000);  // Retry every second
-    };
-  
-    retryFetchProfileImage();  // Initiate the retry process
-  }, []);
-  
+    });
+
+    // Cleanup auth state listener on component unmount
+    return () => unsubscribeAuth();
+  }, []); // Empty dependency array ensures this runs only once when the component mounts
 
 
 
@@ -308,7 +327,12 @@ const HomeScreen = () => {
               </View>
               <View style={styles.greetingContainer}>
                 <Text style={[styles.greeting, {color: colors.text}]}>
-                  Hello, <Text style={styles.username}>{name}</Text>
+                  Hello, 
+                  {loading ? (
+                      <ActivityIndicator size="small" color="#D3D3D3" style={{justifyContent:'center'}} />
+                    ) : (
+                      <Text style={styles.username}> {name}</Text>
+                    )}
                 </Text>
               </View>
               <View style={[styles.sectionHeader, {color: colors.text}]}>
@@ -338,7 +362,7 @@ const HomeScreen = () => {
           renderItem={renderVerticalItem}
           keyExtractor={(item, index) => `${item.name}-${index}`}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.verticalList}
+          contentContainerStyle={[styles.verticalList, { paddingBottom: tabBarHeight }]}
         />
       </View>
     </SafeAreaView>
@@ -349,7 +373,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#ffffff',
-
   },
   container: {
     paddingHorizontal: wp('4%'),

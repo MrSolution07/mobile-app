@@ -1,95 +1,211 @@
 import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, StyleSheet, Pressable, Image, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import DataContext from './Context/Context';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation,useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {useThemeColors} from './Context/Theme/useThemeColors';
+import { db, auth } from '../config/firebaseConfig'; 
+import { doc, getDoc,updateDoc } from 'firebase/firestore';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import tw from 'twrnc';
 
-
-const cardIcons = {
-  visa: require('../assets/images/visa.png'), 
-  mastercard: require('../assets/images/mastercard.png'),
-};
 
 const Withdraw = () => {
   const colors = useThemeColors();
-  const { withdrawAmount, setWithdrawAmount, amount, setAmount } = useContext(DataContext);
-  const [cardNumber, setCardNumber] = useState('');
+  // const { withdrawAmount, setWithdrawAmount,  zarAmount, setAmount } = useContext(DataContext);
+  const [zarAmount, setZarAmount] = useState(0);
+  const [withdrawAmount, setWithdrawAmount] = useState(0);
   const [accountNumber, setAccountNumber] = useState('');
-  const [cvv, setCvv] = useState('');
-  const [expiryDate, setExpiryDate] = useState('');
-  const [cardType, setCardType] = useState(null);
+  const [accountHolder, setAccountHolder] = useState('');
+  const [bankName,setBankName] = useState('');
+  const [branchCode, setBranchCode] = useState('');
+  const [ loading, setloading] = useState();
+  const [loadingEth,setLoadingEth] = useState();
   const [errorMessage, setErrorMessage] = useState('');
+  const [ethToZarRate, setEthToZarRate] = useState(null); 
+  const [convertedZarAmount, setConvertedZarAmount] = useState(''); 
+  const [ethAmount, setEthAmount] = useState('');
+  const [ethAmountInZar, setEthAmountInZar] = useState(0);
   const navigation = useNavigation();
+  const currentUser = auth.currentUser;
 
-  const determineCardType = (number) => {
-    if (number.startsWith('4')) {
-      return 'visa';
-    } else if (number.startsWith('5')) {
-      return 'mastercard';
+  const fetchAmounts = async () => {
+    if (!currentUser) return;
+
+    try {
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      const userDocSnapshot = await getDoc(userDocRef);
+
+      if (userDocSnapshot.exists()) {
+        const userData = userDocSnapshot.data();
+        setZarAmount(userData.balanceInZar || 0);
+        const ethAmount = userData.ethAmount || 0; 
+        const totalZarFromEth = (ethAmount * ethToZarRate).toFixed(2);
+        setEthAmountInZar(totalZarFromEth);
+      }
+
+      if (!ethToZarRate) {
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=zar');
+        const data = await response.json();
+        setEthToZarRate(data.ethereum.zar);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to fetch account balance or ETH rate.');
+      console.error('Error fetching account balance:', error);
     }
-    return null;
   };
 
-  const handleCardNumberChange = (number) => {
-    const cleaned = number.replace(/\D+/g, '');
-    const limited = cleaned.slice(0, 16);
-    const formatted = limited.replace(/(.{4})/g, '$1 ').trim();
-    setCardNumber(formatted);
-    const type = determineCardType(limited);
-    setCardType(type);
-  };
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchAmounts();
+    }, [])
+  );
 
-  const handleWithdraw = () => {
+  const handleWithdraw = async () => {
+    setloading(true);
     setErrorMessage('');
-    if (!withdrawAmount || !accountNumber || !cardNumber || !cvv || !expiryDate) {
+  
+    if (!withdrawAmount || !accountNumber || !accountHolder || !bankName || !branchCode) {
       setErrorMessage('Please fill in all fields.');
+      setloading(false);
       return;
     }
-
-    const rawCardNumber = cardNumber.replace(/\s+/g, '');
-    if (!/^\d{16}$/.test(rawCardNumber)) {
-      setErrorMessage('Card number must be exactly 16 digits.');
+  
+    if (parseFloat(withdrawAmount) > zarAmount) {
+      setErrorMessage('Cannot withdraw amount greater than balance.');
+      setloading(false);
       return;
     }
+  
+    try {
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      const userDocSnapshot = await getDoc(userDocRef);
+  
+      if (userDocSnapshot.exists()) {
+        const currentBalance = userDocSnapshot.data().balanceInZar || 0;
+        const newBalance = currentBalance - parseFloat(withdrawAmount);
+  
+        const withdrawalEntry = {
+          type: 'Withdrawal',
+          amount: parseFloat(withdrawAmount),
+          date: new Date().toISOString().split('T')[0], 
+        };
+  
+        await updateDoc(userDocRef, {
+          balanceInZar: newBalance,
+          withdrawals: [...(userDocSnapshot.data().withdrawals || []), withdrawalEntry],
+        });
 
-    if (!/^\d{3}$/.test(cvv)) {
-      setErrorMessage('CVV must be exactly 3 digits.');
+  
+        setWithdrawAmount('');
+        setAccountNumber('');
+        setAccountHolder('');
+        setBankName('');
+        setBranchCode('');
+  
+        Alert.alert('Success', `Withdrawal of ${withdrawAmount} ZAR was successful!`, [
+          { text: 'OK', onPress: () => navigation.goBack() },
+        ]);
+      }
+    } catch (error) {
+      console.error('Error processing withdrawal:', error);
+      Alert.alert('Error', 'Failed to process withdrawal.');
+    } finally {
+      setloading(false);
+    }
+  };
+
+  const handleEthConversion = async () => {
+    setLoadingEth(true);
+  
+    if (!ethAmount) {
+      Alert.alert('Error', 'Please enter a valid ETH amount to convert.');
+      setLoadingEth(false);
       return;
     }
-
-    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiryDate)) {
-      setErrorMessage('Expiry date must be in MM/YY format.');
+  
+    const ethAmountFloat = parseFloat(ethAmount);
+    if (isNaN(ethAmountFloat) || ethAmountFloat <= 0) {
+      Alert.alert('Error', 'Invalid ETH amount entered.');
+      setLoadingEth(false);
       return;
     }
+  
+    const zarEquivalent = ethAmountFloat * ethToZarRate; 
+    console.log(typeof zarEquivalent);
+  
+    const userDocRef = doc(db, 'users', currentUser.uid);
+    try {
+      const userDocSnapshot = await getDoc(userDocRef);
+      if (userDocSnapshot.exists()) {
+        const currentZarBalance = userDocSnapshot.data().balanceInZar || 0;
+        console.log(typeof currentZarBalance);
+ 
+        const currentEthBalance = userDocSnapshot.data().ethAmount || 0; 
 
-    const [inputMonth, inputYear] = expiryDate.split('/').map(Number);
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth() + 1;
-    const currentYear = currentDate.getFullYear() % 100;
+        if (ethAmountFloat > currentEthBalance) {
+          Alert.alert('Error', 'Insufficient ETH balance for conversion.');
+          return;
+        }
+  
+        const newZarBalance = (parseFloat(currentZarBalance) + zarEquivalent).toFixed(2);
+        const newEthBalance = currentEthBalance - ethAmountFloat.toFixed(8);
+  
+        await updateDoc(userDocRef, {
+          balanceInZar: newZarBalance,
+          ethAmount: newEthBalance, 
+        });
+  
+        Alert.alert('Success', `Converted ${ethAmountFloat} ETH to R${zarEquivalent}.`,[
+            { text: 'OK', onPress: () => navigation.goBack() }
+          ]
+        );
+        setEthAmount('');
+        setConvertedZarAmount('');
+      }
+    } catch (error) {
+      console.error('Error updating balance:', error);
+      Alert.alert('Error', 'Failed to update balance after conversion.');
+    } finally {
+      setLoadingEth(false);
+    }
+  };
 
-    if (inputYear < currentYear || (inputYear === currentYear && inputMonth < currentMonth)) {
-      setErrorMessage('Expiry date cannot be in the past.');
+  const handleETHAmountChange = (ethInput) => {
+    const parsedInput = parseFloat(ethInput);
+    if (isNaN(parsedInput)) {
+      setEthAmount('');
+      setConvertedZarAmount('');
       return;
     }
+    setEthAmount(ethInput);
+    const zarEquivalent = (parsedInput * ethToZarRate).toFixed(2);
+    setConvertedZarAmount(zarEquivalent); 
+  };
+  
 
-    const totalWithdrawal = parseFloat(withdrawAmount) + 0.02;
-    if (totalWithdrawal > amount) {
-      setErrorMessage('Insufficient funds for withdrawal.');
-      return;
+
+  const handleAccountNumberChange = (input) => {
+    if (/^\d{0,10}$/.test(input)) {  
+      setAccountNumber(input);
     }
-
-    setAmount((prevAmount) => (prevAmount - totalWithdrawal).toFixed(2));
-    setWithdrawAmount('');
-    setAccountNumber('');
-    setCardNumber('');
-    setCvv('');
-    setExpiryDate('');
-    setCardType(null);
-
-    Alert.alert('Success', `Withdrawal of ${withdrawAmount} ZAR was successful!`, [
-      { text: 'OK', onPress: () => navigation.goBack() },
-    ]);
+  };
+  
+  const handleBranchCodeChange = (input) => {
+    if (/^\d{0,5}$/.test(input)) {  
+      setBranchCode(input);
+    }
+  };
+  
+  const handleAccountHolderChange = (input) => {
+    if (/^[a-zA-Z\s]*$/.test(input)) {  
+      setAccountHolder(input);
+    }
+  };
+  
+  const handleBankNameChange = (input) => {
+    if (/^[a-zA-Z\s]*$/.test(input)) {  
+      setBankName(input);
+    }
   };
 
   return (
@@ -97,7 +213,7 @@ const Withdraw = () => {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // Adjust this value as necessary
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} 
       >
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <View style={[styles.container, {backgroundColor:colors.background}]}>
@@ -109,6 +225,8 @@ const Withdraw = () => {
               keyboardType="numeric"
               value={withdrawAmount}
               onChangeText={setWithdrawAmount}
+              placeholderTextColor={colors.placeholderText}
+
               
             />
 
@@ -119,57 +237,84 @@ const Withdraw = () => {
               placeholder="Account Number"
               keyboardType="numeric"
               value={accountNumber}
-              onChangeText={setAccountNumber}
+              onChangeText={handleAccountNumberChange}
+              placeholderTextColor={colors.placeholderText}
             />
-
-            <View style={styles.cardInputContainer}>
-              <TextInput
-                style={styles.inputWithIcon}
-                placeholder="Card Number"
-                keyboardType="numeric"
-                value={cardNumber}
-                onChangeText={handleCardNumberChange}
-                maxLength={19}
-              />
-              {cardType && (
-                <Image
-                  source={cardIcons[cardType]}
-                  style={styles.cardIcon}
-                  resizeMode="contain"
-                />
-              )}
-            </View>
-
             <TextInput
               style={styles.input}
-              placeholder="CVV"
+              placeholder="Account Holder"
+              keyboardType="default"
+              value={accountHolder}
+              onChangeText={handleAccountHolderChange}
+              placeholderTextColor={colors.placeholderText}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Bank Name"
+              keyboardType="default"
+              value={bankName}
+              onChangeText={handleBankNameChange}
+              placeholderTextColor={colors.placeholderText}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Branch Code"
               keyboardType="numeric"
-              value={cvv}
-              onChangeText={setCvv}
-              maxLength={3}
+              value={branchCode}
+              onChangeText={handleBranchCodeChange}
+              placeholderTextColor={colors.placeholderText}
             />
 
-            <TextInput
-              style={styles.input}
-              placeholder="Expiry Date (MM/YY)"
-              value={expiryDate}
-              onChangeText={setExpiryDate}
-              maxLength={5}
-            />
 
             {errorMessage ? (
               <Text style={styles.errorMessage}>{errorMessage}</Text>
             ) : null}
 
-            <Pressable onPress={handleWithdraw} style={styles.button}>
-              <Text style={styles.buttonText}>Confirm Withdrawal</Text>
-            </Pressable>
+              <Pressable onPress={handleWithdraw} style={styles.button}>
+                {loading ? (
+                  <Text style= {styles.buttonText}>Confirming...</Text>
+                ) : (
+                  <Text style={styles.buttonText}>Confirm Withdrawal</Text>
+                )}
+              </Pressable>
+
+              <View style={tw`mt-15`}>
+              <Text style={[styles.subheading, { color: colors.text }]}>Convert ETH to ZAR</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Amount in ETH"
+                keyboardType="numeric"
+                value={ethAmount}
+                onChangeText={handleETHAmountChange}
+                placeholderTextColor={colors.placeholderText}
+              />
+              {convertedZarAmount ? (
+                <View style={tw`justify-center items-center mb-2`}>
+                <View style={styles.zarEquivalent}>
+                 <Text style={styles.subtitle}>Transaction Summary</Text>
+
+                <Text style={styles.convertedAmount}>
+                  ZAR Equivalent: R{convertedZarAmount}
+                </Text>
+                </View>
+                </View>
+              ) : null}
+
+              <Pressable style={styles.button} onPress={handleEthConversion}>
+                {loadingEth ? (
+                  <Text style={styles.buttonText}>Confirming...</Text>
+                ) : (
+                  <Text style={styles.buttonText}>Confirm ETH Withdrawal</Text>
+                )}
+              </Pressable>
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -206,6 +351,22 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: '100%',
     marginBottom: 20,
+  },
+  zarEquivalent:{
+  backgroundColor:'white',
+  borderColor:'#dcdcdc',
+  borderRadius:8,
+  width:wp('60%'),
+  height:hp('20%'),
+  alignContent:'center',
+  justifyContent:'center',
+  borderWidth: 1,
+  padding: 15,
+
+  },
+  convertedAmount:{
+    color: '#075eec',
+    fontWeight:'bold',
   },
   inputWithIcon: {
     height: 50,
@@ -246,6 +407,26 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: 'white',
+  },
+  subheading: {
+    fontSize: 20,
+    marginBottom: 10,
+    fontWeight:'bold',
+    textAlign:'center',
+    color:'#333333',
+  },
+  convertedAmount: {
+    marginTop: 10,
+    fontSize: 16,
+    color:'#075eec',
+  },
+  subtitle:{
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 10,
+    color: '#333',
+    textAlign:'center',
+
   },
 });
 

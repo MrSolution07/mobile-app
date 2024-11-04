@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ScrollView,KeyboardAvoidingView,Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ScrollView,KeyboardAvoidingView,Platform, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,6 +15,7 @@ const SubmitOfferScreen = () => {
   const route = useRoute();
   const { nft } = route.params; // Get the NFT data passed from the previous screen
   const [offerAmount, setOfferAmount] = useState('');
+  const [loading, setLoading] = useState();
 
   // Request permission and get push token
   useEffect(() => {
@@ -47,9 +48,18 @@ const SubmitOfferScreen = () => {
 };
 
 const handleOfferSubmit = async () => {
+  setLoading(true);
+  const currentUser = auth.currentUser;
+  if (currentUser && currentUser.uid === nft.creatorId) {
+    Alert.alert("Sorry", "You can't make an offer on your own NFT.");
+    setLoading(false);
+    return;
+  }
+
   if (!offerAmount || isNaN(offerAmount) || parseFloat(offerAmount) <= 0) {
-      Alert.alert('Error', 'Please enter a valid offer amount.');
-      return;
+    Alert.alert('Error', 'Please enter a valid offer amount.');
+    setLoading(false);
+    return;
   }
 
   try {
@@ -80,7 +90,7 @@ const handleOfferSubmit = async () => {
 
       const userEthAmount = userData.ethAmount || 0;
       if (parseFloat(offerAmount) > userEthAmount) {
-          Alert.alert('Unsufficient funds', 'You do not have enough ETH to make this offer.');
+          Alert.alert('Insufficient funds', 'You do not have enough ETH to make this offer.');
           return;
       }
 
@@ -139,8 +149,10 @@ const handleOfferSubmit = async () => {
       navigation.goBack();
 
   } catch (error) {
-      console.error('Error submitting offer:', error);
-      Alert.alert('Error', 'There was an issue submitting your offer. Please try again.');
+    console.error('Error submitting offer:', error);
+    Alert.alert('Error', 'There was an issue submitting your offer. Please try again.');
+  } finally {
+    setLoading(false);
   }
 };
 
@@ -156,7 +168,7 @@ const handleOfferSubmit = async () => {
         keyboardShouldPersistTaps="handled">
 
         <View style={styles.container}>
-          <Image source={nft.imageUrl } style={styles.backgroundImage} />
+          <Image source={{uri:nft.imageUrl}} style={styles.backgroundImage} />
           <View style={styles.card}>
             <Text style={styles.title}>Make an Offer on {nft.title}</Text>
             <Text style={styles.nftPrice}>
@@ -177,8 +189,13 @@ const handleOfferSubmit = async () => {
               onChangeText={setOfferAmount}
             />
             <TouchableOpacity style={styles.submitButton} onPress={handleOfferSubmit}>
-              <Text style={styles.submitButtonText}>Submit Offer</Text>
-            </TouchableOpacity>
+              { loading ? (
+                <ActivityIndicator size="large" color="#075eec"/> ):(
+
+                <Text style={styles.submitButtonText}>Submit Offer</Text>
+                )}
+               </TouchableOpacity>
+            
             <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>

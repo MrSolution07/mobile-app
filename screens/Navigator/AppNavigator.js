@@ -286,6 +286,7 @@ export default function AppNavigator() {
               headerBackground: () => (
                 <View style={{ backgroundColor: 'transparent', flex: 1 }} />
               ),
+              headerBackTitleVisible:false,
             }}
           />
           <Stack.Screen
@@ -297,12 +298,14 @@ export default function AppNavigator() {
               headerBackground: () => (
                 <View style={{ backgroundColor: 'transparent', flex: 1 }} />
               ),
+              headerBackTitleVisible:false,
             }}
           />
           <Stack.Screen
             name="Onboarding"
             component={Onboarding}
-            options={{ headerShown: false }}
+            options={{ headerShown: false, 
+            }}
           />
           <Stack.Screen
             name="ForgotPassword"
@@ -313,6 +316,7 @@ export default function AppNavigator() {
               headerBackground: () => (
                 <View style={{ backgroundColor: 'transparent', flex: 1 }} />
               ),
+              headerBackTitleVisible : false
             }}
           />
           <Stack.Screen
@@ -325,6 +329,8 @@ export default function AppNavigator() {
               headerBackground: () => (
                 <View style={{ backgroundColor: 'transparent', flex: 1 }} />
               ),
+
+              headerBackTitleVisible : false
             }}
           />
           {/* <Stack.Screen
@@ -348,6 +354,8 @@ export default function AppNavigator() {
               headerBackground: () => (
                 <View style={{ backgroundColor: 'transparent', flex: 1 }} />
               ),
+              headerTintColor: isDarkMode ? 'white' : 'black',
+              headerBackTitleVisible : false
             }}
           />
           <Stack.Screen
@@ -359,6 +367,8 @@ export default function AppNavigator() {
               headerBackground: () => (
                 <View style={{ backgroundColor: 'transparent', flex: 1 }} />
               ),
+              headerTintColor: isDarkMode ? 'white' : 'black',
+              headerBackTitleVisible : false
             }}
           />
           <Stack.Screen
@@ -370,6 +380,8 @@ export default function AppNavigator() {
               headerBackground: () => (
                 <View style={{ backgroundColor: 'transparent', flex: 1 }} />
               ),
+              headerTintColor: isDarkMode ? 'white' : 'black',
+              headerBackTitleVisible : false
             }}
           />
           {/* <Stack.Screen
@@ -389,6 +401,8 @@ export default function AppNavigator() {
               headerBackground: () => (
                 <View style={{ backgroundColor: 'transparent', flex: 1 }} />
               ),
+              headerTintColor: isDarkMode ? 'white' : 'black',
+              headerBackTitleVisible: false,
             }}
           />
           <Stack.Screen
@@ -400,6 +414,8 @@ export default function AppNavigator() {
               headerBackground: () => (
                 <View style={{ backgroundColor: 'transparent', flex: 1 }} />
               ),
+              headerTintColor: isDarkMode ? 'white' : 'black',
+              headerBackTitleVisible: false,
             }}
           />
           <Stack.Screen
@@ -411,6 +427,8 @@ export default function AppNavigator() {
               headerBackground: () => (
                 <View style={{ backgroundColor: 'transparent', flex: 1 }} />
               ),
+              headerTintColor: isDarkMode ? 'white' : 'black',
+              headerBackTitleVisible: false,
             }}
           />
           <Stack.Screen
@@ -422,6 +440,8 @@ export default function AppNavigator() {
               headerBackground: () => (
                 <View style={{ backgroundColor: 'transparent', flex: 1 }} />
               ),
+              headerTintColor: isDarkMode ? 'white' : 'black',
+              headerBackTitleVisible : false
             }}
           />
           <Stack.Screen
@@ -433,6 +453,8 @@ export default function AppNavigator() {
               headerBackground: () => (
                 <View style={{ backgroundColor: 'transparent', flex: 1 }} />
               ),
+              headerTintColor: isDarkMode ? 'white' : 'black',
+              headerBackTitleVisible : false,
             }}
           />
           <Stack.Screen
@@ -444,6 +466,8 @@ export default function AppNavigator() {
               headerBackground: () => (
                 <View style={{ backgroundColor: 'transparent', flex: 1 }} />
               ),
+              headerTintColor: isDarkMode ? 'white' : 'black',
+              headerBackTitleVisible : false
             }}
           />
           <Stack.Screen
@@ -456,7 +480,7 @@ export default function AppNavigator() {
                 <View style={{ backgroundColor: 'transparent', flex: 1 }} />
               ),     
               headerTintColor: isDarkMode ? 'white' : 'black',
-              headerBackTitleVisible: false,
+              headerBackTitleVisible: false
             }}
           />
         </Stack.Navigator>

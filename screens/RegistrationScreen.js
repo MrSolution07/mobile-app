@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { SafeAreaView, View, Image, Text, TouchableOpacity, TextInput, Pressable, StyleSheet, ScrollView,Alert} from 'react-native';
+import { SafeAreaView, View, Image, Text, TouchableOpacity, TextInput, Pressable, StyleSheet, ScrollView,Alert,KeyboardAvoidingView,Platform} from 'react-native';
 import CheckBox from 'expo-checkbox';
 import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
@@ -77,6 +77,10 @@ export default function RegistrationScreen({ navigation }) {
 
   return (
     <SafeAreaView style={tw`flex-1 bg-transparent`}>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
       <View style={tw`flex-1`}>
         <Image
           source={{ uri: 'https://i.pinimg.com/originals/6b/f8/48/6bf848ae5afdb77782a1ff14067b194a.jpg' }}
@@ -94,6 +98,7 @@ export default function RegistrationScreen({ navigation }) {
           showsVerticalScrollIndicator={false}
           bounces={false}
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode='tap'
         >
           <View style={tw`flex-1 p-6 bg-[rgba(245,245,245,0.85)]`}>
             <View style={tw`mb-10 mt-10`}>
@@ -255,6 +260,7 @@ export default function RegistrationScreen({ navigation }) {
         isVisible={isModalVisible} 
         onClose={() => setModalVisible(false)} 
       />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

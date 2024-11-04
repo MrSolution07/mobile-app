@@ -1,6 +1,6 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StyleSheet } from 'react-native';
+import React,{useState, useEffect} from 'react';
+import { createBottomTabNavigator, useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { StyleSheet,Keyboard } from 'react-native';
 import { BlurView } from 'expo-blur';
 import CustomTabIcon from './CustomTabIcon'; 
 import Home from './HomeScreen';
@@ -11,7 +11,26 @@ import { useThemeColors } from '../Context/Theme/useThemeColors';
 
 const Tab = createBottomTabNavigator();
 
+
+
 export default function Tabs() {
+
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setIsKeyboardVisible(true);
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setIsKeyboardVisible(false);
+    });
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   const colors = useThemeColors();
   return (
       <Tab.Navigator
@@ -22,17 +41,22 @@ export default function Tabs() {
           headerShown: false,
           tabBarStyle: {
             ...styles.tabBarStyle,
-            backgroundColor: colors.tabbackground
+            backgroundColor: colors.tabbackground,
+            display: isKeyboardVisible ? 'none' : 'flex',
           },
+          tabBarSafeAreaInset: { bottom: 'always' },
           tabBarIcon: ({ focused }) => <CustomTabIcon focused={focused} name={getIconName(route.name)} />,
           tabBarBackground:() =>{
             <BlurView intensity={80}
-            style={{...StyleSheet.absoluteFillObject,
+            style={{
+              ...StyleSheet.absoluteFillObject,
               borderTopLeftRadius:20,
               borderTopRightRadius:20,
               overflow:"hidden",
               // backgroundColor:"transparent"
+            
             }}
+
             />
           }
         })}
@@ -57,6 +81,7 @@ export default function Tabs() {
             name="Gemini"
             component={Gemini}
             options={{title:""}}
+            
           />
         
       </Tab.Navigator>
@@ -79,27 +104,26 @@ const getIconName = (routeName) => {
 };
 
 const styles = StyleSheet.create({
-  
+  container: {
+    flex: 1,
+    backgroundColor: 'black', 
+    paddingBottom: 5,
+    paddingTop: 5, 
+  },
   tabBarStyle: {
-    // height: 50,
-    // borderRadius: 10,
-    // backgroundColor: 'black',
-    // opacity: 0.8,
-    // elevation: 5,
-    // alignSelf:'center',
-    // bottom: 15,
-    // width: '80%',
-      height: 60,
-      borderRadius: 10,
-      backgroundColor: 'black',
-      opacity: 0.9,
-      elevation: 5,
-      alignSelf: 'center',
-      bottom: 15,
-      width: '80%', 
-      flexDirection: 'row', 
-      justifyContent: 'space-between', 
-      paddingBottom: 10,
-      paddingTop: 10,
+    height: 60,
+    borderRadius: 12,
+    backgroundColor: 'black',
+    opacity: 0.9,
+    elevation: 5,
+    alignSelf: 'center',
+    marginBottom: 10, 
+    width: '80%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: 10,
+    paddingTop: 10,
+    left: '9.5%', 
+    position: 'absolute',
   },
 });

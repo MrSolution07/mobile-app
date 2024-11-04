@@ -12,11 +12,11 @@ import * as Facebook from 'expo-auth-session/providers/facebook';
 import * as WebBrowser from 'expo-web-browser';
 import { signInWithCredential, GoogleAuthProvider, getAuth, signInWithEmailAndPassword, FacebookAuthProvider } from 'firebase/auth';
 
-const webClientId = '348282660108-kt8fic5e05o92i5df2ah4sqnaeoflnhb.apps.googleusercontent.com'
+const webClientId = '817642667283-nvi3u2762gr41sk47ij9soluus1utlpd.apps.googleusercontent.com'
 const iosClientId = '348282660108-5m00pvh46a3vrp973l0sce7q9m6nolke.apps.googleusercontent.com'
 const androidClientId = '348282660108-abudgte82ncrt748dbpnod8er6re1gi9.apps.googleusercontent.com'
 
-
+// 817642667283-nvi3u2762gr41sk47ij9soluus1utlpd.apps.googleusercontent.com
 WebBrowser.maybeCompleteAuthSession();
 
 const LoginScreen = ({ navigation }) => {
@@ -212,10 +212,10 @@ const LoginScreen = ({ navigation }) => {
                   <Text style={styles.socialButtonText}>Login with Google</Text>
                 </Pressable>
 
-                <Pressable style={styles.socialButton} >
+                {/* <Pressable style={styles.socialButton} >
                   <FontAwesome5 name="phone-alt" size={20} color="black" style={tw`right-3`} />
                   <Text style={styles.socialButtonText}>Login with Number</Text>
-                </Pressable>
+                </Pressable> */}
 
                 <View style={styles.signUpContainer}>
                   <Text style={styles.signUpText}>Don't have an account?{' '}</Text>

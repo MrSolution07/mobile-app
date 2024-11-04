@@ -40,6 +40,9 @@ const SettingsScreen = () => {
               navigation.reset({
                 index: 0,
                 routes: [{ name: 'Login' }],
+                options :{
+                  gestureEnabled: false,
+                },
               });
             } catch (error) {
               Alert.alert('Error', 'Failed to logout. Please try again.');
@@ -54,7 +57,7 @@ const SettingsScreen = () => {
   const handleDeleteAccount = async () => {
     Alert.alert(
       'Delete Account',
-      'Are you sure you want to delete your account? This action is irreversible.',
+      'Are you sure you want to delete your account? You will be redirected to a page to finalize the deletion process.',
       [
         { text: 'Cancel', style: 'cancel' },
         {

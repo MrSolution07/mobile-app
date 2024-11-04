@@ -1,8 +1,9 @@
 {
   "expo": {
-    "name": "mobile-app",
-    "slug": "mobile-app",
+    "name": "metawaysa",
+    "slug": "metawaysa",
     "version": "1.0.0",
+    "orientation": "default",
     "extra": {
       "eas": {
         "projectId": "e1efd1de-84ab-4602-a753-0e6d4b0d9e6c"
@@ -10,7 +11,17 @@
     },
     "android": {
       "package": "com.mr_solution.mobileapp",
-      "scheme": "fb568695575728130"
+      "scheme": "fb568695575728130",
+      "splash": {
+        "image": "./assets/images/splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      },
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/logo1.png",
+        "backgroundColor": "#ffffff"
+      }
+      
     },
     "ios": {
       "bundleIdentifier": "com.mrsolution.mobileapp",
@@ -18,7 +29,13 @@
       "infoPlist": {
         "NSFaceIDUsageDescription": "This app uses Face ID to authenticate the user.",
         "NSBiometricUsageDescription": "This app uses biometric authentication to secure your account."
-      }
+      },
+      "splash": {
+        "image": "./assets/images/splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      },
+      "icon":"./assets/images/logo1.png"
     }
   }
 }
