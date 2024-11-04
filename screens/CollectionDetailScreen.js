@@ -26,18 +26,8 @@ const CollectionDetailScreen = () => {
   const navigation = useNavigation();
   const { collection } = route.params; 
 
-  const totalVolumePrice = collection.nfts.reduce((sum, nft) => sum + nft.price, 0);
 
-  // Navigates to SubmitOfferScreen with the collection data
-  const handleMakeCollectionOffer = () => {
-    navigation.navigate('SubmitOffer', {
-      collection: {
-        name: collection.name,
-        image: collection.image,
-        volumePrice: totalVolumePrice,
-      },
-    });
-  };
+  
 
   const onNftPress = (item) => {
     console.log("NFT Pressed:", item);
@@ -64,9 +54,9 @@ const CollectionDetailScreen = () => {
         numColumns={2}
       />
       
-      {/* <TouchableOpacity style={[styles.makeOfferButton,{backgroundColor: colors.tabbackground}]} onPress={handleMakeCollectionOffer}>
+      <TouchableOpacity style={[styles.makeOfferButton,{backgroundColor: colors.tabbackground}]}>
         <Text style={styles.makeOfferButtonText}>Make Collection Offer</Text>
-      </TouchableOpacity> */}
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };

@@ -146,8 +146,7 @@ const TopUpScreen = () => {
       if (userDocSnapshot.exists()) {
         const currentBalance = userDocSnapshot.data().balanceInZar || 0;
   
-        const newBalance = currentBalance + parseFloat(amount);
-  
+        const newBalance = (parseFloat(currentBalance) + parseFloat(amount)).toFixed(2);
         const transferEntry = {
           type: 'Transfer',
           amount: parseFloat(amount),

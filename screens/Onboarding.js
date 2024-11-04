@@ -5,6 +5,7 @@ import Slide from '../components/Slide';
 import tw from 'twrnc';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 const { width, height } = Dimensions.get('window');
 
@@ -36,6 +37,7 @@ const Onboarding = ({ navigation }) => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const ref = useRef();
   const borderColorAnimation = useRef(new Animated.Value(0)).current;
+
 
   const playBorderColorAnimation = () => {
     borderColorAnimation.setValue(0); 
@@ -111,6 +113,7 @@ const Onboarding = ({ navigation }) => {
       StatusBar.setHidden(true);
       return () => StatusBar.setHidden(false);
     }, []);
+
   
     return (
       <View style={{ height: height * 0.25, justifyContent: 'flex-end', alignItems: 'center' }}>
@@ -219,7 +222,15 @@ const Onboarding = ({ navigation }) => {
         )}
         scrollEventThrottle={16}
       />
+       {currentSlideIndex === 0  && (
+        <View style={styles.swipe}>
+          <Text style={styles.swipeText}>Swipe</Text>
+          <MaterialCommunityIcons name="chevron-triple-right" size={24} color="rgba(7, 94, 236, 0.75)" style={styles.icon} />
+        </View>
+      )}
       <Footer />
+     
+
     </SafeAreaView>
   );
 };
@@ -259,6 +270,25 @@ const styles = StyleSheet.create({
   },
   btnText: {
     fontFamily: 'VarelaRound_400Regular',
+  },
+  swipeText:{
+    color: 'rgba(7, 94, 236, 1)',
+    fontFamily: 'VarelaRound_400Regular',
+    fontSize: 18,
+    textAlign:'center',
+  },
+  swipe: {
+    position: 'absolute',
+    bottom:hp('25%'),
+    left: wp('40%'),
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent:'center',
+  },
+  icon: {
+    color: 'rgba(7, 94, 236, 1)',
+    textAlign:'center',
+    top:hp('0.4%'),
   },
 });
 

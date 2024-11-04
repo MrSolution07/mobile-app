@@ -5,6 +5,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {useThemeColors} from './Context/Theme/useThemeColors';
 import { db, auth } from '../config/firebaseConfig'; 
 import { doc, getDoc,updateDoc } from 'firebase/firestore';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import tw from 'twrnc';
+
 
 const Withdraw = () => {
   const colors = useThemeColors();
@@ -16,12 +19,15 @@ const Withdraw = () => {
   const [bankName,setBankName] = useState('');
   const [branchCode, setBranchCode] = useState('');
   const [ loading, setloading] = useState();
+  const [loadingEth,setLoadingEth] = useState();
   const [errorMessage, setErrorMessage] = useState('');
+  const [ethToZarRate, setEthToZarRate] = useState(null); 
+  const [convertedZarAmount, setConvertedZarAmount] = useState(''); 
+  const [ethAmount, setEthAmount] = useState('');
+  const [ethAmountInZar, setEthAmountInZar] = useState(0);
   const navigation = useNavigation();
   const currentUser = auth.currentUser;
 
-
-  
   const fetchAmounts = async () => {
     if (!currentUser) return;
 
@@ -32,9 +38,18 @@ const Withdraw = () => {
       if (userDocSnapshot.exists()) {
         const userData = userDocSnapshot.data();
         setZarAmount(userData.balanceInZar || 0);
+        const ethAmount = userData.ethAmount || 0; 
+        const totalZarFromEth = (ethAmount * ethToZarRate).toFixed(2);
+        setEthAmountInZar(totalZarFromEth);
+      }
+
+      if (!ethToZarRate) {
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=zar');
+        const data = await response.json();
+        setEthToZarRate(data.ethereum.zar);
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to fetch account balance.');
+      Alert.alert('Error', 'Failed to fetch account balance or ETH rate.');
       console.error('Error fetching account balance:', error);
     }
   };
@@ -79,8 +94,8 @@ const Withdraw = () => {
           balanceInZar: newBalance,
           withdrawals: [...(userDocSnapshot.data().withdrawals || []), withdrawalEntry],
         });
+
   
-        // setZarAmount(newBalance);
         setWithdrawAmount('');
         setAccountNumber('');
         setAccountHolder('');
@@ -98,6 +113,76 @@ const Withdraw = () => {
       setloading(false);
     }
   };
+
+  const handleEthConversion = async () => {
+    setLoadingEth(true);
+  
+    if (!ethAmount) {
+      Alert.alert('Error', 'Please enter a valid ETH amount to convert.');
+      setLoadingEth(false);
+      return;
+    }
+  
+    const ethAmountFloat = parseFloat(ethAmount);
+    if (isNaN(ethAmountFloat) || ethAmountFloat <= 0) {
+      Alert.alert('Error', 'Invalid ETH amount entered.');
+      setLoadingEth(false);
+      return;
+    }
+  
+    const zarEquivalent = ethAmountFloat * ethToZarRate; 
+    console.log(typeof zarEquivalent);
+  
+    const userDocRef = doc(db, 'users', currentUser.uid);
+    try {
+      const userDocSnapshot = await getDoc(userDocRef);
+      if (userDocSnapshot.exists()) {
+        const currentZarBalance = userDocSnapshot.data().balanceInZar || 0;
+        console.log(typeof currentZarBalance);
+ 
+        const currentEthBalance = userDocSnapshot.data().ethAmount || 0; 
+
+        if (ethAmountFloat > currentEthBalance) {
+          Alert.alert('Error', 'Insufficient ETH balance for conversion.');
+          return;
+        }
+  
+        const newZarBalance = (parseFloat(currentZarBalance) + zarEquivalent).toFixed(2);
+        const newEthBalance = currentEthBalance - ethAmountFloat.toFixed(8);
+  
+        await updateDoc(userDocRef, {
+          balanceInZar: newZarBalance,
+          ethAmount: newEthBalance, 
+        });
+  
+        Alert.alert('Success', `Converted ${ethAmountFloat} ETH to R${zarEquivalent}.`,[
+            { text: 'OK', onPress: () => navigation.goBack() }
+          ]
+        );
+        setEthAmount('');
+        setConvertedZarAmount('');
+      }
+    } catch (error) {
+      console.error('Error updating balance:', error);
+      Alert.alert('Error', 'Failed to update balance after conversion.');
+    } finally {
+      setLoadingEth(false);
+    }
+  };
+
+  const handleETHAmountChange = (ethInput) => {
+    const parsedInput = parseFloat(ethInput);
+    if (isNaN(parsedInput)) {
+      setEthAmount('');
+      setConvertedZarAmount('');
+      return;
+    }
+    setEthAmount(ethInput);
+    const zarEquivalent = (parsedInput * ethToZarRate).toFixed(2);
+    setConvertedZarAmount(zarEquivalent); 
+  };
+  
+
 
   const handleAccountNumberChange = (input) => {
     if (/^\d{0,10}$/.test(input)) {  
@@ -193,12 +278,43 @@ const Withdraw = () => {
                 )}
               </Pressable>
 
+              <View style={tw`mt-15`}>
+              <Text style={[styles.subheading, { color: colors.text }]}>Convert ETH to ZAR</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Amount in ETH"
+                keyboardType="numeric"
+                value={ethAmount}
+                onChangeText={handleETHAmountChange}
+                placeholderTextColor={colors.placeholderText}
+              />
+              {convertedZarAmount ? (
+                <View style={tw`justify-center items-center mb-2`}>
+                <View style={styles.zarEquivalent}>
+                 <Text style={styles.subtitle}>Transaction Summary</Text>
+
+                <Text style={styles.convertedAmount}>
+                  ZAR Equivalent: R{convertedZarAmount}
+                </Text>
+                </View>
+                </View>
+              ) : null}
+
+              <Pressable style={styles.button} onPress={handleEthConversion}>
+                {loadingEth ? (
+                  <Text style={styles.buttonText}>Confirming...</Text>
+                ) : (
+                  <Text style={styles.buttonText}>Confirm ETH Withdrawal</Text>
+                )}
+              </Pressable>
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -235,6 +351,22 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: '100%',
     marginBottom: 20,
+  },
+  zarEquivalent:{
+  backgroundColor:'white',
+  borderColor:'#dcdcdc',
+  borderRadius:8,
+  width:wp('60%'),
+  height:hp('20%'),
+  alignContent:'center',
+  justifyContent:'center',
+  borderWidth: 1,
+  padding: 15,
+
+  },
+  convertedAmount:{
+    color: '#075eec',
+    fontWeight:'bold',
   },
   inputWithIcon: {
     height: 50,
@@ -275,6 +407,26 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: 'white',
+  },
+  subheading: {
+    fontSize: 20,
+    marginBottom: 10,
+    fontWeight:'bold',
+    textAlign:'center',
+    color:'#333333',
+  },
+  convertedAmount: {
+    marginTop: 10,
+    fontSize: 16,
+    color:'#075eec',
+  },
+  subtitle:{
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 10,
+    color: '#333',
+    textAlign:'center',
+
   },
 });
 
