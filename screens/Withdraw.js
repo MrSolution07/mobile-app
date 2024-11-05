@@ -225,7 +225,7 @@ const Withdraw = () => {
               keyboardType="numeric"
               value={withdrawAmount}
               onChangeText={setWithdrawAmount}
-              placeholderTextColor={colors.placeholderText}
+              placeholderTextColor={'#808080'}
 
               
             />
@@ -238,7 +238,7 @@ const Withdraw = () => {
               keyboardType="numeric"
               value={accountNumber}
               onChangeText={handleAccountNumberChange}
-              placeholderTextColor={colors.placeholderText}
+              placeholderTextColor={'#808080'}
             />
             <TextInput
               style={styles.input}
@@ -246,7 +246,7 @@ const Withdraw = () => {
               keyboardType="default"
               value={accountHolder}
               onChangeText={handleAccountHolderChange}
-              placeholderTextColor={colors.placeholderText}
+              placeholderTextColor={'#808080'}
             />
             <TextInput
               style={styles.input}
@@ -254,7 +254,7 @@ const Withdraw = () => {
               keyboardType="default"
               value={bankName}
               onChangeText={handleBankNameChange}
-              placeholderTextColor={colors.placeholderText}
+              placeholderTextColor={'#808080'}
             />
             <TextInput
               style={styles.input}
@@ -262,7 +262,7 @@ const Withdraw = () => {
               keyboardType="numeric"
               value={branchCode}
               onChangeText={handleBranchCodeChange}
-              placeholderTextColor={colors.placeholderText}
+              placeholderTextColor={'#808080'}
             />
 
 
@@ -286,7 +286,7 @@ const Withdraw = () => {
                 keyboardType="numeric"
                 value={ethAmount}
                 onChangeText={handleETHAmountChange}
-                placeholderTextColor={colors.placeholderText}
+                placeholderTextColor={'#808080'}
               />
               {convertedZarAmount ? (
                 <View style={tw`justify-center items-center mb-2`}>

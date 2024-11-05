@@ -239,7 +239,8 @@ const BuyETHPage = () => {
         placeholder="Amount of ETH to Buy"
         keyboardType="numeric"
         value={ethAmount}
-        onChangeText={handleETHAmountChange}  // Automatic conversion as user types
+        onChangeText={handleETHAmountChange} 
+        placeholderTextColor={'#808080'} 
       />
 
       {zarAmount ? (
