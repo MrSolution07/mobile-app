@@ -212,7 +212,7 @@ const TopUpScreen = () => {
             keyboardType="numeric"
             value={amount}
             onChangeText={(text) => setAmount(text.replace(/[^0-9.]/g, ''))}
-            placeholderTextColor={colors.placeholderText}
+            placeholderTextColor={'#808080'}
 
           />
 
@@ -233,7 +233,7 @@ const TopUpScreen = () => {
               value={cardNumber}
               onChangeText={handleCardNumberChange}
               maxLength={19}
-              placeholderTextColor={colors.placeholderText}
+              placeholderTextColor={'#808080'}
             />
             {cardType && (
               <Image
@@ -249,7 +249,7 @@ const TopUpScreen = () => {
             placeholder="Account Holder"
             value={accountHolder}
             onChangeText={setAccountHolder}
-            placeholderTextColor={colors.placeholderText}
+            placeholderTextColor={'#808080'}
 
           />
 
@@ -260,7 +260,7 @@ const TopUpScreen = () => {
             value={cvv}
             onChangeText={(text) => setCvv(text.replace(/[^0-9]/g, ''))}
             maxLength={3}
-            placeholderTextColor={colors.placeholderText}
+            placeholderTextColor={'#808080'}
           />
 
           <TextInput
@@ -281,7 +281,7 @@ const TopUpScreen = () => {
               setExpiryDate(formattedText);
             }}
             maxLength={5} // Ensure input is limited to MM/YY
-            placeholderTextColor={colors.placeholderText}
+            placeholderTextColor={'#808080'}
           />
 
           {errorMessage ? (
